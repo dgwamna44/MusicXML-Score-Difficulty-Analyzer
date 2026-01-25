@@ -396,7 +396,11 @@ def derive_observed_grades(score_path: str):
         observed_range_grade = max(range_improvements, key=range_improvements.get)
 
     # Determine observed key grade
+<<<<<<< HEAD
     if min(key_confidences.values()) > 0.97:
+=======
+    if min(key_confidences.values()) > TOP_CONFIDENCE_THRESHOLD:
+>>>>>>> e685a87d21ca719a0784bc37bbbdb6d9c949820c
         observed_key_grade = min(GRADES)
     else:
         observed_key_grade = max(key_improvements, key=key_improvements.get)

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 from collections import defaultdict
 import math
 from pathlib import Path
@@ -114,6 +115,16 @@ def reconcile_rhythm_rules(*rulesets):
 combined_rhythm_rules = reconcile_rhythm_rules(*MASTER_RHYTHM_DF.values())
 
 
+=======
+from music21 import converter, stream, meter
+from collections import defaultdict
+from app_data.rhythms import RHYTHM_TOKEN_MAP
+from models import PartialNoteData, MeterData
+
+ANALYSIS_NOTES = {}
+partial_notes = []
+music21_notes = []
+>>>>>>> e685a87d21ca719a0784bc37bbbdb6d9c949820c
 # =========================
 # Rhythm helpers
 # =========================
@@ -122,6 +133,7 @@ def get_rhythm_token(n):
     base = RHYTHM_TOKEN_MAP[n.duration.type]["token"]
     return base + ("d" * n.duration.dots)
 
+<<<<<<< HEAD
 
 def is_implicit_empty_measure(measure, ts):
     events = list(measure.notesAndRests)
@@ -143,15 +155,30 @@ def is_implicit_empty_measure(measure, ts):
 def annotate_tuplets(notes: list[PartialNoteData], music21_notes):
     current_tuplet_id = 0
     active_signature = None
+=======
+def annotate_tuplets(notes: list[PartialNoteData], music21_notes):
+    """
+    Mutates PartialNoteData objects to add tuplet info.
+    Assumes notes and music21_notes are aligned 1:1
+    """
+    current_tuplet_id = 0
+    active_tuplet = None
+>>>>>>> e685a87d21ca719a0784bc37bbbdb6d9c949820c
     tuplet_index = 0
 
     for pd, n in zip(notes, music21_notes):
 
         if not n.duration.tuplets:
+<<<<<<< HEAD
+=======
+            active_tuplet = None
+            tuplet_index = 0
+>>>>>>> e685a87d21ca719a0784bc37bbbdb6d9c949820c
             continue
 
         t = n.duration.tuplets[0]
 
+<<<<<<< HEAD
         signature = (
             pd.measure,
             pd.beat_index,
@@ -162,12 +189,19 @@ def annotate_tuplets(notes: list[PartialNoteData], music21_notes):
         if signature != active_signature:
             current_tuplet_id += 1
             active_signature = signature
+=======
+        # Start new tuplet group
+        if active_tuplet is None or t is not active_tuplet:
+            current_tuplet_id += 1
+            active_tuplet = t
+>>>>>>> e685a87d21ca719a0784bc37bbbdb6d9c949820c
             tuplet_index = 0
 
         pd.tuplet_id = current_tuplet_id
         pd.tuplet_index = tuplet_index
         pd.tuplet_actual = t.numberNotesActual
         pd.tuplet_normal = t.numberNotesNormal
+<<<<<<< HEAD
         pd.tuplet_class = get_tuplet_class(t.numberNotesActual, t.numberNotesNormal)
 
         tuplet_index += 1
@@ -253,6 +287,11 @@ def rhythm_note_confidence(note, rules):
         rule_subdivision(note, rules),
         rule_tuplet(note, rules),
         ]
+=======
+
+        tuplet_index += 1
+
+>>>>>>> e685a87d21ca719a0784bc37bbbdb6d9c949820c
 
 
 # =========================
@@ -262,8 +301,11 @@ def rhythm_note_confidence(note, rules):
 def group_notes_by_beat(notes: list[PartialNoteData]):
     groups = defaultdict(list)
     for n in notes:
+<<<<<<< HEAD
         if n.rhythm_token is None:
             continue
+=======
+>>>>>>> e685a87d21ca719a0784bc37bbbdb6d9c949820c
         groups[(n.measure, n.beat_index)].append(n)
     return groups
 
@@ -273,6 +315,7 @@ def group_notes_by_beat(notes: list[PartialNoteData]):
 # =========================
 
 def run(score_path: str, target_grade: float):
+<<<<<<< HEAD
     from music21 import converter, stream, meter
     score = converter.parse(score_path)
 
@@ -284,16 +327,32 @@ def run(score_path: str, target_grade: float):
     meter_data = []
     meters = score.parts[0].recurse().getElementsByClass(meter.TimeSignature)
     total_measures = score.parts[0].measure(-1).number
+=======
+    score = converter.parse(score_path)
+
+    # -------------------------
+    # Meter data
+    # -------------------------
+    meter_data: list[MeterData] = []
+    meters = score.parts[0].recurse().getElementsByClass(meter.TimeSignature)
+>>>>>>> e685a87d21ca719a0784bc37bbbdb6d9c949820c
 
     if not meters:
         meters = [meter.TimeSignature("4/4")]
 
+<<<<<<< HEAD
     for index, ts in enumerate(meters):
         data = MeterData(
+=======
+    for ts in meters:
+        meter_data.append(
+            MeterData(
+>>>>>>> e685a87d21ca719a0784bc37bbbdb6d9c949820c
                 measure=ts.getContextByClass(stream.Measure).number,
                 time_signature=ts.ratioString,
                 grade=target_grade
             )
+<<<<<<< HEAD
         if index < len(meters) - 1:
             next_measure = meters[index+1].getContextByClass(stream.Measure).number
             data.duration = next_measure - data.measure
@@ -315,10 +374,14 @@ def run(score_path: str, target_grade: float):
             data.type = "mixed"
 
         meter_data.append(data)
+=======
+        )
+>>>>>>> e685a87d21ca719a0784bc37bbbdb6d9c949820c
 
     # -------------------------
     # Note extraction
     # -------------------------
+<<<<<<< HEAD
     for part in score.parts:
         part_name = part.partName
         current_ts = None
@@ -328,16 +391,30 @@ def run(score_path: str, target_grade: float):
 
         partial_notes = []
         music21_notes = []
+=======
+    all_notes: list[PartialNoteData] = []
+
+    for part in score.parts:
+        part_name = part.partName
+        current_ts = None
+        ANALYSIS_NOTES[part_name] = {}
+        ANALYSIS_NOTES[part_name]['Note Data'] = []
+>>>>>>> e685a87d21ca719a0784bc37bbbdb6d9c949820c
 
         for m in part.getElementsByClass(stream.Measure):
             ts = m.getContextByClass(meter.TimeSignature)
             if ts is not None:
                 current_ts = ts
+<<<<<<< HEAD
             if current_ts is None:
+=======
+            if current_ts is None: # this will handle any pickup measures that won't have a time signature
+>>>>>>> e685a87d21ca719a0784bc37bbbdb6d9c949820c
                 continue
 
             beat_length = current_ts.beatDuration.quarterLength
 
+<<<<<<< HEAD
             # IMPLICIT EMPTY MEASURE
             if is_implicit_empty_measure(m, current_ts):
                 partial_notes.append(
@@ -355,6 +432,8 @@ def run(score_path: str, target_grade: float):
                 )
                 continue
 
+=======
+>>>>>>> e685a87d21ca719a0784bc37bbbdb6d9c949820c
             for n in m.notesAndRests:
                 beat_index = int(n.offset // beat_length)
                 beat_offset = n.offset % beat_length
@@ -365,15 +444,27 @@ def run(score_path: str, target_grade: float):
                     grade=target_grade,
                     instrument=part_name,
                     duration=n.duration.quarterLength,
+<<<<<<< HEAD
                     rhythm_token=get_rhythm_token(n) + ("r" if n.isRest else ""),
                     beat_index=beat_index,
                     beat_offset=beat_offset,
                     beat_unit=beat_length
+=======
+                    written_midi_value=None,
+                    written_pitch=None,
+                    sounding_midi_value=None,
+                    sounding_pitch=None,
+                    rhythm_token=get_rhythm_token(n) + ("r" if n.isRest else ""),
+                    beat_index= beat_index,
+                    beat_offset= beat_offset,
+                    beat_unit= beat_length
+>>>>>>> e685a87d21ca719a0784bc37bbbdb6d9c949820c
                 )
 
                 partial_notes.append(p)
                 music21_notes.append(n)
 
+<<<<<<< HEAD
         annotate_tuplets(partial_notes, music21_notes)
         ANALYSIS_NOTES[part_name]["Note Data"] = partial_notes
 
@@ -399,3 +490,10 @@ def run(score_path: str, target_grade: float):
                 note.comments = [r[1] for r in res if r[1] is not None] 
 
     return ANALYSIS_NOTES
+=======
+                annotate_tuplets(partial_notes, music21_notes)
+                all_notes.extend(partial_notes)
+
+        ANALYSIS_NOTES[part_name]['Note Data'] = all_notes
+    return ANALYSIS_NOTES
+>>>>>>> e685a87d21ca719a0784bc37bbbdb6d9c949820c

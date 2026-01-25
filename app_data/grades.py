@@ -1,3 +1,6 @@
 GRADES = [.5,1,1.5,2,2.5,3,3.5,4,4.5,5]
+<<<<<<< HEAD
 ROUNDED_GRADES = [1,2,3,4,5]
+=======
+>>>>>>> e685a87d21ca719a0784bc37bbbdb6d9c949820c
 MAX_GRADE = GRADES[-1]
