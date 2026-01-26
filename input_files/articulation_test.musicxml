@@ -494,11 +494,6 @@ Arranged by [Arranger]</credit-words>
    </score-instrument>
   </score-part>
   <score-part id="P13">
-   <identification>
-    <miscellaneous>
-     <miscellaneous-field name="show-rhythms">false</miscellaneous-field>
-    </miscellaneous>
-   </identification>
    <part-name>Tuba</part-name>
    <part-name-display>
     <display-text>Tuba</display-text>
@@ -655,6 +650,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="190" default-y="-22">
     <pitch>
@@ -675,6 +675,9 @@ Arranged by [Arranger]</credit-words>
     <beam number="1">begin</beam>
     <notations>
      <tuplet type="start" bracket="no" number="1" default-y="-20" placement="below" />
+     <articulations>
+      <staccato />
+     </articulations>
     </notations>
    </note>
    <note color="#000000" default-x="249" default-y="-22">
@@ -695,6 +698,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">continue</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="307" default-y="-22">
     <pitch>
@@ -715,6 +723,9 @@ Arranged by [Arranger]</credit-words>
     <beam number="1">end</beam>
     <notations>
      <tuplet type="stop" bracket="no" number="1" default-y="-20" placement="below" />
+     <articulations>
+      <staccato />
+     </articulations>
     </notations>
    </note>
    <note color="#000000" default-x="365" default-y="-49">
@@ -729,6 +740,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">begin</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="453" default-y="-49">
     <pitch>
@@ -743,6 +759,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">continue</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="540" default-y="-49">
     <pitch>
@@ -756,6 +777,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">continue</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="598" default-y="-49">
     <pitch>
@@ -769,6 +795,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">end</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
   </measure>
   <!--============== Part: P1, Measure: 3 ==============-->
@@ -832,6 +863,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="80" default-y="-42">
     <pitch>
@@ -845,6 +881,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">begin</beam>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="127" default-y="-42">
     <pitch>
@@ -858,6 +899,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">end</beam>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="175" default-y="-32">
     <pitch>
@@ -871,6 +917,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">begin</beam>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="222" default-y="-32">
     <pitch>
@@ -884,6 +935,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">continue</beam>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="270" default-y="-32">
     <pitch>
@@ -897,6 +953,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">continue</beam>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="317" default-y="-32">
     <pitch>
@@ -910,6 +971,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">end</beam>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
   </measure>
   <!--============== Part: P1, Measure: 5 ==============-->
@@ -2049,6 +2115,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="50" default-y="-45">
     <pitch>
@@ -2061,6 +2132,11 @@ Arranged by [Arranger]</credit-words>
     <type>eighth</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="80" default-y="-40">
     <pitch>
@@ -2073,6 +2149,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="132" default-y="-30">
     <pitch>
@@ -2085,6 +2166,11 @@ Arranged by [Arranger]</credit-words>
     <type>eighth</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
   </measure>
   <!--============== Part: P1, Measure: 22 ==============-->
@@ -2101,6 +2187,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">begin</beam>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="40" default-y="-22">
     <pitch>
@@ -2114,6 +2205,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">end</beam>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="66" default-y="-20">
     <pitch>
@@ -2126,6 +2222,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="146" default-y="-19">
     <pitch>
@@ -2146,6 +2247,9 @@ Arranged by [Arranger]</credit-words>
     <beam number="1">begin</beam>
     <notations>
      <tuplet type="start" bracket="no" number="1" default-y="-20" placement="below" />
+     <articulations>
+      <strong-accent />
+     </articulations>
     </notations>
    </note>
    <note color="#000000" default-x="175" default-y="-19">
@@ -2165,6 +2269,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">continue</beam>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="204" default-y="-19">
     <pitch>
@@ -2185,6 +2294,9 @@ Arranged by [Arranger]</credit-words>
     <beam number="1">end</beam>
     <notations>
      <tuplet type="stop" bracket="no" number="1" default-y="-20" placement="below" />
+     <articulations>
+      <strong-accent />
+     </articulations>
     </notations>
    </note>
   </measure>
@@ -3162,6 +3274,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="190" default-y="-22">
     <pitch>
@@ -3182,6 +3299,9 @@ Arranged by [Arranger]</credit-words>
     <beam number="1">begin</beam>
     <notations>
      <tuplet type="start" bracket="no" number="1" default-y="-20" placement="below" />
+     <articulations>
+      <staccato />
+     </articulations>
     </notations>
    </note>
    <note color="#000000" default-x="249" default-y="-22">
@@ -3202,6 +3322,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">continue</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="307" default-y="-22">
     <pitch>
@@ -3222,6 +3347,9 @@ Arranged by [Arranger]</credit-words>
     <beam number="1">end</beam>
     <notations>
      <tuplet type="stop" bracket="no" number="1" default-y="-20" placement="below" />
+     <articulations>
+      <staccato />
+     </articulations>
     </notations>
    </note>
    <note color="#000000" default-x="365" default-y="-49">
@@ -3236,6 +3364,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">begin</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="453" default-y="-49">
     <pitch>
@@ -3250,6 +3383,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">continue</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="540" default-y="-49">
     <pitch>
@@ -3263,6 +3401,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">continue</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="598" default-y="-49">
     <pitch>
@@ -3276,6 +3419,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">end</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
   </measure>
   <!--============== Part: P2, Measure: 3 ==============-->
@@ -3341,6 +3489,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="80" default-y="-42">
     <pitch>
@@ -3354,6 +3507,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">begin</beam>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="127" default-y="-42">
     <pitch>
@@ -3367,6 +3525,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">end</beam>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="175" default-y="-32">
     <pitch>
@@ -3380,6 +3543,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">begin</beam>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="222" default-y="-32">
     <pitch>
@@ -3393,6 +3561,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">continue</beam>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="270" default-y="-32">
     <pitch>
@@ -3406,6 +3579,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">continue</beam>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="317" default-y="-32">
     <pitch>
@@ -3419,6 +3597,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">end</beam>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
   </measure>
   <!--============== Part: P2, Measure: 5 ==============-->
@@ -3822,6 +4005,9 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <slur color="#000000" type="start" orientation="over" />
+    </notations>
    </note>
    <note color="#000000" default-x="55" default-y="-42">
     <pitch>
@@ -4016,6 +4202,9 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">end</beam>
+    <notations>
+     <slur color="#000000" type="stop" orientation="over" />
+    </notations>
    </note>
   </measure>
   <!--============== Part: P2, Measure: 12 ==============-->
@@ -4045,6 +4234,13 @@ Arranged by [Arranger]</credit-words>
   </measure>
   <!--============== Part: P2, Measure: 14 ==============-->
   <measure number="14" width="252">
+   <direction>
+    <direction-type>
+     <words default-x="9" default-y="-75" justify="left" valign="middle" font-family="Palatino" font-style="italic" font-size="9.3874" font-weight="normal">legato</words>
+    </direction-type>
+    <voice>1</voice>
+    <staff>1</staff>
+   </direction>
    <note color="#000000" default-x="15" default-y="-55">
     <pitch>
      <step>B</step>
@@ -4564,6 +4760,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="50" default-y="-45">
     <pitch>
@@ -4576,6 +4777,11 @@ Arranged by [Arranger]</credit-words>
     <type>eighth</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="80" default-y="-40">
     <pitch>
@@ -4588,6 +4794,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="132" default-y="-30">
     <pitch>
@@ -4600,6 +4811,11 @@ Arranged by [Arranger]</credit-words>
     <type>eighth</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
   </measure>
   <!--============== Part: P2, Measure: 22 ==============-->
@@ -4616,6 +4832,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">begin</beam>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="40" default-y="-22">
     <pitch>
@@ -4629,6 +4850,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">end</beam>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="66" default-y="-20">
     <pitch>
@@ -4641,6 +4867,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="146" default-y="-19">
     <pitch>
@@ -4661,6 +4892,9 @@ Arranged by [Arranger]</credit-words>
     <beam number="1">begin</beam>
     <notations>
      <tuplet type="start" bracket="no" number="1" default-y="-20" placement="below" />
+     <articulations>
+      <strong-accent />
+     </articulations>
     </notations>
    </note>
    <note color="#000000" default-x="175" default-y="-19">
@@ -4680,6 +4914,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">continue</beam>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="204" default-y="-19">
     <pitch>
@@ -4700,6 +4939,9 @@ Arranged by [Arranger]</credit-words>
     <beam number="1">end</beam>
     <notations>
      <tuplet type="stop" bracket="no" number="1" default-y="-20" placement="below" />
+     <articulations>
+      <strong-accent />
+     </articulations>
     </notations>
    </note>
   </measure>
@@ -5682,6 +5924,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="190" default-y="-19">
     <pitch>
@@ -5702,6 +5949,9 @@ Arranged by [Arranger]</credit-words>
     <beam number="1">begin</beam>
     <notations>
      <tuplet type="start" bracket="no" number="1" default-y="-20" placement="below" />
+     <articulations>
+      <staccato />
+     </articulations>
     </notations>
    </note>
    <note color="#000000" default-x="249" default-y="-19">
@@ -5721,6 +5971,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">continue</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="307" default-y="-19">
     <pitch>
@@ -5741,6 +5996,9 @@ Arranged by [Arranger]</credit-words>
     <beam number="1">end</beam>
     <notations>
      <tuplet type="stop" bracket="no" number="1" default-y="-20" placement="below" />
+     <articulations>
+      <staccato />
+     </articulations>
     </notations>
    </note>
    <note color="#000000" default-x="365" default-y="-39">
@@ -5755,6 +6013,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">begin</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="453" default-y="-39">
     <pitch>
@@ -5768,6 +6031,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">continue</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="540" default-y="-39">
     <pitch>
@@ -5781,6 +6049,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">continue</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="598" default-y="-39">
     <pitch>
@@ -5794,6 +6067,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">end</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
   </measure>
   <!--============== Part: P3, Measure: 3 ==============-->
@@ -5858,6 +6136,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="80" default-y="-34">
     <pitch>
@@ -5871,6 +6154,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">begin</beam>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="127" default-y="-34">
     <pitch>
@@ -5885,6 +6173,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">end</beam>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="175" default-y="-24">
     <pitch>
@@ -5898,6 +6191,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">begin</beam>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="222" default-y="-24">
     <pitch>
@@ -5911,6 +6209,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">continue</beam>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="270" default-y="-24">
     <pitch>
@@ -5924,6 +6227,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">continue</beam>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="317" default-y="-24">
     <pitch>
@@ -5938,6 +6246,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">end</beam>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
   </measure>
   <!--============== Part: P3, Measure: 5 ==============-->
@@ -6340,6 +6653,9 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <slur color="#000000" type="start" orientation="over" />
+    </notations>
    </note>
    <note color="#000000" default-x="55" default-y="-34">
     <pitch>
@@ -6530,6 +6846,9 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">end</beam>
+    <notations>
+     <slur color="#000000" type="stop" orientation="over" />
+    </notations>
    </note>
   </measure>
   <!--============== Part: P3, Measure: 12 ==============-->
@@ -6559,6 +6878,13 @@ Arranged by [Arranger]</credit-words>
   </measure>
   <!--============== Part: P3, Measure: 14 ==============-->
   <measure number="14" width="252">
+   <direction>
+    <direction-type>
+     <words default-x="9" default-y="-70" justify="left" valign="middle" font-family="Palatino" font-style="italic" font-size="9.3874" font-weight="normal">legato</words>
+    </direction-type>
+    <voice>1</voice>
+    <staff>1</staff>
+   </direction>
    <note color="#000000" default-x="15" default-y="-50">
     <pitch>
      <step>C</step>
@@ -7066,6 +7392,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="50" default-y="-40">
     <pitch>
@@ -7078,6 +7409,11 @@ Arranged by [Arranger]</credit-words>
     <type>eighth</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="80" default-y="-35">
     <pitch>
@@ -7091,6 +7427,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="132" default-y="-25">
     <pitch>
@@ -7103,6 +7444,11 @@ Arranged by [Arranger]</credit-words>
     <type>eighth</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
   </measure>
   <!--============== Part: P3, Measure: 22 ==============-->
@@ -7119,6 +7465,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">begin</beam>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="40" default-y="-22">
     <pitch>
@@ -7133,6 +7484,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">end</beam>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="66" default-y="-20">
     <pitch>
@@ -7145,6 +7501,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="146" default-y="-19">
     <pitch>
@@ -7166,6 +7527,9 @@ Arranged by [Arranger]</credit-words>
     <beam number="1">begin</beam>
     <notations>
      <tuplet type="start" bracket="no" number="1" default-y="-20" placement="below" />
+     <articulations>
+      <strong-accent />
+     </articulations>
     </notations>
    </note>
    <note color="#000000" default-x="175" default-y="-19">
@@ -7185,6 +7549,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">continue</beam>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="204" default-y="-19">
     <pitch>
@@ -7206,6 +7575,9 @@ Arranged by [Arranger]</credit-words>
     <beam number="1">end</beam>
     <notations>
      <tuplet type="stop" bracket="no" number="1" default-y="-20" placement="below" />
+     <articulations>
+      <strong-accent />
+     </articulations>
     </notations>
    </note>
   </measure>
@@ -8175,6 +8547,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="190" default-y="-52">
     <pitch>
@@ -8195,6 +8572,9 @@ Arranged by [Arranger]</credit-words>
     <beam number="1">begin</beam>
     <notations>
      <tuplet type="start" bracket="no" number="1" default-y="-20" placement="below" />
+     <articulations>
+      <staccato />
+     </articulations>
     </notations>
    </note>
    <note color="#000000" default-x="249" default-y="-52">
@@ -8214,6 +8594,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">continue</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="307" default-y="-52">
     <pitch>
@@ -8234,6 +8619,9 @@ Arranged by [Arranger]</credit-words>
     <beam number="1">end</beam>
     <notations>
      <tuplet type="stop" bracket="no" number="1" default-y="-20" placement="below" />
+     <articulations>
+      <staccato />
+     </articulations>
     </notations>
    </note>
    <note color="#000000" default-x="365" default-y="2">
@@ -8248,6 +8636,11 @@ Arranged by [Arranger]</credit-words>
     <stem>up</stem>
     <staff>1</staff>
     <beam number="1">begin</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="453" default-y="2">
     <pitch>
@@ -8261,6 +8654,11 @@ Arranged by [Arranger]</credit-words>
     <stem>up</stem>
     <staff>1</staff>
     <beam number="1">continue</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="540" default-y="2">
     <pitch>
@@ -8274,6 +8672,11 @@ Arranged by [Arranger]</credit-words>
     <stem>up</stem>
     <staff>1</staff>
     <beam number="1">continue</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="598" default-y="2">
     <pitch>
@@ -8287,6 +8690,11 @@ Arranged by [Arranger]</credit-words>
     <stem>up</stem>
     <staff>1</staff>
     <beam number="1">end</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
   </measure>
   <!--============== Part: P4, Measure: 3 ==============-->
@@ -8351,6 +8759,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>up</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="80">
     <pitch>
@@ -8364,6 +8777,11 @@ Arranged by [Arranger]</credit-words>
     <stem>up</stem>
     <staff>1</staff>
     <beam number="1">begin</beam>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="127">
     <pitch>
@@ -8378,6 +8796,11 @@ Arranged by [Arranger]</credit-words>
     <stem>up</stem>
     <staff>1</staff>
     <beam number="1">end</beam>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="175" default-y="12">
     <pitch>
@@ -8391,6 +8814,11 @@ Arranged by [Arranger]</credit-words>
     <stem>up</stem>
     <staff>1</staff>
     <beam number="1">begin</beam>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="222" default-y="12">
     <pitch>
@@ -8404,6 +8832,11 @@ Arranged by [Arranger]</credit-words>
     <stem>up</stem>
     <staff>1</staff>
     <beam number="1">continue</beam>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="270" default-y="12">
     <pitch>
@@ -8417,6 +8850,11 @@ Arranged by [Arranger]</credit-words>
     <stem>up</stem>
     <staff>1</staff>
     <beam number="1">continue</beam>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="317" default-y="12">
     <pitch>
@@ -8431,6 +8869,11 @@ Arranged by [Arranger]</credit-words>
     <stem>up</stem>
     <staff>1</staff>
     <beam number="1">end</beam>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
   </measure>
   <!--============== Part: P4, Measure: 5 ==============-->
@@ -8833,6 +9276,9 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>up</stem>
     <staff>1</staff>
+    <notations>
+     <slur color="#000000" type="start" orientation="over" />
+    </notations>
    </note>
    <note color="#000000" default-x="55">
     <pitch>
@@ -9023,6 +9469,9 @@ Arranged by [Arranger]</credit-words>
     <stem>up</stem>
     <staff>1</staff>
     <beam number="1">end</beam>
+    <notations>
+     <slur color="#000000" type="stop" orientation="over" />
+    </notations>
    </note>
   </measure>
   <!--============== Part: P4, Measure: 12 ==============-->
@@ -9559,6 +10008,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>up</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="50" default-y="-5">
     <pitch>
@@ -9571,6 +10025,11 @@ Arranged by [Arranger]</credit-words>
     <type>eighth</type>
     <stem>up</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="80">
     <pitch>
@@ -9584,6 +10043,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>up</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="132" default-y="10">
     <pitch>
@@ -9596,6 +10060,11 @@ Arranged by [Arranger]</credit-words>
     <type>eighth</type>
     <stem>up</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
   </measure>
   <!--============== Part: P4, Measure: 22 ==============-->
@@ -9612,6 +10081,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">begin</beam>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="40" default-y="-52">
     <pitch>
@@ -9626,6 +10100,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">end</beam>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="66" default-y="-45">
     <pitch>
@@ -9638,6 +10117,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="146" default-y="-49">
     <pitch>
@@ -9659,6 +10143,9 @@ Arranged by [Arranger]</credit-words>
     <beam number="1">begin</beam>
     <notations>
      <tuplet type="start" bracket="no" number="1" default-y="-20" placement="below" />
+     <articulations>
+      <strong-accent />
+     </articulations>
     </notations>
    </note>
    <note color="#000000" default-x="175" default-y="-49">
@@ -9678,6 +10165,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">continue</beam>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="204" default-y="-49">
     <pitch>
@@ -9699,6 +10191,9 @@ Arranged by [Arranger]</credit-words>
     <beam number="1">end</beam>
     <notations>
      <tuplet type="stop" bracket="no" number="1" default-y="-20" placement="below" />
+     <articulations>
+      <strong-accent />
+     </articulations>
     </notations>
    </note>
   </measure>
@@ -10669,6 +11164,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="190" default-y="-19">
     <pitch>
@@ -10689,6 +11189,9 @@ Arranged by [Arranger]</credit-words>
     <beam number="1">begin</beam>
     <notations>
      <tuplet type="start" bracket="no" number="1" default-y="40" placement="above" />
+     <articulations>
+      <staccato />
+     </articulations>
     </notations>
    </note>
    <note color="#000000" default-x="249" default-y="-19">
@@ -10708,6 +11211,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">continue</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="307" default-y="-19">
     <pitch>
@@ -10728,6 +11236,9 @@ Arranged by [Arranger]</credit-words>
     <beam number="1">end</beam>
     <notations>
      <tuplet type="stop" bracket="no" number="1" default-y="40" placement="above" />
+     <articulations>
+      <staccato />
+     </articulations>
     </notations>
    </note>
    <note color="#000000" default-x="365" default-y="-39">
@@ -10742,6 +11253,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">begin</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="453" default-y="-39">
     <pitch>
@@ -10755,6 +11271,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">continue</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="540" default-y="-39">
     <pitch>
@@ -10768,6 +11289,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">continue</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="598" default-y="-39">
     <pitch>
@@ -10781,6 +11307,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">end</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
   </measure>
   <!--============== Part: P5, Measure: 3 ==============-->
@@ -10845,6 +11376,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="80" default-y="-34">
     <pitch>
@@ -10858,6 +11394,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">begin</beam>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="127" default-y="-34">
     <pitch>
@@ -10872,6 +11413,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">end</beam>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="175" default-y="-24">
     <pitch>
@@ -10885,6 +11431,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">begin</beam>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="222" default-y="-24">
     <pitch>
@@ -10898,6 +11449,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">continue</beam>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="270" default-y="-24">
     <pitch>
@@ -10911,6 +11467,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">continue</beam>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="317" default-y="-24">
     <pitch>
@@ -10925,6 +11486,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">end</beam>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
   </measure>
   <!--============== Part: P5, Measure: 5 ==============-->
@@ -11327,6 +11893,9 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <slur color="#000000" type="start" orientation="over" />
+    </notations>
    </note>
    <note color="#000000" default-x="55" default-y="-34">
     <pitch>
@@ -11517,6 +12086,9 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">end</beam>
+    <notations>
+     <slur color="#000000" type="stop" orientation="over" />
+    </notations>
    </note>
   </measure>
   <!--============== Part: P5, Measure: 12 ==============-->
@@ -12053,6 +12625,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="50" default-y="-40">
     <pitch>
@@ -12065,6 +12642,11 @@ Arranged by [Arranger]</credit-words>
     <type>eighth</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="80" default-y="-35">
     <pitch>
@@ -12078,6 +12660,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="132" default-y="-25">
     <pitch>
@@ -12090,6 +12677,11 @@ Arranged by [Arranger]</credit-words>
     <type>eighth</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
   </measure>
   <!--============== Part: P5, Measure: 22 ==============-->
@@ -12106,6 +12698,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">begin</beam>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="40" default-y="-22">
     <pitch>
@@ -12120,6 +12717,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">end</beam>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="66" default-y="-20">
     <pitch>
@@ -12132,6 +12734,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="146" default-y="-19">
     <pitch>
@@ -12152,7 +12759,10 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">begin</beam>
     <notations>
-     <tuplet type="start" bracket="no" number="1" default-y="-20" placement="above" />
+     <tuplet type="start" bracket="no" number="1" default-y="-36" placement="above" />
+     <articulations>
+      <strong-accent />
+     </articulations>
     </notations>
    </note>
    <note color="#000000" default-x="175" default-y="-19">
@@ -12172,6 +12782,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">continue</beam>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="204" default-y="-19">
     <pitch>
@@ -12192,7 +12807,10 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">end</beam>
     <notations>
-     <tuplet type="stop" bracket="no" number="1" default-y="-20" placement="above" />
+     <tuplet type="stop" bracket="no" number="1" default-y="-36" placement="above" />
+     <articulations>
+      <strong-accent />
+     </articulations>
     </notations>
    </note>
   </measure>
@@ -13163,6 +13781,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="190" default-y="-32">
     <pitch>
@@ -13184,6 +13807,9 @@ Arranged by [Arranger]</credit-words>
     <beam number="1">begin</beam>
     <notations>
      <tuplet type="start" bracket="no" number="1" default-y="-20" placement="below" />
+     <articulations>
+      <staccato />
+     </articulations>
     </notations>
    </note>
    <note color="#000000" default-x="249" default-y="-32">
@@ -13203,6 +13829,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">continue</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="307" default-y="-32">
     <pitch>
@@ -13224,6 +13855,9 @@ Arranged by [Arranger]</credit-words>
     <beam number="1">end</beam>
     <notations>
      <tuplet type="stop" bracket="no" number="1" default-y="-20" placement="below" />
+     <articulations>
+      <staccato />
+     </articulations>
     </notations>
    </note>
    <note color="#000000" default-x="365" default-y="-52">
@@ -13238,6 +13872,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">begin</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="453" default-y="-52">
     <pitch>
@@ -13251,6 +13890,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">continue</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="540" default-y="-52">
     <pitch>
@@ -13264,6 +13908,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">continue</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="598" default-y="-52">
     <pitch>
@@ -13277,6 +13926,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">end</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
   </measure>
   <!--============== Part: P6, Measure: 3 ==============-->
@@ -13341,6 +13995,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>up</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="80" default-y="-52">
     <pitch>
@@ -13354,6 +14013,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">begin</beam>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="127" default-y="-52">
     <pitch>
@@ -13368,6 +14032,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">end</beam>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="175" default-y="-42">
     <pitch>
@@ -13381,6 +14050,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">begin</beam>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="222" default-y="-42">
     <pitch>
@@ -13394,6 +14068,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">continue</beam>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="270" default-y="-42">
     <pitch>
@@ -13408,6 +14087,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">continue</beam>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="317" default-y="-42">
     <pitch>
@@ -13422,6 +14106,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">end</beam>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
   </measure>
   <!--============== Part: P6, Measure: 5 ==============-->
@@ -14559,6 +15248,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>up</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="50" default-y="-55">
     <pitch>
@@ -14571,6 +15265,11 @@ Arranged by [Arranger]</credit-words>
     <type>eighth</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="80" default-y="-50">
     <pitch>
@@ -14584,6 +15283,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="132" default-y="-40">
     <pitch>
@@ -14596,6 +15300,11 @@ Arranged by [Arranger]</credit-words>
     <type>eighth</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
   </measure>
   <!--============== Part: P6, Measure: 22 ==============-->
@@ -14613,6 +15322,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">begin</beam>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="40" default-y="-32">
     <pitch>
@@ -14627,6 +15341,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">end</beam>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="66" default-y="-25">
     <pitch>
@@ -14639,6 +15358,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="146" default-y="-29">
     <pitch>
@@ -14660,6 +15384,9 @@ Arranged by [Arranger]</credit-words>
     <beam number="1">begin</beam>
     <notations>
      <tuplet type="start" bracket="no" number="1" default-y="-20" placement="below" />
+     <articulations>
+      <strong-accent />
+     </articulations>
     </notations>
    </note>
    <note color="#000000" default-x="175" default-y="-29">
@@ -14679,6 +15406,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">continue</beam>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="204" default-y="-29">
     <pitch>
@@ -14700,6 +15432,9 @@ Arranged by [Arranger]</credit-words>
     <beam number="1">end</beam>
     <notations>
      <tuplet type="stop" bracket="no" number="1" default-y="-20" placement="below" />
+     <articulations>
+      <strong-accent />
+     </articulations>
     </notations>
    </note>
   </measure>
@@ -15676,6 +16411,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="190" default-y="-19">
     <pitch>
@@ -15695,7 +16435,10 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">begin</beam>
     <notations>
-     <tuplet type="start" bracket="no" number="1" default-y="-20" placement="above" />
+     <tuplet type="start" bracket="no" number="1" default-y="-26" placement="above" />
+     <articulations>
+      <staccato />
+     </articulations>
     </notations>
    </note>
    <note color="#000000" default-x="249" default-y="-19">
@@ -15715,6 +16458,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">continue</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="307" default-y="-19">
     <pitch>
@@ -15734,7 +16482,10 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">end</beam>
     <notations>
-     <tuplet type="stop" bracket="no" number="1" default-y="-20" placement="above" />
+     <tuplet type="stop" bracket="no" number="1" default-y="-26" placement="above" />
+     <articulations>
+      <staccato />
+     </articulations>
     </notations>
    </note>
    <note color="#000000" default-x="365" default-y="-39">
@@ -15749,6 +16500,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">begin</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="453" default-y="-39">
     <pitch>
@@ -15762,6 +16518,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">continue</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="540" default-y="-39">
     <pitch>
@@ -15775,6 +16536,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">continue</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="598" default-y="-39">
     <pitch>
@@ -15788,6 +16554,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">end</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
   </measure>
   <!--============== Part: P7, Measure: 3 ==============-->
@@ -15852,6 +16623,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="80" default-y="-34">
     <pitch>
@@ -15865,6 +16641,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">begin</beam>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="127" default-y="-34">
     <pitch>
@@ -15879,6 +16660,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">end</beam>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="175" default-y="-24">
     <pitch>
@@ -15892,6 +16678,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">begin</beam>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="222" default-y="-24">
     <pitch>
@@ -15905,6 +16696,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">continue</beam>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="270" default-y="-24">
     <pitch>
@@ -15918,6 +16714,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">continue</beam>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="317" default-y="-24">
     <pitch>
@@ -15932,6 +16733,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">end</beam>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
   </measure>
   <!--============== Part: P7, Measure: 5 ==============-->
@@ -17060,6 +17866,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="50" default-y="-40">
     <pitch>
@@ -17072,6 +17883,11 @@ Arranged by [Arranger]</credit-words>
     <type>eighth</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="80" default-y="-35">
     <pitch>
@@ -17085,6 +17901,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="132" default-y="-25">
     <pitch>
@@ -17097,6 +17918,11 @@ Arranged by [Arranger]</credit-words>
     <type>eighth</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
   </measure>
   <!--============== Part: P7, Measure: 22 ==============-->
@@ -17113,6 +17939,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">begin</beam>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="40" default-y="-22">
     <pitch>
@@ -17127,6 +17958,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">end</beam>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="66" default-y="-20">
     <pitch>
@@ -17139,6 +17975,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="146" default-y="-19">
     <pitch>
@@ -17159,7 +18000,10 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">begin</beam>
     <notations>
-     <tuplet type="start" bracket="no" number="1" default-y="-20" placement="above" />
+     <tuplet type="start" bracket="no" number="1" default-y="-36" placement="above" />
+     <articulations>
+      <strong-accent />
+     </articulations>
     </notations>
    </note>
    <note color="#000000" default-x="175" default-y="-19">
@@ -17179,6 +18023,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">continue</beam>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="204" default-y="-19">
     <pitch>
@@ -17199,7 +18048,10 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">end</beam>
     <notations>
-     <tuplet type="stop" bracket="no" number="1" default-y="-20" placement="above" />
+     <tuplet type="stop" bracket="no" number="1" default-y="-36" placement="above" />
+     <articulations>
+      <strong-accent />
+     </articulations>
     </notations>
    </note>
   </measure>
@@ -18171,6 +19023,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="190" default-y="-32">
     <pitch>
@@ -18192,6 +19049,9 @@ Arranged by [Arranger]</credit-words>
     <beam number="1">begin</beam>
     <notations>
      <tuplet type="start" bracket="no" number="1" default-y="-20" placement="below" />
+     <articulations>
+      <staccato />
+     </articulations>
     </notations>
    </note>
    <note color="#000000" default-x="249" default-y="-32">
@@ -18211,6 +19071,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">continue</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="307" default-y="-32">
     <pitch>
@@ -18232,6 +19097,9 @@ Arranged by [Arranger]</credit-words>
     <beam number="1">end</beam>
     <notations>
      <tuplet type="stop" bracket="no" number="1" default-y="-20" placement="below" />
+     <articulations>
+      <staccato />
+     </articulations>
     </notations>
    </note>
    <note color="#000000" default-x="365" default-y="-52">
@@ -18246,6 +19114,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">begin</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="453" default-y="-52">
     <pitch>
@@ -18259,6 +19132,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">continue</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="540" default-y="-52">
     <pitch>
@@ -18272,6 +19150,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">continue</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="598" default-y="-52">
     <pitch>
@@ -18285,6 +19168,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">end</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
   </measure>
   <!--============== Part: P8, Measure: 3 ==============-->
@@ -18349,6 +19237,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>up</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="80" default-y="-52">
     <pitch>
@@ -18362,6 +19255,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">begin</beam>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="127" default-y="-52">
     <pitch>
@@ -18376,6 +19274,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">end</beam>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="175" default-y="-42">
     <pitch>
@@ -18389,6 +19292,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">begin</beam>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="222" default-y="-42">
     <pitch>
@@ -18402,6 +19310,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">continue</beam>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="270" default-y="-42">
     <pitch>
@@ -18416,6 +19329,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">continue</beam>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="317" default-y="-42">
     <pitch>
@@ -18430,6 +19348,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">end</beam>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
   </measure>
   <!--============== Part: P8, Measure: 5 ==============-->
@@ -19567,6 +20490,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>up</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="50" default-y="-55">
     <pitch>
@@ -19579,6 +20507,11 @@ Arranged by [Arranger]</credit-words>
     <type>eighth</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="80" default-y="-50">
     <pitch>
@@ -19592,6 +20525,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="132" default-y="-40">
     <pitch>
@@ -19604,6 +20542,11 @@ Arranged by [Arranger]</credit-words>
     <type>eighth</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
   </measure>
   <!--============== Part: P8, Measure: 22 ==============-->
@@ -19621,6 +20564,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">begin</beam>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="40" default-y="-32">
     <pitch>
@@ -19635,6 +20583,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">end</beam>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="66" default-y="-25">
     <pitch>
@@ -19647,6 +20600,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="146" default-y="-29">
     <pitch>
@@ -19668,6 +20626,9 @@ Arranged by [Arranger]</credit-words>
     <beam number="1">begin</beam>
     <notations>
      <tuplet type="start" bracket="no" number="1" default-y="-20" placement="below" />
+     <articulations>
+      <strong-accent />
+     </articulations>
     </notations>
    </note>
    <note color="#000000" default-x="175" default-y="-29">
@@ -19687,6 +20648,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">continue</beam>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="204" default-y="-29">
     <pitch>
@@ -19708,6 +20674,9 @@ Arranged by [Arranger]</credit-words>
     <beam number="1">end</beam>
     <notations>
      <tuplet type="stop" bracket="no" number="1" default-y="-20" placement="below" />
+     <articulations>
+      <strong-accent />
+     </articulations>
     </notations>
    </note>
   </measure>
@@ -20643,6 +21612,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">begin</beam>
     <beam number="2">begin</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="59" default-y="-42">
     <pitch>
@@ -20657,6 +21631,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">continue</beam>
     <beam number="2">continue</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="102" default-y="-42">
     <pitch>
@@ -20671,6 +21650,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">continue</beam>
     <beam number="2">continue</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="146" default-y="-42">
     <pitch>
@@ -20685,6 +21669,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">end</beam>
     <beam number="2">end</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="190" default-y="-22">
     <pitch>
@@ -20699,6 +21688,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">begin</beam>
     <beam number="2">begin</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="234" default-y="-22">
     <pitch>
@@ -20713,6 +21707,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">continue</beam>
     <beam number="2">continue</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="278" default-y="-22">
     <pitch>
@@ -20727,6 +21726,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">continue</beam>
     <beam number="2">continue</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="321" default-y="-22">
     <pitch>
@@ -20741,6 +21745,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">end</beam>
     <beam number="2">end</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="365" default-y="-39">
     <pitch>
@@ -20755,6 +21764,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">begin</beam>
     <beam number="2">begin</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="409" default-y="-39">
     <pitch>
@@ -20769,6 +21783,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">continue</beam>
     <beam number="2">continue</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="453" default-y="-39">
     <pitch>
@@ -20783,6 +21802,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">continue</beam>
     <beam number="2">continue</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="497" default-y="-39">
     <pitch>
@@ -20797,6 +21821,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">end</beam>
     <beam number="2">end</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="540" default-y="-49">
     <pitch>
@@ -20811,6 +21840,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">begin</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="626" default-y="-49">
     <pitch>
@@ -20825,6 +21859,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">end</beam>
     <beam number="2">backward hook</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
   </measure>
   <!--============== Part: P9, Measure: 3 ==============-->
@@ -20889,6 +21928,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="80" default-y="10">
     <pitch>
@@ -20901,6 +21945,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>up</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="175" default-y="-45">
     <pitch>
@@ -20913,6 +21962,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="270" default-y="-35">
     <pitch>
@@ -20926,6 +21980,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
   </measure>
   <!--============== Part: P9, Measure: 5 ==============-->
@@ -21466,6 +22525,11 @@ Arranged by [Arranger]</credit-words>
     <accidental>natural</accidental>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <tenuto />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="55">
     <pitch>
@@ -21478,6 +22542,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>up</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <tenuto />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="115" default-y="-55">
     <pitch>
@@ -21490,6 +22559,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <tenuto />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="175" default-y="-45">
     <pitch>
@@ -21502,6 +22576,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <tenuto />
+     </articulations>
+    </notations>
    </note>
   </measure>
   <!--============== Part: P9, Measure: 11 ==============-->
@@ -22268,6 +23347,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="50" default-y="10">
     <pitch>
@@ -22280,6 +23364,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>up</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="106" default-y="-45">
     <pitch>
@@ -22292,6 +23381,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
   </measure>
   <!--============== Part: P9, Measure: 22 ==============-->
@@ -22308,6 +23402,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="66" default-y="-32">
     <pitch>
@@ -22322,6 +23421,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">begin</beam>
     <beam number="2">begin</beam>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="86" default-y="-32">
     <pitch>
@@ -22337,6 +23441,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">continue</beam>
     <beam number="2">continue</beam>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="106" default-y="-32">
     <pitch>
@@ -22351,6 +23460,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">continue</beam>
     <beam number="2">continue</beam>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="126" default-y="-32">
     <pitch>
@@ -22365,6 +23479,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">end</beam>
     <beam number="2">end</beam>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="146" default-y="-22">
     <pitch>
@@ -22379,6 +23498,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">begin</beam>
     <beam number="2">begin</beam>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="168" default-y="-22">
     <pitch>
@@ -22394,6 +23518,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">continue</beam>
     <beam number="2">continue</beam>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="190" default-y="-22">
     <pitch>
@@ -22408,6 +23537,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">continue</beam>
     <beam number="2">continue</beam>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="211" default-y="-22">
     <pitch>
@@ -22423,6 +23557,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">end</beam>
     <beam number="2">end</beam>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
   </measure>
   <!--============== Part: P9, Measure: 23 ==============-->
@@ -23495,6 +24634,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">begin</beam>
     <beam number="2">begin</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="59" default-y="-42">
     <pitch>
@@ -23509,6 +24653,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">continue</beam>
     <beam number="2">continue</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="102" default-y="-42">
     <pitch>
@@ -23523,6 +24672,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">continue</beam>
     <beam number="2">continue</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="146" default-y="-42">
     <pitch>
@@ -23537,6 +24691,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">end</beam>
     <beam number="2">end</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="190" default-y="-22">
     <pitch>
@@ -23551,6 +24710,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">begin</beam>
     <beam number="2">begin</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="234" default-y="-22">
     <pitch>
@@ -23565,6 +24729,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">continue</beam>
     <beam number="2">continue</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="278" default-y="-22">
     <pitch>
@@ -23579,6 +24748,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">continue</beam>
     <beam number="2">continue</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="321" default-y="-22">
     <pitch>
@@ -23593,6 +24767,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">end</beam>
     <beam number="2">end</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="365" default-y="-39">
     <pitch>
@@ -23607,6 +24786,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">begin</beam>
     <beam number="2">begin</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="409" default-y="-39">
     <pitch>
@@ -23621,6 +24805,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">continue</beam>
     <beam number="2">continue</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="453" default-y="-39">
     <pitch>
@@ -23635,6 +24824,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">continue</beam>
     <beam number="2">continue</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="497" default-y="-39">
     <pitch>
@@ -23649,6 +24843,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">end</beam>
     <beam number="2">end</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="540" default-y="-49">
     <pitch>
@@ -23663,6 +24862,11 @@ Arranged by [Arranger]</credit-words>
     <stem>down</stem>
     <staff>1</staff>
     <beam number="1">begin</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="626" default-y="-49">
     <pitch>
@@ -23677,6 +24881,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">end</beam>
     <beam number="2">backward hook</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
   </measure>
   <!--============== Part: P10, Measure: 3 ==============-->
@@ -23741,6 +24950,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="80" default-y="10">
     <pitch>
@@ -23753,6 +24967,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>up</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="175" default-y="-45">
     <pitch>
@@ -23765,6 +24984,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="270" default-y="-35">
     <pitch>
@@ -23778,6 +25002,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
   </measure>
   <!--============== Part: P10, Measure: 5 ==============-->
@@ -24043,6 +25272,12 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="56" default-y="5">
     <pitch>
@@ -24055,6 +25290,12 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>up</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="116" default-y="-50">
     <pitch>
@@ -24067,6 +25308,12 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="175" default-y="-40">
     <pitch>
@@ -24079,6 +25326,12 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+      <accent />
+     </articulations>
+    </notations>
    </note>
   </measure>
   <!--============== Part: P10, Measure: 8 ==============-->
@@ -25120,6 +26373,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="50" default-y="10">
     <pitch>
@@ -25132,6 +26390,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>up</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="106" default-y="-45">
     <pitch>
@@ -25144,6 +26407,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
   </measure>
   <!--============== Part: P10, Measure: 22 ==============-->
@@ -25160,6 +26428,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="66" default-y="-32">
     <pitch>
@@ -25174,6 +26447,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">begin</beam>
     <beam number="2">begin</beam>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="86" default-y="-32">
     <pitch>
@@ -25189,6 +26467,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">continue</beam>
     <beam number="2">continue</beam>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="106" default-y="-32">
     <pitch>
@@ -25203,6 +26486,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">continue</beam>
     <beam number="2">continue</beam>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="126" default-y="-32">
     <pitch>
@@ -25217,6 +26505,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">end</beam>
     <beam number="2">end</beam>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="146" default-y="-22">
     <pitch>
@@ -25231,6 +26524,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">begin</beam>
     <beam number="2">begin</beam>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="168" default-y="-22">
     <pitch>
@@ -25246,6 +26544,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">continue</beam>
     <beam number="2">continue</beam>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="190" default-y="-22">
     <pitch>
@@ -25260,6 +26563,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">continue</beam>
     <beam number="2">continue</beam>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="211" default-y="-22">
     <pitch>
@@ -25275,6 +26583,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">end</beam>
     <beam number="2">end</beam>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
   </measure>
   <!--============== Part: P10, Measure: 23 ==============-->
@@ -26349,6 +27662,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">begin</beam>
     <beam number="2">begin</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="59" default-y="-57">
     <pitch>
@@ -26363,6 +27681,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">continue</beam>
     <beam number="2">continue</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="102" default-y="-57">
     <pitch>
@@ -26378,6 +27701,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">continue</beam>
     <beam number="2">continue</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="146" default-y="-57">
     <pitch>
@@ -26392,6 +27720,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">end</beam>
     <beam number="2">end</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="190" default-y="-42">
     <pitch>
@@ -26406,6 +27739,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">begin</beam>
     <beam number="2">begin</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="234" default-y="-42">
     <pitch>
@@ -26420,6 +27758,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">continue</beam>
     <beam number="2">continue</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="278" default-y="-42">
     <pitch>
@@ -26434,6 +27777,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">continue</beam>
     <beam number="2">continue</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="321" default-y="-42">
     <pitch>
@@ -26448,6 +27796,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">end</beam>
     <beam number="2">end</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="365" default-y="-54">
     <pitch>
@@ -26462,6 +27815,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">begin</beam>
     <beam number="2">begin</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="409" default-y="-54">
     <pitch>
@@ -26476,6 +27834,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">continue</beam>
     <beam number="2">continue</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="453" default-y="-54">
     <pitch>
@@ -26491,6 +27854,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">continue</beam>
     <beam number="2">continue</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="497" default-y="-54">
     <pitch>
@@ -26505,6 +27873,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">end</beam>
     <beam number="2">end</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="540" default-y="-5">
     <pitch>
@@ -26519,6 +27892,11 @@ Arranged by [Arranger]</credit-words>
     <stem>up</stem>
     <staff>1</staff>
     <beam number="1">begin</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="626" default-y="-5">
     <pitch>
@@ -26533,6 +27911,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">end</beam>
     <beam number="2">backward hook</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
   </measure>
   <!--============== Part: P11, Measure: 3 ==============-->
@@ -26597,6 +27980,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>up</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="80" default-y="-10">
     <pitch>
@@ -26609,6 +27997,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>up</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="175" default-y="5">
     <pitch>
@@ -26621,6 +28014,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>up</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="270" default-y="-55">
     <pitch>
@@ -26633,6 +28031,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
   </measure>
   <!--============== Part: P11, Measure: 5 ==============-->
@@ -26898,6 +28301,12 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>up</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="56" default-y="-15">
     <pitch>
@@ -26910,6 +28319,12 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>up</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="116">
     <pitch>
@@ -26922,6 +28337,12 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>up</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="175" default-y="10">
     <pitch>
@@ -26934,6 +28355,12 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>up</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+      <accent />
+     </articulations>
+    </notations>
    </note>
   </measure>
   <!--============== Part: P11, Measure: 8 ==============-->
@@ -27987,6 +29414,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>up</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="50" default-y="-10">
     <pitch>
@@ -27999,6 +29431,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>up</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="106" default-y="5">
     <pitch>
@@ -28011,6 +29448,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>up</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
   </measure>
   <!--============== Part: P11, Measure: 22 ==============-->
@@ -28026,6 +29468,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="66" default-y="-52">
     <pitch>
@@ -28040,6 +29487,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">begin</beam>
     <beam number="2">begin</beam>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="86" default-y="-52">
     <pitch>
@@ -28054,6 +29506,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">continue</beam>
     <beam number="2">continue</beam>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="106" default-y="-52">
     <pitch>
@@ -28068,6 +29525,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">continue</beam>
     <beam number="2">continue</beam>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="126" default-y="-52">
     <pitch>
@@ -28082,6 +29544,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">end</beam>
     <beam number="2">end</beam>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="146" default-y="-42">
     <pitch>
@@ -28096,6 +29563,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">begin</beam>
     <beam number="2">begin</beam>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="168" default-y="-42">
     <pitch>
@@ -28112,6 +29584,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">continue</beam>
     <beam number="2">continue</beam>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="190" default-y="-42">
     <pitch>
@@ -28126,6 +29603,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">continue</beam>
     <beam number="2">continue</beam>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="211" default-y="-42">
     <pitch>
@@ -28141,6 +29623,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">end</beam>
     <beam number="2">end</beam>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
   </measure>
   <!--============== Part: P11, Measure: 23 ==============-->
@@ -29223,6 +30710,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">begin</beam>
     <beam number="2">begin</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="59" default-y="-52">
     <pitch>
@@ -29237,6 +30729,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">continue</beam>
     <beam number="2">continue</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="102" default-y="-52">
     <pitch>
@@ -29252,6 +30749,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">continue</beam>
     <beam number="2">continue</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="146" default-y="-52">
     <pitch>
@@ -29266,6 +30768,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">end</beam>
     <beam number="2">end</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="190" default-y="-42">
     <pitch>
@@ -29280,6 +30787,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">begin</beam>
     <beam number="2">begin</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="234" default-y="-42">
     <pitch>
@@ -29294,6 +30806,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">continue</beam>
     <beam number="2">continue</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="278" default-y="-42">
     <pitch>
@@ -29309,6 +30826,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">continue</beam>
     <beam number="2">continue</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="321" default-y="-42">
     <pitch>
@@ -29323,6 +30845,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">end</beam>
     <beam number="2">end</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="365" default-y="-49">
     <pitch>
@@ -29337,6 +30864,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">begin</beam>
     <beam number="2">begin</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="409" default-y="-49">
     <pitch>
@@ -29351,6 +30883,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">continue</beam>
     <beam number="2">continue</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="453" default-y="-49">
     <pitch>
@@ -29366,6 +30903,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">continue</beam>
     <beam number="2">continue</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="497" default-y="-49">
     <pitch>
@@ -29380,6 +30922,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">end</beam>
     <beam number="2">end</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="540" default-y="2">
     <pitch>
@@ -29395,6 +30942,11 @@ Arranged by [Arranger]</credit-words>
     <stem>up</stem>
     <staff>1</staff>
     <beam number="1">begin</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="626" default-y="2">
     <pitch>
@@ -29409,6 +30961,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">end</beam>
     <beam number="2">backward hook</beam>
+    <notations>
+     <articulations>
+      <staccato />
+     </articulations>
+    </notations>
    </note>
   </measure>
   <!--============== Part: P12, Measure: 3 ==============-->
@@ -29474,6 +31031,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>up</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="80" default-y="-5">
     <pitch>
@@ -29486,6 +31048,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>up</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="175" default-y="10">
     <pitch>
@@ -29498,6 +31065,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>up</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="270" default-y="-50">
     <pitch>
@@ -29510,6 +31082,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <accent />
+     </articulations>
+    </notations>
    </note>
   </measure>
   <!--============== Part: P12, Measure: 5 ==============-->
@@ -29771,6 +31348,12 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>up</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="56" default-y="-10">
     <pitch>
@@ -29783,6 +31366,12 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>up</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="116" default-y="5">
     <pitch>
@@ -29796,6 +31385,12 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>up</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+      <accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="175" default-y="-55">
     <pitch>
@@ -29808,6 +31403,12 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+      <accent />
+     </articulations>
+    </notations>
    </note>
   </measure>
   <!--============== Part: P12, Measure: 8 ==============-->
@@ -30872,6 +32473,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>up</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="50" default-y="-5">
     <pitch>
@@ -30884,6 +32490,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>up</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="106" default-y="10">
     <pitch>
@@ -30896,6 +32507,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>up</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
   </measure>
   <!--============== Part: P12, Measure: 22 ==============-->
@@ -30911,6 +32527,11 @@ Arranged by [Arranger]</credit-words>
     <type>quarter</type>
     <stem>down</stem>
     <staff>1</staff>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="66" default-y="-52">
     <pitch>
@@ -30925,6 +32546,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">begin</beam>
     <beam number="2">begin</beam>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="86" default-y="-52">
     <pitch>
@@ -30939,6 +32565,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">continue</beam>
     <beam number="2">continue</beam>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="106" default-y="-52">
     <pitch>
@@ -30953,6 +32584,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">continue</beam>
     <beam number="2">continue</beam>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="126" default-y="-52">
     <pitch>
@@ -30967,6 +32603,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">end</beam>
     <beam number="2">end</beam>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="146" default-y="-32">
     <pitch>
@@ -30981,6 +32622,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">begin</beam>
     <beam number="2">begin</beam>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="168" default-y="-32">
     <pitch>
@@ -30995,6 +32641,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">continue</beam>
     <beam number="2">continue</beam>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="190" default-y="-32">
     <pitch>
@@ -31009,6 +32660,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">continue</beam>
     <beam number="2">continue</beam>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
    <note color="#000000" default-x="211" default-y="-32">
     <pitch>
@@ -31023,6 +32679,11 @@ Arranged by [Arranger]</credit-words>
     <staff>1</staff>
     <beam number="1">end</beam>
     <beam number="2">end</beam>
+    <notations>
+     <articulations>
+      <strong-accent />
+     </articulations>
+    </notations>
    </note>
   </measure>
   <!--============== Part: P12, Measure: 23 ==============-->

@@ -1,13 +1,13 @@
 from music21 import converter, pitch, stream, key, instrument
 import pandas as pd
 import re, math
-from utilities import traffic_light, confidence_curve, parse_part_name, normalize_key_name, validate_for_range_analysis, get_rounded_grade
+from utilities import confidence_curve, parse_part_name, normalize_key_name, validate_for_range_analysis, get_rounded_grade
 from data_processing.unpack_tables import unpack_source_grade_table
-from app_data import GRADES, MAX_GRADE,GRADE_TO_KEY_TABLE,PUBLISHER_CATALOG_FREQUENCY, GRADE_TO_INSTRUMENTATION_TABLE, PITCH_TO_INDEX, MAJOR_DIATONIC_MAP, MINOR_DIATONIC_MAP
+from app_data import GRADES, GRADE_TO_KEY_TABLE,PUBLISHER_CATALOG_FREQUENCY, PITCH_TO_INDEX, MAJOR_DIATONIC_MAP, MINOR_DIATONIC_MAP
 from models import KeyData, PartialNoteData
 from pathlib import Path
 from functools import reduce
-from analyzers.instrument_rules import clarinet_break_allowed, crosses_break
+from utilities.instrument_rules import clarinet_break_allowed, crosses_break
 
 MASTER_PUBLISHER_DF = {} # aggregated range data from all publishers
 COMBINED_PUBLISHER_DF = {} # range data with core/extended values
@@ -197,7 +197,7 @@ def run(
 
     for ks in keys:
         measure = ks.getContextByClass(stream.Measure).number
-        tonic = normalize_key_name(ks.tonicPitchNameWithCase)
+        tonic = normalize_key_name(ks.tonicPitchNameWithCase).upper()
         quality = ks.type
         KEY_DATA.append(
             KeyData(
@@ -337,9 +337,9 @@ def run(
                 global_total_confidence += note_data.range_confidence
 
         # store summary percentages per part
-        ANALYSIS_RESULTS[original_part_name]["Core Range %"] = round(100*num_notes_in_core_range/part_total_notes,2) if part_total_notes else 0
-        ANALYSIS_RESULTS[original_part_name]["Extended Range %"] = round(100*num_notes_in_ext_range/part_total_notes,2) if part_total_notes else 0
-        ANALYSIS_RESULTS[original_part_name]["Out of Range %"] = round(100*num_notes_out_of_range_grade/part_total_notes,2) if part_total_notes else 0
+        ANALYSIS_RESULTS[original_part_name]["core_range_pct"] = round(100*num_notes_in_core_range/part_total_notes,2) if part_total_notes else 0
+        ANALYSIS_RESULTS[original_part_name]["extended_range_pct"] = round(100*num_notes_in_ext_range/part_total_notes,2) if part_total_notes else 0
+        ANALYSIS_RESULTS[original_part_name]["out_of_range_pct"] = round(100*num_notes_out_of_range_grade/part_total_notes,2) if part_total_notes else 0
 
     # ----- Per-grade summary -----
 
@@ -351,7 +351,8 @@ def run(
     grade_summary = {
         "target_grade": target_grade,
         "total_notes": global_total_notes,
-        "overall_range_confidence": overall_confidence
+        "overall_range_confidence": overall_confidence,
+        "overall_key_confidence": sum(k.confidence * k.exposure for k in KEY_DATA) if KEY_DATA else 0
     }
 
     return ANALYSIS_RESULTS, grade_summary
@@ -359,7 +360,7 @@ def run(
 def derive_observed_grades(score_path: str):
     """
     Run the analyzer across all grades and determine the observed range and key grades
-    based on the largest improvement in overall composite confidence and key confidence.
+    based on the largest improvement in overall confidence and key confidence.
     """
 
     TOP_CONFIDENCE_THRESHOLD = 0.97
@@ -371,8 +372,8 @@ def derive_observed_grades(score_path: str):
     for grade in GRADES:
         analysis_results, summary = run(score_path=score_path, target_grade=grade)
         range_confidences[grade] = summary["overall_range_confidence"]
-        key_data = analysis_results.get('Key Data', [])
-        key_confidences[grade] = sum(k.confidence * k.exposure for k in key_data) if key_data else 0
+        key_confidences[grade] = summary["overall_key_confidence"]
+
 
     # Compute improvements between consecutive grades for range
     range_improvements = {}
@@ -396,11 +397,7 @@ def derive_observed_grades(score_path: str):
         observed_range_grade = max(range_improvements, key=range_improvements.get)
 
     # Determine observed key grade
-<<<<<<< HEAD
     if min(key_confidences.values()) > 0.97:
-=======
-    if min(key_confidences.values()) > TOP_CONFIDENCE_THRESHOLD:
->>>>>>> e685a87d21ca719a0784bc37bbbdb6d9c949820c
         observed_key_grade = min(GRADES)
     else:
         observed_key_grade = max(key_improvements, key=key_improvements.get)

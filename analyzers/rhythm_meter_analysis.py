@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 from collections import defaultdict
 import math
 from pathlib import Path
@@ -11,7 +10,7 @@ from models import PartialNoteData, MeterData, RhythmGradeRules
 # Globals
 # =========================
 
-ANALYSIS_NOTES = {}
+analysis_notes = {}
 MASTER_RHYTHM_DF = {}
 ABS_TOLERANCE = 1e-06 # set tolerance to compare flating point number accuracy using math.isclose()
 
@@ -115,16 +114,6 @@ def reconcile_rhythm_rules(*rulesets):
 combined_rhythm_rules = reconcile_rhythm_rules(*MASTER_RHYTHM_DF.values())
 
 
-=======
-from music21 import converter, stream, meter
-from collections import defaultdict
-from app_data.rhythms import RHYTHM_TOKEN_MAP
-from models import PartialNoteData, MeterData
-
-ANALYSIS_NOTES = {}
-partial_notes = []
-music21_notes = []
->>>>>>> e685a87d21ca719a0784bc37bbbdb6d9c949820c
 # =========================
 # Rhythm helpers
 # =========================
@@ -133,7 +122,6 @@ def get_rhythm_token(n):
     base = RHYTHM_TOKEN_MAP[n.duration.type]["token"]
     return base + ("d" * n.duration.dots)
 
-<<<<<<< HEAD
 
 def is_implicit_empty_measure(measure, ts):
     events = list(measure.notesAndRests)
@@ -155,30 +143,15 @@ def is_implicit_empty_measure(measure, ts):
 def annotate_tuplets(notes: list[PartialNoteData], music21_notes):
     current_tuplet_id = 0
     active_signature = None
-=======
-def annotate_tuplets(notes: list[PartialNoteData], music21_notes):
-    """
-    Mutates PartialNoteData objects to add tuplet info.
-    Assumes notes and music21_notes are aligned 1:1
-    """
-    current_tuplet_id = 0
-    active_tuplet = None
->>>>>>> e685a87d21ca719a0784bc37bbbdb6d9c949820c
     tuplet_index = 0
 
     for pd, n in zip(notes, music21_notes):
 
         if not n.duration.tuplets:
-<<<<<<< HEAD
-=======
-            active_tuplet = None
-            tuplet_index = 0
->>>>>>> e685a87d21ca719a0784bc37bbbdb6d9c949820c
             continue
 
         t = n.duration.tuplets[0]
 
-<<<<<<< HEAD
         signature = (
             pd.measure,
             pd.beat_index,
@@ -189,19 +162,12 @@ def annotate_tuplets(notes: list[PartialNoteData], music21_notes):
         if signature != active_signature:
             current_tuplet_id += 1
             active_signature = signature
-=======
-        # Start new tuplet group
-        if active_tuplet is None or t is not active_tuplet:
-            current_tuplet_id += 1
-            active_tuplet = t
->>>>>>> e685a87d21ca719a0784bc37bbbdb6d9c949820c
             tuplet_index = 0
 
         pd.tuplet_id = current_tuplet_id
         pd.tuplet_index = tuplet_index
         pd.tuplet_actual = t.numberNotesActual
         pd.tuplet_normal = t.numberNotesNormal
-<<<<<<< HEAD
         pd.tuplet_class = get_tuplet_class(t.numberNotesActual, t.numberNotesNormal)
 
         tuplet_index += 1
@@ -224,25 +190,25 @@ def meter_segment_confidence(segment, rules: RhythmGradeRules):
 # Rhythm confidence parsers
 # =========================
 
-def rule_dotted(note, rules):
+def rule_dotted(note, rules, target_grade):
     if "d" not in note.rhythm_token:
-        return (1, None)
+        return (1, None, None)
     if rules.allow_dotted:
-        return (1, None)
-    return (0, "dotted rhythms not common for given grade", "Dotted Rhythm")
+        return (1, None, None)
+    return (0, f"dotted rhythms not common for grade {target_grade}", "Dotted Rhythm")
 
 def check_syncopation(dur, offset):
     # return remainder, if any, and if syncopation exists for given note length and offset
     return (offset % dur, offset % dur != 0)
 
-def rule_syncopation(note, rules):
+def rule_syncopation(note, rules, target_grade):
     _, is_sync = check_syncopation(
         note.duration,
         note.offset
     )
     if not is_sync:
-        return (1, None)
-    return (1, None) if rules.allow_syncopation else (0, "syncopation not common for given grade", "Syncopation")
+        return (1, None, None)
+    return (1, None, None) if rules.allow_syncopation else (0, f"syncopation not common for grade {target_grade}", "Syncopation")
 
 def get_quarter_length(token):
     if not token or 'r' in token:
@@ -259,7 +225,7 @@ def get_quarter_length(token):
         add /= 2
     return total
 
-def rule_subdivision(note, rules):
+def rule_subdivision(note, rules, target_grade):
     note_duration = get_quarter_length(note.rhythm_token)
     if note_duration is None:
         return (1, None, None)
@@ -267,9 +233,9 @@ def rule_subdivision(note, rules):
     if note_duration <= max_allowed:
         return (1, None, None)
     else:
-        return (0, f"subdivisions smaller than {rules.max_subdivision} not common for given grade", "Subdivision")
+        return (0, f"subdivisions smaller than {rules.max_subdivision} not common for grade {target_grade}", "Subdivision")
 
-def rule_tuplet(note, rules):
+def rule_tuplet(note, rules, target_grade):
     if note.tuplet_id is None:
         return (1, None, None)
     if not rules.allow_tuplet:
@@ -278,20 +244,15 @@ def rule_tuplet(note, rules):
         if tuplet_class in rules.allowed_tuplet_classes:
             return (1, None, None)
         else:
-            return (0, f"{tuplet_class} tuplets not common for given grade", "Tuplets")
+            return (0, f"{tuplet_class} tuplets not common for grade {target_grade}", "Tuplets")
     
-def rhythm_note_confidence(note, rules):
+def rhythm_note_confidence(note, rules, target_grade):
     return [
-        rule_dotted(note, rules),
-        rule_syncopation(note, rules),
-        rule_subdivision(note, rules),
-        rule_tuplet(note, rules),
+        rule_dotted(note, rules, target_grade),
+        rule_syncopation(note, rules, target_grade),
+        rule_subdivision(note, rules, target_grade),
+        rule_tuplet(note, rules, target_grade),
         ]
-=======
-
-        tuplet_index += 1
-
->>>>>>> e685a87d21ca719a0784bc37bbbdb6d9c949820c
 
 
 # =========================
@@ -301,11 +262,8 @@ def rhythm_note_confidence(note, rules):
 def group_notes_by_beat(notes: list[PartialNoteData]):
     groups = defaultdict(list)
     for n in notes:
-<<<<<<< HEAD
         if n.rhythm_token is None:
             continue
-=======
->>>>>>> e685a87d21ca719a0784bc37bbbdb6d9c949820c
         groups[(n.measure, n.beat_index)].append(n)
     return groups
 
@@ -315,7 +273,6 @@ def group_notes_by_beat(notes: list[PartialNoteData]):
 # =========================
 
 def run(score_path: str, target_grade: float):
-<<<<<<< HEAD
     from music21 import converter, stream, meter
     score = converter.parse(score_path)
 
@@ -327,32 +284,17 @@ def run(score_path: str, target_grade: float):
     meter_data = []
     meters = score.parts[0].recurse().getElementsByClass(meter.TimeSignature)
     total_measures = score.parts[0].measure(-1).number
-=======
-    score = converter.parse(score_path)
-
-    # -------------------------
-    # Meter data
-    # -------------------------
-    meter_data: list[MeterData] = []
-    meters = score.parts[0].recurse().getElementsByClass(meter.TimeSignature)
->>>>>>> e685a87d21ca719a0784bc37bbbdb6d9c949820c
+    duration_quarter_length = total_measures * 4
 
     if not meters:
         meters = [meter.TimeSignature("4/4")]
 
-<<<<<<< HEAD
     for index, ts in enumerate(meters):
         data = MeterData(
-=======
-    for ts in meters:
-        meter_data.append(
-            MeterData(
->>>>>>> e685a87d21ca719a0784bc37bbbdb6d9c949820c
                 measure=ts.getContextByClass(stream.Measure).number,
                 time_signature=ts.ratioString,
                 grade=target_grade
             )
-<<<<<<< HEAD
         if index < len(meters) - 1:
             next_measure = meters[index+1].getContextByClass(stream.Measure).number
             data.duration = next_measure - data.measure
@@ -374,47 +316,29 @@ def run(score_path: str, target_grade: float):
             data.type = "mixed"
 
         meter_data.append(data)
-=======
-        )
->>>>>>> e685a87d21ca719a0784bc37bbbdb6d9c949820c
 
     # -------------------------
     # Note extraction
     # -------------------------
-<<<<<<< HEAD
     for part in score.parts:
         part_name = part.partName
         current_ts = None
 
-        ANALYSIS_NOTES[part_name] = {}
-        ANALYSIS_NOTES[part_name]["Note Data"] = []
+        analysis_notes[part_name] = {}
+        analysis_notes[part_name]["note_data"] = []
 
         partial_notes = []
         music21_notes = []
-=======
-    all_notes: list[PartialNoteData] = []
-
-    for part in score.parts:
-        part_name = part.partName
-        current_ts = None
-        ANALYSIS_NOTES[part_name] = {}
-        ANALYSIS_NOTES[part_name]['Note Data'] = []
->>>>>>> e685a87d21ca719a0784bc37bbbdb6d9c949820c
 
         for m in part.getElementsByClass(stream.Measure):
             ts = m.getContextByClass(meter.TimeSignature)
             if ts is not None:
                 current_ts = ts
-<<<<<<< HEAD
             if current_ts is None:
-=======
-            if current_ts is None: # this will handle any pickup measures that won't have a time signature
->>>>>>> e685a87d21ca719a0784bc37bbbdb6d9c949820c
                 continue
 
             beat_length = current_ts.beatDuration.quarterLength
 
-<<<<<<< HEAD
             # IMPLICIT EMPTY MEASURE
             if is_implicit_empty_measure(m, current_ts):
                 partial_notes.append(
@@ -432,8 +356,6 @@ def run(score_path: str, target_grade: float):
                 )
                 continue
 
-=======
->>>>>>> e685a87d21ca719a0784bc37bbbdb6d9c949820c
             for n in m.notesAndRests:
                 beat_index = int(n.offset // beat_length)
                 beat_offset = n.offset % beat_length
@@ -444,29 +366,17 @@ def run(score_path: str, target_grade: float):
                     grade=target_grade,
                     instrument=part_name,
                     duration=n.duration.quarterLength,
-<<<<<<< HEAD
                     rhythm_token=get_rhythm_token(n) + ("r" if n.isRest else ""),
                     beat_index=beat_index,
                     beat_offset=beat_offset,
                     beat_unit=beat_length
-=======
-                    written_midi_value=None,
-                    written_pitch=None,
-                    sounding_midi_value=None,
-                    sounding_pitch=None,
-                    rhythm_token=get_rhythm_token(n) + ("r" if n.isRest else ""),
-                    beat_index= beat_index,
-                    beat_offset= beat_offset,
-                    beat_unit= beat_length
->>>>>>> e685a87d21ca719a0784bc37bbbdb6d9c949820c
                 )
 
                 partial_notes.append(p)
                 music21_notes.append(n)
 
-<<<<<<< HEAD
         annotate_tuplets(partial_notes, music21_notes)
-        ANALYSIS_NOTES[part_name]["Note Data"] = partial_notes
+        analysis_notes[part_name]["note_data"] = partial_notes
 
     #---------------------
     # Meter Analysis
@@ -474,7 +384,22 @@ def run(score_path: str, target_grade: float):
 
     for m in meter_data:
         m.confidence = meter_segment_confidence(m, rhythm_grade_rules)
-        m.comments = f"{m.timeSignature} not common for grade {m.grade}" if m.confidence == 0 else None 
+        m.comments["Time Signature"] = f"{m.time_signature} not common for grade {m.grade}" if m.confidence == 0 else None 
+    
+    total_conf = sum([i.confidence * i.exposure for i in meter_data])
+    
+    # apply penalties for meter_changes based on target grade
+    
+    if target_grade < 2:
+        if len(meter_data) > 1:
+            total_conf *= 0.6  # penalty for meter_changes in lower grades
+            m.comments["meter_changes"] = "meter_changes not common for lower grades"
+    elif target_grade < 3:
+        if len(meter_data) > 3:
+            total_conf *= 0.6 # penalty for meter_changes in mid grades
+            m.comments["meter_changes"] = "Frequent meter_changes not common for mid grades"
+    
+
 
     #-----------------------
     # Rhythm Analysis 
@@ -482,18 +407,59 @@ def run(score_path: str, target_grade: float):
 
     # check for the following for each note: if it's dotted, if syncopation is allowed, if subdivisions are allowed, if tuplets ar permitted, and if so, simple, even or complex
 
-    for part in ANALYSIS_NOTES.values():
-        for note in part["Note Data"]:
+    for part_name, part in analysis_notes.items():
+        if not isinstance(part, dict) or "note_data" not in part:
+            continue
+        for note in part["note_data"]:
             if note.rhythm_token is not None:
-                res = rhythm_note_confidence(note, rhythm_grade_rules)
-                note.confidence = min(r[0] for r in res)    
-                note.comments = [r[1] for r in res if r[1] is not None] 
+                res = rhythm_note_confidence(note, rhythm_grade_rules, target_grade)
+                note.rhythm_confidence = min(r[0] for r in res)
+                for r in res:    
+                    if r[2] is not None:
+                        note.comments[r[2]] = r[1]
+            else:
+                note.rhythm_confidence = 1  # Empty measures are acceptable
+        total_conf = sum([i.rhythm_confidence * i.duration for i in part["note_data"]])
+        total_dur = sum([i.duration for i in part["note_data"]])
+        part["rhythm_confidence"] = total_conf / total_dur if total_dur > 0 else None
 
-    return ANALYSIS_NOTES
-=======
-                annotate_tuplets(partial_notes, music21_notes)
-                all_notes.extend(partial_notes)
+    grade_summary = {
+        "target_grade": target_grade,
+        "overall_rhythm_confidence": round(sum([part["rhythm_confidence"] for part in analysis_notes.values()]) / len([part for part in analysis_notes.values()]),2),
+        "overall_meter_confidence": round(total_conf / duration_quarter_length,2)
+    }
 
-        ANALYSIS_NOTES[part_name]['Note Data'] = all_notes
-    return ANALYSIS_NOTES
->>>>>>> e685a87d21ca719a0784bc37bbbdb6d9c949820c
+    return analysis_notes, grade_summary
+
+def derive_observed_grades(score_path: str):
+    TOP_CONFIDENCE_THRESHOLD = 0.97
+    meter_confidences = {}
+    rhythm_confidences = {}
+
+    for grade in GRADES:
+        summary = run(score_path=score_path, target_grade=grade)[1]
+        meter_confidences[grade] = summary["overall_meter_confidence"]
+        rhythm_confidences[grade] = summary["overall_rhythm_confidence"]
+    
+    meter_improvements = {}
+    rhythm_improvements = {}
+    sorted_grades = sorted(GRADES)
+    for i in range(1,len(sorted_grades)):
+        prev_grade = sorted_grades[i-1]
+        curr_grade = sorted_grades[i]
+        meter_improvements[curr_grade] = meter_confidences[curr_grade] - meter_confidences[prev_grade]
+        rhythm_improvements[curr_grade] = rhythm_confidences[curr_grade] - rhythm_confidences[prev_grade]
+    
+    if min(meter_improvements.values()) > TOP_CONFIDENCE_THRESHOLD:
+        observed_meter_grade = min(GRADES)
+    else:
+        observed_meter_grade = max(meter_confidences, key=meter_confidences.get)
+    
+    if min(rhythm_improvements.values()) > TOP_CONFIDENCE_THRESHOLD:
+        observed_rhyhtm_grade = min(GRADES)
+    else:
+        observed_rhyhtm_grade = max(rhythm_confidences, key=rhythm_confidences.get)
+    return observed_meter_grade, observed_rhyhtm_grade, meter_confidences, rhythm_confidences
+
+        
+        
