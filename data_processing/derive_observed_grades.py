@@ -52,12 +52,6 @@ def _derive_observed_grade(
     flat_threshold: float,
     flat_epsilon: float,
 ) -> Optional[float]:
-    """
-    If curve is high + flat -> lowest grade.
-    Else -> grade with max confidence (ties -> lowest grade among ties).
-    """
-
-    # drop None
     filtered = {g: c for g, c in confidences.items() if c is not None}
     if not filtered:
         return None
@@ -65,11 +59,17 @@ def _derive_observed_grade(
     grades = sorted(filtered.keys())
     values = [filtered[g] for g in grades]
 
-    # "too easy" = high AND flat
+    # "too easy" / flat-high detector:
     if min(values) >= flat_threshold and (max(values) - min(values)) <= flat_epsilon:
         return grades[0]
 
-    # otherwise pick max confidence; tie-break to lowest grade
-    best_val = max(values)
-    best_grades = [g for g in grades if filtered[g] == best_val]
-    return min(best_grades)
+    # choose grade with largest improvement over previous grade
+    best_grade = grades[0]
+    best_delta = float("-inf")
+    for i in range(1, len(grades)):
+        delta = values[i] - values[i - 1]
+        if delta > best_delta:
+            best_delta = delta
+            best_grade = grades[i]
+
+    return best_grade

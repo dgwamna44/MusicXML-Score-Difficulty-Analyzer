@@ -1,48 +1,63 @@
-from music21 import meter, stream
+# shared/score_extract.py
+from __future__ import annotations
+
+from music21 import meter as m21meter, stream
 from models import MeterData, RhythmGradeRules
-from analyzers.meter.helpers import classify_meter, meter_segment_confidence
+from analyzers.meter.helpers import meter_segment_confidence
 
-def extract_meter_segments(
-    score,
-    *,
-    grade: float,
-    rules_for_grade: RhythmGradeRules
-) -> list[MeterData]:
+
+def extract_meter_segments(score, *, grade: float, rules_for_grade: RhythmGradeRules) -> list[MeterData]:
+    part0 = score.parts[0]
+    measures = list(part0.getElementsByClass(stream.Measure))
+
+    if not measures:
+        return []
+
+    total_measures = len(measures)  # IMPORTANT: use count of measures in score order
+
+    # Build list of (measure_index, measure_number, ts_ratio) ONLY when TS changes
+    change_points: list[tuple[int, int, str]] = []
+
+    prev_ratio = None
+    for idx, meas in enumerate(measures):
+        ts = meas.getContextByClass(m21meter.TimeSignature)
+        ratio = ts.ratioString if ts else "4/4"
+
+        if ratio != prev_ratio:
+            change_points.append((idx, meas.number, ratio))
+            prev_ratio = ratio
+
     segments: list[MeterData] = []
-    
 
-    meters = score.parts[0].recurse().getElementsByClass(meter.TimeSignature)
-    total_measures = score.parts[0].measure(-1).number
+    for i, (start_idx, start_num, ratio) in enumerate(change_points):
+        end_idx = change_points[i + 1][0] if i + 1 < len(change_points) else total_measures
+        duration_measures = end_idx - start_idx
+        exposure = duration_measures / total_measures if total_measures else 0.0
 
-    if not meters:
-        meters = [meter.TimeSignature("4/4")]
-
-    for i, ts in enumerate(meters):
-        start_measure = ts.getContextByClass(stream.Measure).number
-
-        if i < len(meters) - 1:
-            next_measure = meters[i + 1].getContextByClass(stream.Measure).number
-            duration_measures = next_measure - start_measure
-        else:
-            duration_measures = total_measures - start_measure + 1
-
-        m = MeterData(
-            measure=start_measure,
-            time_signature=ts.ratioString,
+        seg = MeterData(
+            measure=start_num,
+            time_signature=ratio,
             grade=grade,
         )
+        seg.duration = duration_measures
+        seg.exposure = exposure
+        seg.type = classify_meter(ratio)          # helper below (avoids needing ts object)
+        seg.confidence = meter_segment_confidence(seg, rules_for_grade)
 
-        m.duration = duration_measures
-        m.exposure = (duration_measures / total_measures) if total_measures else 0.0
+        if seg.confidence == 0:
+            seg.comments["Time Signature"] = f"{seg.time_signature} not common for grade {grade}"
 
-        m.type = classify_meter(ts)  # "simple"/"compound"/"odd"/"mixed"
-        m.confidence = meter_segment_confidence(m, rules_for_grade)
-
-        if m.confidence == 0:
-            m.comments["Time Signature"] = (
-                f"{m.time_signature} not common for grade {grade}"
-            )
-
-        segments.append(m)
+        segments.append(seg)
 
     return segments
+
+
+def classify_meter(ratio: str) -> str:
+    num, denom = map(int, ratio.split("/"))
+    if num in (2, 3, 4) and denom == 4:
+        return "simple"
+    if num in (6, 9, 12) and denom == 8:
+        return "compound"
+    if denom == 8 and num % 3 != 0:
+        return "odd"
+    return "mixed"
