@@ -61,3 +61,16 @@ def classify_meter(ratio: str) -> str:
     if denom == 8 and num % 3 != 0:
         return "odd"
     return "mixed"
+
+
+def max_chord_size_in_part(part) -> int:
+    #returns max chord size in given part
+    return max(
+        (
+            len(n.pitches)
+            for m in part.getElementsByClass(stream.Measure)
+            for n in m.notesAndRests
+            if n.isChord
+        ),
+        default=1,
+    )
