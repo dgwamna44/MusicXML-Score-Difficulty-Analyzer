@@ -5,11 +5,14 @@ NON_PERCUSSION_INSTRUMENTS = {
     "piccolo": r"piccolo(?:\s+\d+)?",
     "flute": r"flute(?:\s+\d+)?",
     "oboe": r"oboe(?:\s+\d+)?",
+    "english_horn": r"(?:english horn|cor anglais)(?:\s+\d+)?",
     "contra_bass_clarinet": r"contra bass clarinet(?:\s+\d+)?(?:\s+in\s+|in)?(?:b♭|bb)?",
     "bass_clarinet": r"bass clarinet(?:\s+\d+)?(?:\s+in\s+|in)?(?:b♭|bb)?",
+    "clarinet_eb": r"(?:(?:e♭|eb)\s+clarinet(?:\s+\d+)?(?:\s+in\s+|in)?(?:e♭|eb)?|clarinet(?:\s+\d+)?(?:\s+in\s+|in)\s*(?:e♭|eb))",
     "clarinet_bb": r"(?:b♭\s+|bb\s+)?clarinet(?:\s+\d+)?(?:\s+in\s+|in)?(?:b♭|bb)?",
     "alto_clarinet": r"(?:e♭\s+|eb\s+)?alto clarinet(?:\s+\d+)?(?:\s+in\s+|in)?(?:e♭|eb)?",
     "bassoon": r"bassoon(?:\s+\d+)?",
+    "soprano_sax": r"(?:b♭\s+|bb\s+)?soprano sax(?:ophone)?(?:\s+\d+)?(?:\s+in\s+|in)?(?:b♭|bb)?",
     "alto_sax": r"(?:e♭\s+|eb\s+)?alto sax(?:ophone)?(?:\s+\d+)?(?:\s+in\s+|in)?(?:e♭|eb)?",
     "tenor_sax": r"(?:b♭\s+|bb\s+)?tenor sax(?:ophone)?(?:\s+\d+)?(?:\s+in\s+|in)?(?:b♭|bb)?",
     "bari_sax": r"(?:e♭\s+|eb\s+)?baritone sax(?:ophone)?(?:\s+\d+)?(?:\s+in\s+|in)?(?:e♭|eb)?",
@@ -51,7 +54,9 @@ FAMILY_MAP = {
     "piccolo": "wind",
     "flute": "wind",
     "oboe": "wind",
+    "english_horn": "wind",
     "bassoon": "wind",
+    "clarinet_eb": "wind",
     "clarinet_bb": "wind",
     "alto_clarinet": "wind",
     "bass_clarinet": "wind",
@@ -59,6 +64,7 @@ FAMILY_MAP = {
     "alto_sax": "wind",
     "tenor_sax": "wind",
     "bari_sax": "wind",
+    "soprano_sax": "wind",
 
     # brass
     "trumpet_bb": "brass",
@@ -96,17 +102,24 @@ INST_TO_GRADE_NON_STRING = {
     "english_horn": {
         "ABC": 4, "FJH": 4, "Belwin": 4, "Marlatt": 5
     },
+    "clarinet_eb":
+    {
+        "Marlatt": 5,
+    },
     "clarinet_bb": {
         "ABC": 0.5, "FJH": 0.5, "Belwin": 0.5, "Marlatt": 1
     },
     "alto_clarinet":{
-          "ABC": None, "FJH": None, "Belwin": None, "Marlatt": 5
+          "Marlatt": 1.5, "Kjos": .5
+    },
+    "soprano_sax":{
+        "ABC": 5
     },
     "bass_clarinet": {
         "ABC": 2, "FJH": 0.5, "Belwin": 0.5, "Marlatt": 1
     },
     "contra_bass_clarinet": {
-        "ABC": None, "FJH": None, "Belwin": None, "Marlatt": 5
+       "Marlatt": 5
     },
     "alto_sax": {
         "ABC": 0.5, "FJH": 0.5, "Belwin": 0.5, "Marlatt": 1
@@ -130,7 +143,7 @@ INST_TO_GRADE_NON_STRING = {
         "ABC": 0.5, "FJH": 0.5, "Belwin": 0.5, "Marlatt": 1
     },
     "bass_trombone": {
-        "ABC": None, "FJH": 4, "Belwin": 4, "Marlatt": 5
+        "FJH": 4, "Belwin": 4, "Marlatt": 5
     },
     "euphonium": {
         "ABC": 2, "FJH": 1, "Belwin": 0.5, "Marlatt": 1
@@ -154,16 +167,16 @@ INST_TO_GRADE_NON_STRING = {
         "ABC": 1, "FJH": 0.5, "Belwin": 0.5, "Marlatt": 1
     },
     "drum_set": {
-        "ABC": None, "FJH": None, "Belwin": 2.5, "Marlatt": None
+        "Belwin": 2.5
     },
     "piano": {
-        "ABC": None, "FJH": None, "Belwin": 2.5, "Marlatt": 4
+        "Belwin": 2.5, "Marlatt": 4
     },
     "synthesizer": {
-        "ABC": None, "FJH": None, "Belwin": 3, "Marlatt": None
+        "Belwin": 3
     },
     "electric_bass": {
-        "ABC": None, "FJH": None, "Belwin": 3, "Marlatt": None
+        "Belwin": 3
     },
     "vibraphone": {
         "ABC": 2, "FJH": 2, "Belwin": 1, "Marlatt": 2

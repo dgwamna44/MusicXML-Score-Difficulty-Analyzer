@@ -5,7 +5,8 @@ from .string_parsing import (
     get_rounded_grade,
     normalize_key_name,
     parse_part_name,
-    validate_part_for_analysis,
+    validate_part_for_availability,
+    validate_part_for_range_analysis,
 )
 
 __all__ = [
@@ -18,5 +19,6 @@ __all__ = [
     "get_rounded_grade",
     "normalize_key_name",
     "parse_part_name",
-    "validate_part_for_analysis",
+    "validate_part_for_availability",
+    "validate_part_for_range_analysis",
 ]

@@ -74,6 +74,8 @@ def annotate_tuplets(notes: list[PartialNoteData], music21_notes):
 
 def check_syncopation(dur, offset):
     # return remainder, if any, and if syncopation exists for given note length and offset
+    if dur in (None, 0) or offset is None:
+        return (0, False)
     return (offset % dur, offset % dur != 0)
 
 

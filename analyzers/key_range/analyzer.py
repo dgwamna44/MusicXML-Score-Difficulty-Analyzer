@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+from copy import deepcopy
+
 from analyzers.base import BaseAnalyzer
 from analyzers.key_range.extract import extract_key_segments, extract_note_data
 from analyzers.key_range.rules import total_key_confidence, compute_range_confidence
-from utilities import parse_part_name, validate_part_for_analysis, get_rounded_grade, traffic_light
+from utilities import parse_part_name, validate_part_for_range_analysis, get_rounded_grade, traffic_light
 from music21 import converter
 
 
@@ -13,22 +15,29 @@ class KeyRangeAnalyzer(BaseAnalyzer):
     BaseAnalyzer.rules = combined_ranges (instrument -> grade -> {core, extended} + total_range).
     """
 
-    def __init__(self, combined_ranges: dict):
+    def __init__(self, combined_ranges: dict, *, key_segments_base=None):
         super().__init__(combined_ranges)  # BaseAnalyzer stores this on self.rules
+        self._key_segments_base = key_segments_base
+
+    def _get_key_segments(self, score, grade: float):
+        if self._key_segments_base is None:
+            return extract_key_segments(score, grade)
+        key_segments = deepcopy(self._key_segments_base)
+        for k in key_segments:
+            k.grade = grade
+        return key_segments
 
     # -------------------------------------------------------------
     # CONFIDENCE CURVE (for derive_observed_grades)
     # -------------------------------------------------------------
 
     def analyze_confidence(self, score, grade: float):
-        """
-        Returns ONE scalar: combined key + range confidence.
-        """
+
         ranges = self.rules
         range_grade = float(get_rounded_grade(grade))
 
         # --- Key segments ---
-        key_segments = extract_key_segments(score, grade)
+        key_segments = self._get_key_segments(score, grade)
 
         for k in key_segments:
             k.confidence = total_key_confidence(k.key, grade)
@@ -47,7 +56,7 @@ class KeyRangeAnalyzer(BaseAnalyzer):
         # Compute range confidence per note
         for original_part_name, pdata in note_map.items():
             pname = parse_part_name(original_part_name)
-            canonical = validate_part_for_analysis(pname)
+            canonical = validate_part_for_range_analysis(pname)
 
             # If we can’t map the part to an instrument bucket, skip range scoring for it
             if not canonical or canonical not in ranges:
@@ -77,7 +86,13 @@ class KeyRangeAnalyzer(BaseAnalyzer):
 
         avg_range_conf = (total_conf / total_notes) if total_notes else 0.0
 
-        return (0.75 * avg_range_conf) + (0.25 * combined_conf_key)
+        return (avg_range_conf, combined_conf_key)
+
+    def analyze_confidence_range(self, score, grade: float) -> float:
+        return self.analyze_confidence(score, grade)[0]
+
+    def analyze_confidence_key(self, score, grade: float) -> float:
+        return self.analyze_confidence(score, grade)[1]
 
     # -------------------------------------------------------------
     # TARGET-GRADE ANALYSIS (UI layer)
@@ -91,7 +106,7 @@ class KeyRangeAnalyzer(BaseAnalyzer):
         range_grade = float(get_rounded_grade(target_grade))
 
         # --- Key segments ---
-        key_segments = extract_key_segments(score, target_grade)
+        key_segments = self._get_key_segments(score, target_grade)
 
         for k in key_segments:
             k.confidence = total_key_confidence(k.key, target_grade)
@@ -112,7 +127,7 @@ class KeyRangeAnalyzer(BaseAnalyzer):
 
         for original_part_name, pdata in note_map.items():
             pname = parse_part_name(original_part_name)
-            valid_part = validate_part_for_analysis(pname)
+            valid_part = validate_part_for_range_analysis(pname)
 
             if not valid_part or valid_part not in ranges:
                 continue
@@ -153,30 +168,76 @@ class KeyRangeAnalyzer(BaseAnalyzer):
         return analysis_notes, summary
 
 
+def analyze_confidence_range(analyzer: KeyRangeAnalyzer, score, grade: float) -> float:
+    return analyzer.analyze_confidence_range(score, grade)
+
+
+def analyze_confidence_key(analyzer: KeyRangeAnalyzer, score, grade: float) -> float:
+    return analyzer.analyze_confidence_key(score, grade)
+
+
 # -------------------------------------------------------------
 # ENTRY POINT
 # -------------------------------------------------------------
 
-def run_key_range(score_path: str, target_grade: float):
+def run_key_range(score_path: str, target_grade: float, *, score=None, score_factory=None, progress_cb=None, run_observed=True):
     from data_processing import derive_observed_grades
     from analyzers.key_range.ranges import load_combined_ranges
 
-    combined_ranges = load_combined_ranges("data/range") 
-    analyzer = KeyRangeAnalyzer(combined_ranges)
+    combined_ranges = load_combined_ranges("data/range")
+
+    if score_factory is None:
+        if score is not None:
+            score_factory = lambda: deepcopy(score)
+        elif score_path is not None:
+            score_factory = lambda: converter.parse(score_path)
+        else:
+            raise ValueError("score_path or score_factory is required")
+
+    base_score = score if score is not None else score_factory()
+    sounding_score = base_score.toSoundingPitch()
+    key_segments_base = extract_key_segments(base_score, target_grade, sounding_score=sounding_score)
+    analyzer = KeyRangeAnalyzer(combined_ranges, key_segments_base=key_segments_base)
 
     # Confidence curve across grades (fresh score each run)
-    observed_grade, conf_curve = derive_observed_grades(
-        score_factory=lambda: converter.parse(score_path),
-        analyze_confidence=analyzer.analyze_confidence,
-    )
+    def _progress_range(grade, idx, total):
+        if progress_cb is not None:
+            progress_cb(grade, idx, total, "range")
+
+    def _progress_key(grade, idx, total):
+        if progress_cb is not None:
+            progress_cb(grade, idx, total, "key")
+
+    if run_observed:
+        observed_grade_range, conf_curve_range = derive_observed_grades(
+            score_factory=score_factory,
+            analyze_confidence=analyzer.analyze_confidence_range,
+            progress_cb=_progress_range if progress_cb is not None else None,
+        )
+    else:
+        observed_grade_range, conf_curve_range = None, {}
+
+    if run_observed:
+        observed_grade_key, conf_curve_key = derive_observed_grades(
+            score_factory=score_factory,
+            analyze_confidence=analyzer.analyze_confidence_key,
+            progress_cb=_progress_key if progress_cb is not None else None,
+        )
+    else:
+        observed_grade_key, conf_curve_key = None, {}
+
 
     # UI data for target grade
-    score = converter.parse(score_path)
+    if score is None:
+        score = base_score
+
     analysis_notes, summary = analyzer.analyze_target(score, target_grade)
 
     return {
-        "observed_grade": observed_grade,
-        "confidence": conf_curve,
+        "observed_grade_range": observed_grade_range,
+        "confidence_range": conf_curve_range,
+        "observed_grade_key": observed_grade_key,
+        "confidence_key": conf_curve_key, 
         "analysis_notes": analysis_notes,
         "summary": summary,
     }

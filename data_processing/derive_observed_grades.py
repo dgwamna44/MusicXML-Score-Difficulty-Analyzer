@@ -10,6 +10,7 @@ def derive_observed_grades(
     grades=GRADES,
     flat_threshold: float = 0.97,
     flat_epsilon: float = 0.02,
+    progress_cb: Optional[Callable[..., None]] = None,
 ) -> Tuple[Optional[float], Dict[float, Optional[float]]]:
     """
     Runs confidence-only analysis for each grade and derives an observed grade.
@@ -17,7 +18,7 @@ def derive_observed_grades(
     Parameters
     ----------
     score_factory:
-        A callable that returns a *fresh* parsed score each time.
+        A callable that returns a *fresh* score each time (re-parse or clone).
         (Important: avoids cross-grade mutation / caching issues.)
     analyze_confidence:
         Function(score, grade) -> confidence (0..1) or None
@@ -34,9 +35,12 @@ def derive_observed_grades(
 
     confidences: Dict[float, Optional[float]] = {}
 
-    for grade in grades:
+    total = len(grades)
+    for idx, grade in enumerate(grades, start=1):
         score = score_factory()
         confidences[grade] = analyze_confidence(score, float(grade))
+        if progress_cb is not None:
+            progress_cb(float(grade), idx, total)
 
     observed = _derive_observed_grade(
         confidences,

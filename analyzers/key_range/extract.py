@@ -3,15 +3,16 @@ from music21 import stream, key, pitch
 from models import KeyData, PartialNoteData
 from utilities import normalize_key_name, get_rounded_grade, iter_measure_events
 from app_data import PITCH_TO_INDEX
-from utilities import parse_part_name, validate_part_for_analysis
+from utilities import parse_part_name, validate_part_for_range_analysis
 
 
-def extract_key_segments(score, target_grade):
+def extract_key_segments(score, target_grade, *, sounding_score=None):
     """
     Extracts key signature changes and computes exposures.
     Returns a list of KeyData objects.
     """
-    keys = score.toSoundingPitch().parts[0].recurse().getElementsByClass('KeySignature')
+    src = sounding_score if sounding_score is not None else score.toSoundingPitch()
+    keys = src.parts[0].recurse().getElementsByClass('KeySignature')
     if not keys:
         keys = [key.KeySignature(sharps=None)]
 
@@ -57,7 +58,7 @@ def extract_note_data(score, target_grade, combined_ranges, key_segments):
         analysis_results[original_name] = {"Note Data": []}
 
         parsed = parse_part_name(original_name)
-        valid_part = validate_part_for_analysis(parsed)
+        valid_part = validate_part_for_range_analysis(parsed)
 
         has_range_rules = (
             valid_part

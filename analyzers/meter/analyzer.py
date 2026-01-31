@@ -1,6 +1,8 @@
 # analyzers/meter/analyzer.py
 from __future__ import annotations
 
+from copy import deepcopy
+
 from music21 import converter
 
 from analyzers.base import BaseAnalyzer
@@ -63,18 +65,30 @@ class MeterAnalyzer(BaseAnalyzer):
 
         return meter_data, total_conf
 
-def run_meter(score_path: str, target_grade: float):
-    score = converter.parse(score_path)
+def run_meter(score_path: str, target_grade: float, *, score=None, score_factory=None, progress_cb=None, run_observed=True):
+    if score_factory is None:
+        if score is not None:
+            score_factory = lambda: deepcopy(score)
+        elif score_path is not None:
+            score_factory = lambda: converter.parse(score_path)
+        else:
+            raise ValueError("score_path or score_factory is required")
 
     # shared rhythm rules drive both rhythm + meter
     rules = load_rhythm_rules()
     analyzer = MeterAnalyzer(rules)
 
-    observed_grade, confidences = derive_observed_grades(
-        score_factory=lambda: converter.parse(score_path),
-        analyze_confidence=lambda score, g: analyzer.analyze_confidence(score, g),
-    )
+    if run_observed:
+        observed_grade, confidences = derive_observed_grades(
+            score_factory=score_factory,
+            analyze_confidence=lambda score, g: analyzer.analyze_confidence(score, g),
+            progress_cb=progress_cb,
+        )
+    else:
+        observed_grade, confidences = None, {}
 
+    if score is None:
+        score = score_factory()
     meter_segments, overall_conf = analyzer.analyze_target(score, target_grade)
 
     return {

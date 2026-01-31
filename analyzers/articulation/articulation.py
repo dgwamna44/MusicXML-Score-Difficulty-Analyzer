@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 import pandas as pd
 from music21 import converter, stream
 
@@ -51,18 +53,31 @@ def load_articulation_rules(path: str = r"data/articulation_guidelines.csv") -> 
 # Public entry point
 # ----------------------------
 
-def run_articulation(score_path: str, target_grade: float):
+def run_articulation(score_path: str, target_grade: float, *, score=None, score_factory=None, progress_cb=None, run_observed=True):
     rules = load_articulation_rules()
     analyzer = ArticulationAnalyzer(rules)
 
+    if score_factory is None:
+        if score is not None:
+            score_factory = lambda: deepcopy(score)
+        elif score_path is not None:
+            score_factory = lambda: converter.parse(score_path)
+        else:
+            raise ValueError("score_path or score_factory is required")
+
     # 1) Observed grade + confidence curve (fresh parse per grade)
-    observed, confidences = derive_observed_grades(
-        score_factory=lambda: converter.parse(score_path),
-        analyze_confidence=analyzer.analyze_confidence,
-    )
+    if run_observed:
+        observed, confidences = derive_observed_grades(
+            score_factory=score_factory,
+            analyze_confidence=analyzer.analyze_confidence,
+            progress_cb=progress_cb,
+        )
+    else:
+        observed, confidences = None, {}
 
     # 2) Target-grade UI data (single parse)
-    score = converter.parse(score_path)
+    if score is None:
+        score = score_factory()
     analysis_notes, overall_conf = analyzer.analyze_target(score, target_grade)
 
     return {

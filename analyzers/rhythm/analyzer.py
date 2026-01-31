@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from copy import deepcopy
+
 from music21 import meter, stream, converter
 
 from models import PartialNoteData
@@ -206,17 +208,29 @@ def analyze_rhythm_target(score, rules, target_grade: float):
 # ENTRY POINT (this is where derive_observed_grades goes)
 # ----------------------------
 
-def run_rhythm(score_path: str, target_grade: float):
-    score = converter.parse(score_path)
+def run_rhythm(score_path: str, target_grade: float, *, score=None, score_factory=None, progress_cb=None, run_observed=True):
+    if score_factory is None:
+        if score is not None:
+            score_factory = lambda: deepcopy(score)
+        elif score_path is not None:
+            score_factory = lambda: converter.parse(score_path)
+        else:
+            raise ValueError("score_path or score_factory is required")
     rules = load_rhythm_rules()
 
     # 1) observed grade + confidence curve (across all grades)
-    observed_grade, confidences = derive_observed_grades(
-        score_factory=lambda: converter.parse(score_path),
-        analyze_confidence=lambda score, g: analyze_rhythm_confidence(score, rules, g),
-    )
+    if run_observed:
+        observed_grade, confidences = derive_observed_grades(
+            score_factory=score_factory,
+            analyze_confidence=lambda score, g: analyze_rhythm_confidence(score, rules, g),
+            progress_cb=progress_cb,
+        )
+    else:
+        observed_grade, confidences = None, {}
 
     # 2) target grade (UI note data)
+    if score is None:
+        score = score_factory()
     analysis_notes, overall_conf = analyze_rhythm_target(score, rules, target_grade)
 
     return {

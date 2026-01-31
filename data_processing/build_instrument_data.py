@@ -1,13 +1,26 @@
 from app_data import NON_PERCUSSION_INSTRUMENTS, PERCUSSION_INSTRUMENTS, FAMILY_MAP, INST_TO_GRADE_NON_STRING
 from models import InstrumentData
 from statistics import median
+import json
+from pathlib import Path
+
+
+def load_range_excluded(path: str = r"data/range_excluded.json") -> set[str]:
+    try:
+        data = json.loads(Path(path).read_text())
+    except (OSError, json.JSONDecodeError):
+        return set()
+    excluded = data.get("range_excluded", [])
+    return {str(x) for x in excluded}
 
 def build_instrument_data():
     data = {}
+    range_excluded = load_range_excluded()
     for instrument, pattern in NON_PERCUSSION_INSTRUMENTS.items():        
         data[instrument] = InstrumentData(
             instrument=instrument,
             regex=pattern,
+            range_analysis=instrument not in range_excluded,
             availability=apply_availability(instrument),
             type=FAMILY_MAP.get(instrument, "unknown"),
         )
