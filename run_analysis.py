@@ -11,13 +11,21 @@ from analyzers.key_range import run_key_range
 from analyzers.availability.availability import run_availability
 from analyzers.tempo_duration import run_tempo_duration
 from analyzers.dynamics import run_dynamics
+from models import AnalysisOptions
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--target-only",
+        "--target_only",
         action="store_true",
         help="Skip observed-grade analysis and run target-grade analysis only.",
+    )
+    parser.add_argument(
+        "--strings-only",
+        "--strings_only",
+        action="store_true",
+        help="Use string-only key/range guidelines.",
     )
     args = parser.parse_args()
 
@@ -72,6 +80,10 @@ if __name__ == "__main__":
 
         return _cb
 
+    options = AnalysisOptions(
+        run_observed=not args.target_only,
+        string_only=args.strings_only,
+    )
     target_only = args.target_only
     analyzers = [
         ("availability", run_availability),
@@ -92,7 +104,7 @@ if __name__ == "__main__":
             score=score_factory(),
             score_factory=score_factory,
             progress_cb=None if target_only else progress_bar(name),
-            run_observed=not target_only,
+            analysis_options=options,
         )
         if target_only:
             target_progress(idx, name)

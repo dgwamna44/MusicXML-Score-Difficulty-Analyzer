@@ -15,9 +15,10 @@ class KeyRangeAnalyzer(BaseAnalyzer):
     BaseAnalyzer.rules = combined_ranges (instrument -> grade -> {core, extended} + total_range).
     """
 
-    def __init__(self, combined_ranges: dict, *, key_segments_base=None):
+    def __init__(self, combined_ranges: dict, *, key_segments_base=None, key_confidence_fn=total_key_confidence):
         super().__init__(combined_ranges)  # BaseAnalyzer stores this on self.rules
         self._key_segments_base = key_segments_base
+        self._key_confidence_fn = key_confidence_fn
 
     def _get_key_segments(self, score, grade: float):
         if self._key_segments_base is None:
@@ -40,7 +41,7 @@ class KeyRangeAnalyzer(BaseAnalyzer):
         key_segments = self._get_key_segments(score, grade)
 
         for k in key_segments:
-            k.confidence = total_key_confidence(k.key, grade)
+            k.confidence = self._key_confidence_fn(k.key, grade, k.quality)
 
         combined_conf_key = (
             sum((k.confidence or 0.0) * (k.exposure or 0.0) for k in key_segments)
@@ -109,7 +110,7 @@ class KeyRangeAnalyzer(BaseAnalyzer):
         key_segments = self._get_key_segments(score, target_grade)
 
         for k in key_segments:
-            k.confidence = total_key_confidence(k.key, target_grade)
+            k.confidence = self._key_confidence_fn(k.key, target_grade, k.quality)
             color = traffic_light(k.confidence)
             if color == "yellow":
                 k.comments = f"{k.key} {k.quality} is somewhat common in grade {target_grade}"
@@ -180,11 +181,32 @@ def analyze_confidence_key(analyzer: KeyRangeAnalyzer, score, grade: float) -> f
 # ENTRY POINT
 # -------------------------------------------------------------
 
-def run_key_range(score_path: str, target_grade: float, *, score=None, score_factory=None, progress_cb=None, run_observed=True):
+def run_key_range(
+    score_path: str,
+    target_grade: float,
+    *,
+    score=None,
+    score_factory=None,
+    progress_cb=None,
+    run_observed=True,
+    string_only=False,
+    analysis_options=None,
+):
     from data_processing import derive_observed_grades
-    from analyzers.key_range.ranges import load_combined_ranges
+    from analyzers.key_range.ranges import load_combined_ranges, load_string_ranges
+    from analyzers.key_range.rules import load_string_key_guidelines, string_key_confidence
 
-    combined_ranges = load_combined_ranges("data/range")
+    if analysis_options is not None:
+        run_observed = analysis_options.run_observed
+        string_only = analysis_options.string_only
+
+    combined_ranges = load_string_ranges("data/range") if string_only else load_combined_ranges("data/range")
+    key_confidence_fn = total_key_confidence
+    if string_only:
+        string_guidelines = load_string_key_guidelines()
+        key_confidence_fn = lambda key, grade, quality: string_key_confidence(
+            key, grade, quality, string_guidelines
+        )
 
     if score_factory is None:
         if score is not None:
@@ -197,7 +219,11 @@ def run_key_range(score_path: str, target_grade: float, *, score=None, score_fac
     base_score = score if score is not None else score_factory()
     sounding_score = base_score.toSoundingPitch()
     key_segments_base = extract_key_segments(base_score, target_grade, sounding_score=sounding_score)
-    analyzer = KeyRangeAnalyzer(combined_ranges, key_segments_base=key_segments_base)
+    analyzer = KeyRangeAnalyzer(
+        combined_ranges,
+        key_segments_base=key_segments_base,
+        key_confidence_fn=key_confidence_fn,
+    )
 
     # Confidence curve across grades (fresh score each run)
     def _progress_range(grade, idx, total):

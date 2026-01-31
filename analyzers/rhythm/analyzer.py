@@ -208,7 +208,16 @@ def analyze_rhythm_target(score, rules, target_grade: float):
 # ENTRY POINT (this is where derive_observed_grades goes)
 # ----------------------------
 
-def run_rhythm(score_path: str, target_grade: float, *, score=None, score_factory=None, progress_cb=None, run_observed=True):
+def run_rhythm(
+    score_path: str,
+    target_grade: float,
+    *,
+    score=None,
+    score_factory=None,
+    progress_cb=None,
+    run_observed=True,
+    analysis_options=None,
+):
     if score_factory is None:
         if score is not None:
             score_factory = lambda: deepcopy(score)
@@ -219,6 +228,9 @@ def run_rhythm(score_path: str, target_grade: float, *, score=None, score_factor
     rules = load_rhythm_rules()
 
     # 1) observed grade + confidence curve (across all grades)
+    if analysis_options is not None:
+        run_observed = analysis_options.run_observed
+
     if run_observed:
         observed_grade, confidences = derive_observed_grades(
             score_factory=score_factory,

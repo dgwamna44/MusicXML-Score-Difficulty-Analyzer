@@ -30,7 +30,16 @@ class AvailabilityAnalyzer(BaseAnalyzer):
     def analyze_target(self, score, target_grade):
         return analyze_availablity_target(score, self.rules, target_grade)
     
-def run_availability(score_path: str, target_grade : float, *, score=None, score_factory=None, progress_cb=None, run_observed=True):
+def run_availability(
+    score_path: str,
+    target_grade: float,
+    *,
+    score=None,
+    score_factory=None,
+    progress_cb=None,
+    run_observed=True,
+    analysis_options=None,
+):
     data = build_instrument_data()
     rules = {i: data[i].availability for i in data}
     analyzer = AvailabilityAnalyzer(rules)
@@ -42,6 +51,9 @@ def run_availability(score_path: str, target_grade : float, *, score=None, score
             score_factory = lambda: converter.parse(score_path)
         else:
             raise ValueError("score_path or score_factory is required")
+
+    if analysis_options is not None:
+        run_observed = analysis_options.run_observed
 
     if run_observed:
         observed, confidences = derive_observed_grades(

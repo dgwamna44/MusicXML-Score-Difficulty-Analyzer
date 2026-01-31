@@ -108,10 +108,10 @@ def reconcile_ranges(master: dict) -> dict:
     return combined
 
 
-def load_combined_ranges(range_dir: str | Path = "data/range") -> dict:
+def load_combined_ranges(range_dir: str | Path = "data/range", *, file_glob: str = "*.csv") -> dict:
 
     range_dir = Path(range_dir)
-    files = sorted(range_dir.glob("*.csv"))
+    files = sorted(range_dir.glob(file_glob))
     if not files:
         raise FileNotFoundError(f"No range csv files found in {range_dir.resolve()}")
 
@@ -132,3 +132,7 @@ def load_combined_ranges(range_dir: str | Path = "data/range") -> dict:
         )
 
     return combined
+
+
+def load_string_ranges(range_dir: str | Path = "data/range") -> dict:
+    return load_combined_ranges(range_dir, file_glob="string_range*.csv")

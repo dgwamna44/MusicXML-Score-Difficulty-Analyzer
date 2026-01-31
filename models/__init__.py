@@ -1,6 +1,7 @@
 from .base_analyzer import BaseAnalyzer
 from .articulation_grade_rules import ArticulationGradeRules
 from .duration_data import DurationData, DurationGradeBucket
+from .analysis_options import AnalysisOptions
 from .instrument_data import InstrumentData
 from .key_data import KeyData
 from .meter_data import MeterData
@@ -13,6 +14,7 @@ __all__ = [
     "BaseAnalyzer",
     "DurationData",
     "DurationGradeBucket",
+    "AnalysisOptions",
     "InstrumentData",
     "KeyData",
     "MeterData",

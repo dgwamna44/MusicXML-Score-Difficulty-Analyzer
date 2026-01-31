@@ -60,7 +60,16 @@ def load_duration_rules(path: str = r"data/duration_guidelines.csv"):
     return rules
 
 
-def run_tempo_duration(score_path: str, target_grade: float, *, score=None, score_factory=None, progress_cb=None, run_observed=True):
+def run_tempo_duration(
+    score_path: str,
+    target_grade: float,
+    *,
+    score=None,
+    score_factory=None,
+    progress_cb=None,
+    run_observed=True,
+    analysis_options=None,
+):
     tempo_rules = load_tempo_rules()
     duration_rules = load_duration_rules()
 
@@ -75,6 +84,9 @@ def run_tempo_duration(score_path: str, target_grade: float, *, score=None, scor
             raise ValueError("score_path or score_factory is required")
 
     # observed grade based on tempo only (or you can build a combined curve)
+    if analysis_options is not None:
+        run_observed = analysis_options.run_observed
+
     if run_observed:
         observed, confidences = derive_observed_grades(
             score_factory=score_factory,

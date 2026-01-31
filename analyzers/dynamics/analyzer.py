@@ -16,7 +16,16 @@ class DynamicsAnalyzer(BaseAnalyzer):
     def analyze_target(self, score, target_grade: float):
         return analyze_dynamics_target(score, self.rules, target_grade)
     
-def run_dynamics(score_path, target_grade, *, score=None, score_factory=None, progress_cb=None, run_observed=True):
+def run_dynamics(
+    score_path,
+    target_grade,
+    *,
+    score=None,
+    score_factory=None,
+    progress_cb=None,
+    run_observed=True,
+    analysis_options=None,
+):
     rounded_grade = get_rounded_grade(target_grade)
     rules = load_dynamics_rules()[rounded_grade]
     analyzer = DynamicsAnalyzer(rules)
@@ -28,6 +37,9 @@ def run_dynamics(score_path, target_grade, *, score=None, score_factory=None, pr
             score_factory = lambda: converter.parse(score_path)
         else:
             raise ValueError("score_path or score_factory is required")
+
+    if analysis_options is not None:
+        run_observed = analysis_options.run_observed
 
     if run_observed:
         observed, confidences = derive_observed_grades(

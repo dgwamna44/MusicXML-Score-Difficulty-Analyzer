@@ -65,7 +65,16 @@ class MeterAnalyzer(BaseAnalyzer):
 
         return meter_data, total_conf
 
-def run_meter(score_path: str, target_grade: float, *, score=None, score_factory=None, progress_cb=None, run_observed=True):
+def run_meter(
+    score_path: str,
+    target_grade: float,
+    *,
+    score=None,
+    score_factory=None,
+    progress_cb=None,
+    run_observed=True,
+    analysis_options=None,
+):
     if score_factory is None:
         if score is not None:
             score_factory = lambda: deepcopy(score)
@@ -77,6 +86,9 @@ def run_meter(score_path: str, target_grade: float, *, score=None, score_factory
     # shared rhythm rules drive both rhythm + meter
     rules = load_rhythm_rules()
     analyzer = MeterAnalyzer(rules)
+
+    if analysis_options is not None:
+        run_observed = analysis_options.run_observed
 
     if run_observed:
         observed_grade, confidences = derive_observed_grades(

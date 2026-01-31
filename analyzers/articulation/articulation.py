@@ -53,7 +53,16 @@ def load_articulation_rules(path: str = r"data/articulation_guidelines.csv") -> 
 # Public entry point
 # ----------------------------
 
-def run_articulation(score_path: str, target_grade: float, *, score=None, score_factory=None, progress_cb=None, run_observed=True):
+def run_articulation(
+    score_path: str,
+    target_grade: float,
+    *,
+    score=None,
+    score_factory=None,
+    progress_cb=None,
+    run_observed=True,
+    analysis_options=None,
+):
     rules = load_articulation_rules()
     analyzer = ArticulationAnalyzer(rules)
 
@@ -66,6 +75,9 @@ def run_articulation(score_path: str, target_grade: float, *, score=None, score_
             raise ValueError("score_path or score_factory is required")
 
     # 1) Observed grade + confidence curve (fresh parse per grade)
+    if analysis_options is not None:
+        run_observed = analysis_options.run_observed
+
     if run_observed:
         observed, confidences = derive_observed_grades(
             score_factory=score_factory,
