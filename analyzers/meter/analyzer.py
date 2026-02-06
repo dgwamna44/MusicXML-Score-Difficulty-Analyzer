@@ -112,5 +112,8 @@ def run_meter(
         "observed_grade": observed_grade,
         "confidences": confidences,
         "meter_segments": meter_segments,
+        "analysis_notes": {
+            "meter_data": meter_segments,
+        },
         "overall_confidence": overall_conf,
     }

@@ -44,6 +44,6 @@ def apply_availability(instrument):
         return None
     else:
         pub_grades = INST_TO_GRADE_NON_STRING[instrument]
-        return round(median([pub_grades[i] for i in pub_grades if pub_grades[i] is not None])*2)/2
+        return min([pub_grades[i] for i in pub_grades if pub_grades[i] is not None])
 
 

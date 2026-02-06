@@ -134,8 +134,10 @@ def compute_range_confidence(note, core, ext, total, target_grade, key_quality):
     if key_quality == "major":
         if rel not in MAJOR_DIATONIC_MAP:
             conf = max(0.0, conf - penalty)
+            note.comments["harmonic_tolerance"] = f"Non-diatonic note {note.written_pitch} in major key for grade {target_grade}"
     else:  # minor
         if (rel not in MINOR_DIATONIC_MAP) and rel != 11:
             conf = max(0.0, conf - penalty)
+            note.comments["harmonic_tolerance"] = f"Non-diatonic note {note.written_pitch} in minor key for grade {target_grade}"
 
     return max(0.0, conf)

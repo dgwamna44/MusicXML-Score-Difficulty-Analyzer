@@ -2,7 +2,7 @@ import math
 from models import BaseAnalyzer, DurationData, DurationGradeBucket
 
 def compute_total_seconds_from_tempo_data(tempo_data) -> float:
-    return sum((60.0 / t.bpm) * t.qtr_len for t in tempo_data)
+    return sum((60.0 / t.quarter_bpm) * t.qtr_len for t in tempo_data)
 
 
 def analyze_duration_target(score, rules: dict[float, DurationGradeBucket], target_grade, tempo_data=None):

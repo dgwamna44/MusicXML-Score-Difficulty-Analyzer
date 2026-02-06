@@ -16,6 +16,159 @@ from models import AnalysisOptions
 from utilities.note_reconciler import NoteReconciler
 from app_data import FULL_GRADES
 
+
+def run_analysis_engine(
+    score_path: str,
+    target_grade: float,
+    *,
+    analysis_options: AnalysisOptions,
+    progress_cb=None,
+):
+    target_only = not analysis_options.run_observed
+    base_score = converter.parse(score_path)
+    total_measures = len(list(base_score.parts[0].getElementsByClass("Measure")))
+    score_factory = lambda: deepcopy(base_score)
+
+    analyzers = [
+        ("dynamics", run_dynamics, False),
+        ("availability", run_availability, False),
+        ("key_range", run_key_range, True),
+        ("tempo_duration", run_tempo_duration, False),
+        ("articulation", run_articulation, True),
+        ("rhythm", run_rhythm, True),
+        ("meter", run_meter, False),
+    ]
+    note_analyzers = [a for a in analyzers if a[2]]
+    other_analyzers = [a for a in analyzers if not a[2]]
+
+    def emit(event):
+        if progress_cb is not None:
+            progress_cb(event)
+
+    def progress_bar(name):
+        def _cb(grade, idx, total, label=None):
+            emit(
+                {
+                    "type": "observed",
+                    "analyzer": name,
+                    "label": label,
+                    "grade": grade,
+                    "idx": idx,
+                    "total": total,
+                }
+            )
+
+        return _cb
+
+    def analyzer_progress(step, name):
+        emit(
+            {
+                "type": "analyzer",
+                "analyzer": name,
+                "idx": step,
+                "total": len(analyzers),
+            }
+        )
+
+    def collect_partial_notes(result, name, reconciler: NoteReconciler):
+        analysis = result.get("analysis_notes") if result else None
+        if not analysis:
+            return
+        if name == "articulation":
+            for pdata in analysis.values():
+                for note in pdata.get("articulation_data", []):
+                    reconciler.add(note)
+        elif name == "rhythm":
+            for pdata in analysis.values():
+                for note in pdata.get("note_data", []):
+                    reconciler.add(note)
+        elif name == "key_range":
+            range_data = analysis.get("range_data", {})
+            for pdata in range_data.values():
+                for note in pdata.get("Note Data", []):
+                    reconciler.add(note)
+
+    results = {}
+    reconciler = NoteReconciler()
+    step = 0
+
+    for name, fn, _ in note_analyzers:
+        step += 1
+        results[name] = fn(
+            score_path,
+            target_grade,
+            score=score_factory(),
+            score_factory=score_factory,
+            progress_cb=None if target_only else progress_bar(name),
+            analysis_options=analysis_options,
+        )
+        collect_partial_notes(results[name], name, reconciler)
+        analyzer_progress(step, name)
+
+    results["reconciled_notes"] = reconciler._notes
+
+    for name, fn, _ in other_analyzers:
+        step += 1
+        results[name] = fn(
+            score_path,
+            target_grade,
+            score=score_factory(),
+            score_factory=score_factory,
+            progress_cb=None if target_only else progress_bar(name),
+            analysis_options=analysis_options,
+        )
+        analyzer_progress(step, name)
+
+    emit({"type": "done"})
+    return build_final_result(results, target_only, total_measures)
+
+
+def build_final_result(results, target_only: bool, total_measures: int | None = None):
+    observed_grades = None
+    if not target_only:
+        observed_grades = {
+            "availability": results.get("availability", {}).get("observed_grade"),
+            "dynamics": results.get("dynamics", {}).get("observed_grade"),
+            "key": results.get("key_range", {}).get("observed_grade_key"),
+            "range": results.get("key_range", {}).get("observed_grade_range"),
+            "tempo": results.get("tempo_duration", {}).get("observed_grade_tempo"),
+            "duration": results.get("tempo_duration", {}).get("observed_grade_duration"),
+            "articulation": results.get("articulation", {}).get("observed_grade"),
+            "rhythm": results.get("rhythm", {}).get("observed_grade"),
+            "meter": results.get("meter", {}).get("observed_grade"),
+        }
+
+    confidences = {
+        "availability": results.get("availability", {}).get("overall_confidence"),
+        "dynamics": results.get("dynamics", {}).get("overall_confidence"),
+        "key": results.get("key_range", {}).get("summary", {}).get("overall_key_confidence"),
+        "range": results.get("key_range", {}).get("summary", {}).get("overall_range_confidence"),
+        "tempo": results.get("tempo_duration", {}).get("summary", {}).get("overall_tempo_confidence"),
+        "duration": results.get("tempo_duration", {}).get("summary", {}).get("overall_duration_confidence"),
+        "articulation": results.get("articulation", {}).get("overall_confidence"),
+        "rhythm": results.get("rhythm", {}).get("overall_confidence"),
+        "meter": results.get("meter", {}).get("overall_confidence"),
+    }
+
+    notes = {
+        "availability": results.get("availability", {}).get("analysis_notes", {}),
+        "dynamics": results.get("dynamics", {}).get("analysis_notes", {}),
+        "key": results.get("key_range", {}).get("analysis_notes", {}).get("key_data", {}),
+        "range": results.get("key_range", {}).get("analysis_notes", {}).get("range_data", {}),
+        "tempo": results.get("tempo_duration", {}).get("analysis_notes", {}).get("tempo_data", {}),
+        "duration": results.get("tempo_duration", {}).get("analysis_notes", {}).get("duration_data", {}),
+        "articulation": results.get("articulation", {}).get("analysis_notes", {}),
+        "rhythm": results.get("rhythm", {}).get("analysis_notes", {}),
+        "meter": results.get("meter", {}).get("analysis_notes", {}),
+    }
+
+    return {
+        "observed_grades": observed_grades,
+        "confidences": confidences,
+        "analysis_notes": notes,
+        "total_measures": total_measures,
+    }
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -54,8 +207,6 @@ if __name__ == "__main__":
                   r"input_files\ijo.musicxml"]
     
     score_path = test_files[-1]
-    base_score = converter.parse(score_path)
-    score_factory = lambda: deepcopy(base_score)
 
     def progress_bar(name):
         bar_width = 50
@@ -106,119 +257,16 @@ if __name__ == "__main__":
         string_only=args.strings_only,
         observed_grades=observed_grades,
     )
-    target_only = args.target_only
-    analyzers = [
-        ("dynamics", run_dynamics, False),
-        ("availability", run_availability, False),
-        ("key_range", run_key_range, True),
-        ("tempo_duration", run_tempo_duration, False),
-        ("articulation", run_articulation, True),
-        ("rhythm", run_rhythm, True),
-        ("meter", run_meter, False),
-    ]
-    note_analyzers = [a for a in analyzers if a[2]]
-    other_analyzers = [a for a in analyzers if not a[2]]
-    target_progress = target_progress_bar(len(analyzers))
+    def cli_progress(event):
+        if event.get("type") == "observed":
+            progress_bar(event["analyzer"])(event["grade"], event["idx"], event["total"], event.get("label"))
+        elif event.get("type") == "analyzer":
+            target_progress_bar(7)(event["idx"], event["analyzer"])
 
-    def collect_partial_notes(result, name, reconciler: NoteReconciler):
-        analysis = result.get("analysis_notes") if result else None
-        if not analysis:
-            return
-        if name == "articulation":
-            for pdata in analysis.values():
-                for note in pdata.get("articulation_data", []):
-                    reconciler.add(note)
-        elif name == "rhythm":
-            for pdata in analysis.values():
-                for note in pdata.get("note_data", []):
-                    reconciler.add(note)
-        elif name == "key_range":
-            range_data = analysis.get("range_data", {})
-            for pdata in range_data.values():
-                for note in pdata.get("Note Data", []):
-                    reconciler.add(note)
-
-    results = {}
-    reconciler = NoteReconciler()
-    step = 0
-
-    for name, fn, _ in note_analyzers:
-        step += 1
-        results[name] = fn(
-            score_path,
-            target_grade,
-            score=score_factory(),
-            score_factory=score_factory,
-            progress_cb=None if target_only else progress_bar(name),
-            analysis_options=options,
-        )
-        collect_partial_notes(results[name], name, reconciler)
-        if target_only:
-            target_progress(step, name)
-
-    results["reconciled_notes"] = reconciler._notes
-
-    for name, fn, _ in other_analyzers:
-        step += 1
-        results[name] = fn(
-            score_path,
-            target_grade,
-            score=score_factory(),
-            score_factory=score_factory,
-            progress_cb=None if target_only else progress_bar(name),
-            analysis_options=options,
-        )
-        if target_only:
-            target_progress(step, name)
-
-    ava = results["availability"]
-    dyn = results["dynamics"]
-    kr = results["key_range"]
-    temp = results["tempo_duration"]
-    art = results["articulation"]
-    rhy = results["rhythm"]
-    met = results["meter"]
-    
-    confidences = {}
-    notes = {}
-    observed_grades = {}
-
-    if target_only:
-        observed_grades = None
-    else:
-        observed_grades['availability'] = ava.get('observed_grade')
-        observed_grades['dynamics'] = dyn.get('observed_grade')
-        observed_grades['key'] = kr.get('observed_grade_key')
-        observed_grades['range'] = kr.get('observed_grade_range')
-        observed_grades['tempo'] = temp.get('observed_grade_tempo')
-        observed_grades['duration'] = temp.get('observed_grade_duration')
-        observed_grades['articulation'] = art.get('observed_grade')
-        observed_grades['rhythm'] = rhy.get('observed_grade')
-        observed_grades['meter'] = met.get('observed_grade')
-
-
-    confidences['availability'] = results['availability']['overall_confidence']
-    confidences['dynamics'] = results['dynamics']['overall_confidence']
-    confidences['key'] = results['key_range']['summary']['overall_key_confidence']
-    confidences['range'] = results['key_range']['summary']['overall_range_confidence']
-    confidences['tempo'] = results['tempo_duration']['summary']['overall_tempo_confidence']
-    confidences['duration'] = results['tempo_duration']['summary']['overall_duration_confidence']
-    confidences['articulation'] = results['articulation']['overall_confidence']
-    confidences['rhythm'] = results['rhythm']['overall_confidence']
-    confidences['meter'] = results['meter']['overall_confidence']
-
-    notes['availability'] = results['availability'].get('analysis_notes', {})
-    notes['dynamics'] = results['dynamics'].get('analysis_notes', {})
-    notes['key'] = results['key_range'].get('analysis_notes', {}).get('key_data', {})
-    notes['range'] = results['key_range'].get('analysis_notes', {}).get('range_data', {})
-    notes['tempo'] = results['tempo_duration']["analysis_notes"].get('tempo_notes', {})
-    notes['duration'] = results['tempo_duration']["analysis_notes"].get('duration_notes', {})
-    notes['articulation'] = results['articulation'].get('analysis_notes', {})
-    notes['rhythm'] = results['rhythm'].get('analysis_notes', {})
-    notes['meter'] = results['meter'].get('analysis_notes', {})
-
-    final_result = {
-        "observed_grades": observed_grades,
-        "confidences": confidences,
-        "analysis_notes": notes,
-    }
+    final_result = run_analysis_engine(
+        score_path,
+        target_grade,
+        analysis_options=options,
+        progress_cb=cli_progress,
+    )
+    _ = final_result

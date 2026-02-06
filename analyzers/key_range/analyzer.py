@@ -51,7 +51,7 @@ class KeyRangeAnalyzer(BaseAnalyzer):
         # --- Note extraction (no confidence yet) ---
         note_map = extract_note_data(score, grade, ranges, key_segments)
 
-        total_notes = 0
+        total_exposure = 0.0
         total_conf = 0.0
 
         # Compute range confidence per note
@@ -82,10 +82,12 @@ class KeyRangeAnalyzer(BaseAnalyzer):
                     target_grade=grade,
                     key_quality=key_quality,
                 )
-                total_notes += 1
-                total_conf += conf
+                exposure = float(note.duration or 0.0)
+                note.range_exposure = exposure
+                total_exposure += exposure
+                total_conf += conf * exposure
 
-        avg_range_conf = (total_conf / total_notes) if total_notes else 0.0
+        avg_range_conf = (total_conf / total_exposure) if total_exposure else 0.0
 
         return (avg_range_conf, combined_conf_key)
 
@@ -124,7 +126,7 @@ class KeyRangeAnalyzer(BaseAnalyzer):
         note_map = extract_note_data(score, target_grade, ranges, key_segments)
 
         global_total_conf = 0.0
-        global_total_notes = 0
+        global_total_exposure = 0.0
 
         for original_part_name, pdata in note_map.items():
             pname = parse_part_name(original_part_name)
@@ -150,10 +152,14 @@ class KeyRangeAnalyzer(BaseAnalyzer):
                     key_quality=key_quality,
                 )
                 note.range_confidence = conf
-                global_total_conf += conf
-                global_total_notes += 1
+                exposure = float(note.duration or 0.0)
+                note.range_exposure = exposure
+                global_total_conf += conf * exposure
+                global_total_exposure += exposure
 
-        overall_range_conf = (global_total_conf / global_total_notes) if global_total_notes else 0.0
+        overall_range_conf = (
+            (global_total_conf / global_total_exposure) if global_total_exposure else 0.0
+        )
         overall_key_conf = (
             sum((k.confidence or 0.0) * (k.exposure or 0.0) for k in key_segments)
             if key_segments else 0.0

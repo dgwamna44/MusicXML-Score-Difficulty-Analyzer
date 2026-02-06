@@ -19,7 +19,10 @@ def analyze_tempo_target(score, rules, target_grade):
         seg.grade = target_grade
         seg.confidence = get_tempo_score(seg.bpm, tempo_min, tempo_max)
         if seg.confidence == 0:
-            seg.comments = f"Tempo {seg.bpm} BPM outside grade {target_grade} range ({tempo_min}-{tempo_max})"
+            seg.comments = (
+                f"Tempo {seg.bpm} ({seg.beat_unit}) "
+                f"outside grade {target_grade} range ({tempo_min}-{tempo_max})"
+            )
 
     composite = sum(s.confidence * s.exposure for s in segments)
     return segments, composite

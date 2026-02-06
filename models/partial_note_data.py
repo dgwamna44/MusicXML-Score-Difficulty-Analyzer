@@ -40,5 +40,6 @@ class PartialNoteData:
     # analyzer outputs
     relative_key_index: int | None = None
     range_confidence: float | None = None
+    range_exposure: float | None = None
     rhythm_confidence: float | None = None
     articulation_confidence: float | None = None

@@ -92,11 +92,19 @@ def run_tempo_duration(
         run_observed = analysis_options.run_observed
         grades = analysis_options.observed_grades
 
+    def _progress_tempo(grade, idx, total):
+        if progress_cb is not None:
+            progress_cb(grade, idx, total, "tempo")
+
+    def _progress_duration(grade, idx, total):
+        if progress_cb is not None:
+            progress_cb(grade, idx, total, "duration")
+
     if run_observed:
         kwargs = {
             "score_factory": score_factory,
             "analyze_confidence": analyzer.analyze_confidence,
-            "progress_cb": progress_cb,
+            "progress_cb": _progress_tempo if progress_cb is not None else None,
         }
         if grades is not None:
             kwargs["grades"] = grades
@@ -118,7 +126,7 @@ def run_tempo_duration(
         kwargs = {
             "score_factory": score_factory,
             "analyze_confidence": _duration_confidence,
-            "progress_cb": progress_cb,
+            "progress_cb": _progress_duration if progress_cb is not None else None,
         }
         if grades is not None:
             kwargs["grades"] = grades
