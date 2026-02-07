@@ -1,4 +1,6 @@
 // script.js (ES module)
+const TS_FONT_PATH = "fonts_ts";
+const KS_FONT_PATH = "fonts_key";
 
 function initTooltips() {
   const tooltipTriggerList = [].slice.call(
@@ -20,37 +22,301 @@ function initTooltips() {
 
 function buildTimelineTicks(trackEl, ticks, totalMeasures) {
   if (!trackEl) return;
-  trackEl.querySelectorAll(".timeline-tick").forEach((node) => node.remove());
-  ticks.forEach((tick) => {
-    const left = totalMeasures ? (tick.measure / totalMeasures) * 100 : 0;
+
+  let canvas = trackEl.querySelector(".timeline-canvas");
+  if (!canvas) {
+    canvas = document.createElement("div");
+    canvas.className = "timeline-canvas";
+    const line = trackEl.querySelector(".timeline-line");
+    if (line) {
+      line.remove();
+      canvas.appendChild(line);
+    }
+    trackEl.appendChild(canvas);
+  }
+
+  // Remove existing ticks
+  canvas.querySelectorAll(".timeline-tick").forEach((node) => node.remove());
+
+  // Expect ticks like: [{ measure: 12 }, { measure: 48 }, ...]
+  // If you're currently passing objects with tempo/meter/key/etc, that's fine —
+  // we ignore all of it now and only use measure.
+  const tickList = Array.isArray(ticks) ? [...ticks] : [];
+  const startMeasure = 1;
+  const endMeasure = Number.isFinite(totalMeasures) ? totalMeasures : null;
+
+  const maxMeasures = endMeasure || 0;
+  const viewWidth = trackEl.clientWidth || 0;
+  if (maxMeasures > 50 && viewWidth > 0) {
+    const measureWidth = viewWidth / 50;
+    const canvasWidth = Math.max(viewWidth, maxMeasures * measureWidth);
+    canvas.style.width = `${canvasWidth}px`;
+    trackEl.style.overflowX = "auto";
+  } else {
+    canvas.style.width = "100%";
+    trackEl.style.overflowX = "hidden";
+  }
+
+  if (!tickList.some((tick) => tick?.measure === startMeasure)) {
+    tickList.unshift({ measure: startMeasure });
+  }
+  if (endMeasure && !tickList.some((tick) => tick?.measure === endMeasure)) {
+    tickList.push({ measure: endMeasure });
+  }
+
+  tickList.forEach((tick) => {
+    const measure = Number(tick?.measure);
+    if (!Number.isFinite(measure) || measure <= 0) return;
+
+    let left = 0;
+    if (endMeasure && endMeasure > 1) {
+      left = ((measure - 1) / (endMeasure - 1)) * 100;
+    }
+
     const tickEl = document.createElement("div");
-    tickEl.className = `timeline-tick ${tick.tempo ? "tick-tempo" : "tick-meter"}`;
+    const isStart = measure === startMeasure;
+    const isEnd = measure === endMeasure;
+    tickEl.className = `timeline-tick${isStart ? " timeline-tick-start" : ""}${isEnd ? " timeline-tick-end" : ""}`;
     tickEl.style.left = `${Math.max(0, Math.min(100, left))}%`;
 
-    const above = document.createElement("div");
-    above.className = "tick-above";
-    above.textContent = tick.tempo || tick.meter || "";
-    tickEl.appendChild(above);
+    const hasMeter = Boolean(tick.meter);
+    const hasTempo = tick.tempo_bpm != null || tick.tempo;
+    if (hasMeter || hasTempo) {
+      const topRow = document.createElement("div");
+      topRow.className = "tick-top";
 
-    if (tick.tempo && tick.meter) {
-      const above2 = document.createElement("div");
-      above2.className = "tick-above";
-      above2.textContent = tick.meter;
-      tickEl.appendChild(above2);
+      if (hasMeter) {
+        const [num, den] = String(tick.meter)
+          .split("/")
+          .map((s) => s.trim());
+        if (num && den) {
+          topRow.appendChild(makeTimeSigSvgEl(num, den));
+        }
+      }
+
+      if (hasTempo) {
+        const wrap = document.createElement("div");
+        wrap.className = "tick-tempo";
+
+        const beatUnit = tick.tempo_beat_unit;
+        const bpm = tick.tempo_bpm ?? tick.tempo;
+        const svgSrc = tempoSvgForBeatUnit(beatUnit);
+
+        if (svgSrc) {
+          const img = document.createElement("img");
+          img.className = "tick-tempo-icon";
+          img.src = svgSrc;
+          img.alt = beatUnit ? `${beatUnit} note` : "Tempo";
+          wrap.appendChild(img);
+        }
+
+        const txt = document.createElement("span");
+        txt.className = "tick-tempo-text";
+        if (svgSrc) {
+          txt.textContent = `=${bpm}`;
+        } else if (beatUnit) {
+          txt.textContent = `${beatUnit}=${bpm}`;
+        } else {
+          txt.textContent = String(bpm);
+        }
+        wrap.appendChild(txt);
+
+        topRow.appendChild(wrap);
+      }
+
+      tickEl.appendChild(topRow);
     }
 
     const mark = document.createElement("div");
     mark.className = "tick-mark";
     tickEl.appendChild(mark);
 
-    const below = document.createElement("div");
-    below.className = "tick-below";
-    below.textContent = tick.key || "";
-    tickEl.appendChild(below);
+    if (!isStart && !isEnd) {
+      const measureEl = document.createElement("div");
+      measureEl.className = "tick-measure";
+      measureEl.textContent = String(measure);
+      tickEl.appendChild(measureEl);
+    }
 
-    trackEl.appendChild(tickEl);
+    if (tick.key) {
+      tickEl.appendChild(makeKeySigSvgEl(tick.key, tick.key_quality));
+    }
+
+    canvas.appendChild(tickEl);
   });
 }
+
+function digitImg(digit) {
+  const img = document.createElement("img");
+  img.className = "ts-digit";
+  img.src = `${TS_FONT_PATH}/${digit}.svg`;
+  img.alt = digit;
+  img.draggable = false;
+
+  return img;
+}
+
+function renderNumberAsSvgs(n) {
+  const row = document.createElement("div");
+  row.className = "ts-row";
+
+  const str = String(n).replace(/\D/g, ""); // keep digits only
+  for (const ch of str) row.appendChild(digitImg(ch));
+
+  return row;
+}
+
+function makeTimeSigSvgEl(numerator, denominator) {
+  const wrap = document.createElement("div");
+  wrap.className = "tick-timesig";
+  wrap.setAttribute(
+    "aria-label",
+    `Time signature ${numerator} over ${denominator}`,
+  );
+
+  wrap.appendChild(renderNumberAsSvgs(numerator));
+  wrap.appendChild(renderNumberAsSvgs(denominator));
+  return wrap;
+}
+
+function tempoSvgForBeatUnit(beatUnit) {
+  if (!beatUnit) return null;
+  const norm = String(beatUnit).trim().toLowerCase();
+  if (norm.includes("dotted")) return null;
+  if (norm === "quarter" || norm === "quarter note") {
+    return `${TS_FONT_PATH}/quarter.svg`;
+  }
+  if (norm === "half" || norm === "half note") {
+    return `${TS_FONT_PATH}/half.svg`;
+  }
+  return null;
+}
+
+function makeKeySigSvgEl(keyName, quality) {
+  const wrap = document.createElement("div");
+  wrap.className = "tick-key-wrap";
+
+  const textVal = String(keyName || "").trim();
+  const match = textVal.match(/^([A-Ga-g])([#b-])?/);
+  if (match) {
+    const letter = match[1].toUpperCase();
+    const accidental = match[2];
+    const letterEl = document.createElement("span");
+    letterEl.className = "tick-key-letter";
+    letterEl.textContent = letter;
+    wrap.appendChild(letterEl);
+    if (accidental === "#") {
+      const acc = document.createElement("span");
+      acc.className = "tick-key-accidental";
+      acc.textContent = "♯";
+      wrap.appendChild(acc);
+    } else if (accidental === "b" || accidental === "-") {
+      const acc = document.createElement("span");
+      acc.className = "tick-key-accidental";
+      acc.textContent = "♭";
+      wrap.appendChild(acc);
+    }
+  }
+
+  if (quality) {
+    const q = String(quality).toLowerCase();
+    if (q.startsWith("min")) {
+      const minorEl = document.createElement("span");
+      minorEl.className = "tick-key-minor";
+      minorEl.textContent = "m";
+      wrap.appendChild(minorEl);
+    }
+  }
+
+  return wrap;
+}
+
+function keySigImg(filename, alt) {
+  const img = document.createElement("img");
+  img.className = "tick-key-icon";
+  img.src = `${KS_FONT_PATH}/${filename}`;
+  img.alt = alt;
+  img.draggable = false;
+  img.onerror = () => console.warn("Missing key SVG:", img.src);
+  return img;
+}
+
+function toMeasureArray(data) {
+  if (!data) return [];
+
+  if (Array.isArray(data))
+    return data.map((x) => x.measure).filter(Number.isFinite);
+
+  if (typeof data === "object" && data !== null && "measure" in data) {
+    return Number.isFinite(data.measure) ? [data.measure] : [];
+  }
+
+  return Object.values(data)
+    .map((x) => x?.measure)
+    .filter(Number.isFinite);
+}
+
+
+function prepareTimelineTicks() {
+  const analysisData = window.analysisResult?.result;
+  const notes = analysisData?.analysis_notes || {};
+  const keyData = Array.isArray(notes.key)
+    ? notes.key
+    : Object.values(notes.key || {});
+  const tempoData = Array.isArray(notes.tempo)
+    ? notes.tempo
+    : Object.values(notes.tempo || {});
+  const meterData = Array.isArray(notes.meter?.meter_data)
+    ? notes.meter.meter_data
+    : [];
+
+  const merged = new Map();
+  const upsert = (measure, fields) => {
+    if (!Number.isFinite(measure)) return;
+    const current = merged.get(measure) || { measure };
+    merged.set(measure, { ...current, ...fields });
+  };
+
+  keyData.forEach((item) => {
+    const rawMeasure = Number(item?.measure);
+    const measure = rawMeasure <= 0 ? 1 : rawMeasure;
+    upsert(measure, {
+      key: item?.key || item?.tonic || item?.name,
+      key_quality: item?.quality,
+    });
+  });
+
+  tempoData.forEach((item) => {
+    const bpm = item?.bpm ?? item?.tempo ?? item?.number;
+    const beatUnit = item?.beat_unit;
+    const rawMeasure = Number(item?.measure);
+    const measure = rawMeasure <= 0 ? 1 : rawMeasure;
+    upsert(measure, {
+      tempo_bpm: bpm,
+      tempo_beat_unit: beatUnit,
+      tempo: bpm != null ? String(bpm) : null,
+    });
+  });
+
+  meterData.forEach((item) => {
+    const rawMeasure = Number(item?.measure);
+    const measure = rawMeasure <= 0 ? 1 : rawMeasure;
+    upsert(measure, {
+      meter: item?.time_signature,
+    });
+  });
+
+  return [...merged.values()].sort((a, b) => a.measure - b.measure);
+}
+
+function setTimelineLabels(totalMeasures) {
+  const startEl = document.querySelector("#startingMeasureLabel");
+  const endEl = document.querySelector("#endingMeasureLabel");
+  if (startEl) startEl.textContent = "1";
+  if (endEl) endEl.textContent = totalMeasures ? String(totalMeasures) : "--";
+}
+
+window.prepareTimelineTicks = prepareTimelineTicks;
 
 function getMarkerByLabel(label) {
   const rows = [...document.querySelectorAll(".bar-row")];
@@ -161,47 +427,15 @@ function initAnalysisRequest() {
 
   if (progressOkBtn) {
     progressOkBtn.addEventListener("click", () => {
-      var measures = window.analysisResult.result.total_measures;
+      // Just close modal; do NOT clear/rebuild timeline here.
+
+      if (!window.analysisResult) return;
+
+      const totalMeasures = window.analysisResult?.result?.total_measures ?? 0;
       setMarkerPositions(window.analysisResult?.result?.confidences);
-      document.querySelector("#startingMeasureLabel").textContent = 1;
-      document.querySelector("#endingMeasureLabel").textContent = measures;
+      setTimelineLabels(totalMeasures);
     });
   }
-
-function toMeasureArray(data) {
-  if (!data) return [];
-
-  // already an array of objects
-  if (Array.isArray(data)) return data.map(x => x.measure).filter(Number.isFinite);
-
-  // single object with a measure
-  if (typeof data === "object" && data !== null && "measure" in data) {
-    return Number.isFinite(data.measure) ? [data.measure] : [];
-  }
-
-  // object-of-objects
-  return Object.values(data)
-    .map(x => x?.measure)
-    .filter(Number.isFinite);
-}
-
-function prepareTimelineTicks() {
-  const marks = {};
-
-  const analysisData = window.analysisResult?.result;
-  const notes = analysisData?.analysis_notes || {};
-  const keyData = notes.key;
-  const tempoData = notes.tempo;
-  const meterData = notes.meter?.meter_data;
-
-  marks.Key   = toMeasureArray(keyData);
-  marks.Tempo = toMeasureArray(tempoData);
-  marks.Meter = toMeasureArray(meterData);
-
-  return marks; // (optional) useful to return it
-}
-
-window.prepareTimelineTicks = prepareTimelineTicks;
   const labelMap = {
     range: "Range",
     key: "Key",
@@ -402,12 +636,18 @@ window.prepareTimelineTicks = prepareTimelineTicks;
           .then((r) => r.json())
           .then((result) => {
             window.analysisResult = result;
-            console.log("Analysis result:", result);
+
+            const totalMeasures = result?.result?.total_measures ?? 0;
+
+            setTimelineLabels(totalMeasures);
+
+            const ticks = prepareTimelineTicks();
+            console.log("ticks:", ticks);
+            const track = document.getElementById("timelineTrack");
+
+            buildTimelineTicks(track, ticks, totalMeasures);
           })
           .catch((err) => console.error("Failed to fetch result:", err));
-        progressOkBtn.addEventListener("click", async () => {
-          setMarkerPositions(result?.result?.confidences);
-        });
       }
     };
 
@@ -418,6 +658,26 @@ window.prepareTimelineTicks = prepareTimelineTicks;
       console.warn("Progress stream error; analysisResult not set yet.");
     };
   });
+}
+
+function initTimelineToggles() {
+  const timeline = document.querySelector(".timeline");
+  if (!timeline) return;
+
+  const bind = (id, className) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const sync = () => {
+      timeline.classList.toggle(className, !el.checked);
+    };
+    el.addEventListener("change", sync);
+    sync();
+  };
+
+  bind("toggleMeasures", "hide-measures");
+  bind("toggleKey", "hide-key");
+  bind("toggleTempo", "hide-tempo");
+  bind("toggleMeter", "hide-meter");
 }
 
 function extractScoreTitle(text) {
@@ -626,6 +886,11 @@ async function initVerovio() {
       },
       { emptyLabel: "--" },
     );
+    const track = document.getElementById("timelineTrack");
+    if (track) {
+      track.querySelectorAll(".timeline-tick").forEach((node) => node.remove());
+    }
+    setTimelineLabels();
   });
 
   zoomApply?.addEventListener("click", () =>
@@ -642,4 +907,6 @@ async function initVerovio() {
 initTooltips();
 initGradeOptions();
 initAnalysisRequest();
+initTimelineToggles();
 initVerovio().catch((err) => console.error("initVerovio failed:", err));
+setTimelineLabels();

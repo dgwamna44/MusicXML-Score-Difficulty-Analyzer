@@ -116,7 +116,14 @@ def run_tempo_duration(
     if score is None:
         score = score_factory()
     tempo_data, tempo_conf = analyzer.analyze_target(score, target_grade)
-    duration_data, duration_conf = analyze_duration_target(score, duration_rules, target_grade, tempo_data=tempo_data)
+    duration_data, duration_conf = analyze_duration_target(
+        score,
+        duration_rules,
+        target_grade,
+        tempo_data=tempo_data,
+    )
+    tempo_conf = min(1.0, max(0.0, tempo_conf))
+    duration_conf = min(1.0, max(0.0, duration_conf))
 
     # observed grade based on duration (uses tempo-derived duration)
     if run_observed:

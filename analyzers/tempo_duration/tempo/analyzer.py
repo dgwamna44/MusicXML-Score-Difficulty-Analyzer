@@ -24,7 +24,8 @@ def analyze_tempo_target(score, rules, target_grade):
                 f"outside grade {target_grade} range ({tempo_min}-{tempo_max})"
             )
 
-    composite = sum(s.confidence * s.exposure for s in segments)
+    composite = sum((s.confidence or 0.0) * (s.exposure or 0.0) for s in segments)
+    composite = min(1.0, max(0.0, composite))
     return segments, composite
 
 

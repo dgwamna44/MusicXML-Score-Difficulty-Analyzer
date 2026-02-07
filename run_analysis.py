@@ -3,7 +3,7 @@ from time import perf_counter
 import argparse
 import sys
 
-from music21 import converter
+from music21 import converter, stream
 
 from analyzers.articulation.articulation import run_articulation
 from analyzers.rhythm import run_rhythm
@@ -26,7 +26,7 @@ def run_analysis_engine(
 ):
     target_only = not analysis_options.run_observed
     base_score = converter.parse(score_path)
-    total_measures = len(list(base_score.parts[0].getElementsByClass("Measure")))
+    total_measures = len(list(base_score.parts[0].getElementsByClass(stream.Measure)))
     score_factory = lambda: deepcopy(base_score)
 
     analyzers = [
@@ -124,6 +124,14 @@ def run_analysis_engine(
 
 
 def build_final_result(results, target_only: bool, total_measures: int | None = None):
+    def clamp_conf(value):
+        if value is None:
+            return None
+        try:
+            return min(1.0, max(0.0, float(value)))
+        except (TypeError, ValueError):
+            return None
+
     observed_grades = None
     if not target_only:
         observed_grades = {
@@ -139,15 +147,15 @@ def build_final_result(results, target_only: bool, total_measures: int | None = 
         }
 
     confidences = {
-        "availability": results.get("availability", {}).get("overall_confidence"),
-        "dynamics": results.get("dynamics", {}).get("overall_confidence"),
-        "key": results.get("key_range", {}).get("summary", {}).get("overall_key_confidence"),
-        "range": results.get("key_range", {}).get("summary", {}).get("overall_range_confidence"),
-        "tempo": results.get("tempo_duration", {}).get("summary", {}).get("overall_tempo_confidence"),
-        "duration": results.get("tempo_duration", {}).get("summary", {}).get("overall_duration_confidence"),
-        "articulation": results.get("articulation", {}).get("overall_confidence"),
-        "rhythm": results.get("rhythm", {}).get("overall_confidence"),
-        "meter": results.get("meter", {}).get("overall_confidence"),
+        "availability": clamp_conf(results.get("availability", {}).get("overall_confidence")),
+        "dynamics": clamp_conf(results.get("dynamics", {}).get("overall_confidence")),
+        "key": clamp_conf(results.get("key_range", {}).get("summary", {}).get("overall_key_confidence")),
+        "range": clamp_conf(results.get("key_range", {}).get("summary", {}).get("overall_range_confidence")),
+        "tempo": clamp_conf(results.get("tempo_duration", {}).get("summary", {}).get("overall_tempo_confidence")),
+        "duration": clamp_conf(results.get("tempo_duration", {}).get("summary", {}).get("overall_duration_confidence")),
+        "articulation": clamp_conf(results.get("articulation", {}).get("overall_confidence")),
+        "rhythm": clamp_conf(results.get("rhythm", {}).get("overall_confidence")),
+        "meter": clamp_conf(results.get("meter", {}).get("overall_confidence")),
     }
 
     notes = {

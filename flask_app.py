@@ -30,6 +30,14 @@ def make_json_safe(value):
     return str(value)
 
 
+def parse_bool(value) -> bool:
+    if value is None:
+        return False
+    if isinstance(value, bool):
+        return value
+    return str(value).strip().lower() in {"1", "true", "yes", "on"}
+
+
 @app.get("/")
 def index():
     return send_from_directory("html", "index.html")
@@ -48,9 +56,9 @@ def _run_job(job_id, payload):
         q.put(event)
 
     try:
-        target_only = bool(payload.get("target_only"))
-        strings_only = bool(payload.get("strings_only"))
-        full_grade = bool(payload.get("full_grade_analysis"))
+        target_only = parse_bool(payload.get("target_only"))
+        strings_only = parse_bool(payload.get("strings_only"))
+        full_grade = parse_bool(payload.get("full_grade_analysis"))
         score_path = payload.get("score_path")
         target_grade = float(payload.get("target_grade", 2))
         observed_grades = None
