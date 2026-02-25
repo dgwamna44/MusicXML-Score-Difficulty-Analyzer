@@ -1226,108 +1226,114 @@ function buildTimelineTicks(trackEl, ticks, totalMeasures) {
   canvas.querySelectorAll(".timeline-tick").forEach((n) => n.remove());
 
   let tickList = Array.isArray(ticks) ? [...ticks] : [];
-    const startMeasure = 1;
-    const totalNum = Number(totalMeasures);
-    const endMeasure =
-      Number.isFinite(totalNum) && totalNum > 0 ? totalNum : null;
-    const derivedEnd = tickList.length
-      ? Math.max(...tickList.map((t) => Number(t?.measure) || 0))
-      : null;
-    const endMeasureValue = endMeasure || derivedEnd || null;
+  const startMeasure = 1;
+  const totalNum = Number(totalMeasures);
+  const endMeasure =
+    Number.isFinite(totalNum) && totalNum > 0 ? totalNum : null;
+  const derivedEnd = tickList.length
+    ? Math.max(...tickList.map((t) => Number(t?.measure) || 0))
+    : null;
+  const endMeasureValue = endMeasure || derivedEnd || null;
 
   // ── Canvas width ──────────────────────────────────────────────────────────
   // Keep ~50 measures visible per viewport; scroll only beyond that.
-    const MEASURES_PER_VIEW = 50;
-    const TIMELINE_SIDE_PAD = 14;
-    const rawWidth =
-      trackEl.clientWidth ||
-      trackEl.parentElement?.clientWidth ||
-      window.innerWidth ||
-      600;
-    const viewWidth = Math.max(200, rawWidth - TIMELINE_SIDE_PAD * 2);
+  const MEASURES_PER_VIEW = 50;
+  const TIMELINE_SIDE_PAD = 14;
+  const rawWidth =
+    trackEl.clientWidth ||
+    trackEl.parentElement?.clientWidth ||
+    window.innerWidth ||
+    600;
+  const viewWidth = Math.max(200, rawWidth - TIMELINE_SIDE_PAD * 2);
 
-    canvas.style.padding = `0 ${TIMELINE_SIDE_PAD}px`;
-    canvas.style.boxSizing = "border-box";
+  canvas.style.padding = `0 ${TIMELINE_SIDE_PAD}px`;
+  canvas.style.boxSizing = "border-box";
+  canvas.style.position = "relative";
 
-    if (endMeasureValue && endMeasureValue > 1) {
-      const pxPerMeasure = Math.max(8, Math.floor(viewWidth / MEASURES_PER_VIEW));
-      const naturalWidth =
-        endMeasureValue * pxPerMeasure + TIMELINE_SIDE_PAD * 2;
-      if (endMeasureValue > MEASURES_PER_VIEW) {
-        canvas.style.width = `${naturalWidth}px`;
-        canvas.style.minWidth = `${naturalWidth}px`;
-        trackEl.style.overflowX = "auto";
-      } else {
-        canvas.style.width = "100%";
-        canvas.style.minWidth = "100%";
-        trackEl.style.overflowX = "hidden";
-      }
+  if (endMeasureValue && endMeasureValue > 1) {
+    const pxPerMeasure = Math.max(8, Math.floor(viewWidth / MEASURES_PER_VIEW));
+    const naturalWidth =
+      endMeasureValue * pxPerMeasure + TIMELINE_SIDE_PAD * 2;
+    if (endMeasureValue > MEASURES_PER_VIEW) {
+      canvas.style.width = `${naturalWidth}px`;
+      canvas.style.minWidth = `${naturalWidth}px`;
+      trackEl.style.overflowX = "auto";
     } else {
       canvas.style.width = "100%";
       canvas.style.minWidth = "100%";
       trackEl.style.overflowX = "hidden";
     }
+  } else {
+    canvas.style.width = "100%";
+    canvas.style.minWidth = "100%";
+    trackEl.style.overflowX = "hidden";
+  }
 
   // ── Ensure start/end ticks exist ──────────────────────────────────────────
   if (!tickList.some((t) => Number(t?.measure) === startMeasure)) {
     tickList.unshift({ measure: startMeasure });
   }
-    if (
-      endMeasureValue &&
-      !tickList.some((t) => Number(t?.measure) === endMeasureValue)
-    ) {
-      tickList.push({ measure: endMeasureValue });
-    }
+  if (
+    endMeasureValue &&
+    !tickList.some((t) => Number(t?.measure) === endMeasureValue)
+  ) {
+    tickList.push({ measure: endMeasureValue });
+  }
 
   // ── Position helper ───────────────────────────────────────────────────────
-  // Maps measure number → left% across the canvas.
-  // We use (measure - 1) / (total - 1) so measure 1 = 0% and last = 100%.
+  // Maps measure number → left% within the canvas's content area
+  // Measure 1 = 0%, last measure = 100%
   const measureToPercent = (measure) => {
-      if (!endMeasureValue || endMeasureValue <= 1) return 0;
-      return ((measure - 1) / (endMeasureValue - 1)) * 100;
-    };
+    if (!endMeasureValue || endMeasureValue <= 1) return 0;
+    return ((measure - 1) / (endMeasureValue - 1)) * 100;
+  };
 
   // ── Build each tick ───────────────────────────────────────────────────────
   tickList.forEach((tick) => {
     const measure = Number(tick?.measure);
     if (!Number.isFinite(measure) || measure <= 0) return;
 
-    const pct      = measureToPercent(measure);
-    const isStart  = measure === startMeasure;
-      const isEnd    = measure === endMeasureValue;
+    const pct = measureToPercent(measure);
+    const isStart = measure === startMeasure;
+    const isEnd = measure === endMeasureValue;
     const hasIssue = Boolean(tick.issue);
     const hasMeter = Boolean(tick.meter);
     const hasTempo = tick.tempo_bpm != null || tick.tempo != null;
-    const hasKey   = Boolean(tick.key);
+    const hasKey = Boolean(tick.key);
     const issueOnly = hasIssue && !hasMeter && !hasTempo && !hasKey;
 
     const tickEl = document.createElement("div");
     tickEl.className = "timeline-tick";
-    if (isStart)   tickEl.classList.add("timeline-tick-start");
-    if (isEnd)     tickEl.classList.add("timeline-tick-end");
-    if (hasIssue)  tickEl.classList.add("timeline-tick-issue");
+    if (isStart) tickEl.classList.add("timeline-tick-start");
+    if (isEnd) tickEl.classList.add("timeline-tick-end");
+    if (hasIssue) tickEl.classList.add("timeline-tick-issue");
     if (issueOnly) tickEl.classList.add("timeline-tick-issue-only");
 
-    // Position: clamp so first/last ticks stay fully visible
-      const clampedPct = Math.max(0, Math.min(100, pct));
-      const EDGE_TICK_OFFSET_PX = 10;
-      if (isStart) {
-        tickEl.style.left = `${EDGE_TICK_OFFSET_PX}px`;
-        tickEl.style.transform = "translateX(0)";
-      } else if (isEnd) {
-        tickEl.style.left = `calc(100% - ${EDGE_TICK_OFFSET_PX}px)`;
-        tickEl.style.transform = "translateX(-100%)";
-      } else {
-        tickEl.style.left = `${clampedPct}%`;
-        // All non-edge ticks use the CSS default: translateX(-50%)
-      }
+    // ── Position ticks ────────────────────────────────────────────────────────
+    // All ticks use translateX(-50%) to center on their position.
+    // For start/end, we clamp the position to ensure they stay visible.
+    const EDGE_BUFFER_PX = 10; // Pixels from edge to keep tick center from hitting boundary
+    
+    if (isStart) {
+      // Keep first tick visible: minimum left position
+      tickEl.style.left = `${EDGE_BUFFER_PX}px`;
+      tickEl.style.transform = "translateX(-50%)";
+    } else if (isEnd) {
+      // Keep last tick visible: maximum right position
+      tickEl.style.left = `calc(100% - ${EDGE_BUFFER_PX}px)`;
+      tickEl.style.transform = "translateX(-50%)";
+    } else {
+      // Regular ticks: center on their percentage position
+      tickEl.style.left = `${pct}%`;
+      tickEl.style.transform = "translateX(-50%)";
+    }
 
     // ── Annotations row (above the stem) ──────────────────────────────────
-      if (hasMeter || hasTempo) {
-        const topRow = document.createElement("div");
-        topRow.className = "tick-top";
+    if (hasMeter || hasTempo) {
+      const topRow = document.createElement("div");
+      topRow.className = "tick-top";
 
-        // Time signature
+      // Time signature (topmost)
       if (hasMeter) {
         const parts = String(tick.meter).split("/").map((s) => s.trim());
         if (parts.length === 2) {
@@ -1335,13 +1341,13 @@ function buildTimelineTicks(trackEl, ticks, totalMeasures) {
         }
       }
 
-      // Tempo
-        if (hasTempo) {
-          const wrap = document.createElement("div");
-          wrap.className = "tick-tempo";
+      // Tempo (below meter if both present)
+      if (hasTempo) {
+        const wrap = document.createElement("div");
+        wrap.className = "tick-tempo";
         const beatUnit = tick.tempo_beat_unit;
-        const bpm      = tick.tempo_bpm ?? tick.tempo;
-        const svgSrc   = tempoSvgForBeatUnit(beatUnit);
+        const bpm = tick.tempo_bpm ?? tick.tempo;
+        const svgSrc = tempoSvgForBeatUnit(beatUnit);
 
         if (svgSrc) {
           const img = document.createElement("img");
@@ -1358,41 +1364,41 @@ function buildTimelineTicks(trackEl, ticks, totalMeasures) {
           : beatUnit
             ? `${beatUnit}=${bpm}`
             : String(bpm);
-          wrap.appendChild(txt);
-          topRow.appendChild(wrap);
-        }
-
-        tickEl.appendChild(topRow);
+        wrap.appendChild(txt);
+        topRow.appendChild(wrap);
       }
 
-      const keyEl = hasKey
-        ? makeKeySigSvgEl(tick.key, tick.key_quality)
-        : null;
-      if (keyEl) keyEl.classList.add("tick-key-bottom");
+      tickEl.appendChild(topRow);
+    }
 
-    // ── Stem ──────────────────────────────────────────────────────────────
+    // ── Stem (the vertical tick mark) ─────────────────────────────────────
     const mark = document.createElement("div");
     mark.className = "tick-mark";
     tickEl.appendChild(mark);
 
     // ── Measure label (below stem, skip for start/end boundary ticks) ────
-      if (!isStart && !isEnd) {
-        const measureEl = document.createElement("button");
-        measureEl.type = "button";
-        measureEl.className = "tick-measure";
-        if (hasIssue) measureEl.classList.add("tick-measure-issue");
-        measureEl.dataset.measure = String(measure);
-        measureEl.textContent = String(measure);
+    if (!isStart && !isEnd) {
+      const measureEl = document.createElement("button");
+      measureEl.type = "button";
+      measureEl.className = "tick-measure";
+      if (hasIssue) measureEl.classList.add("tick-measure-issue");
+      measureEl.dataset.measure = String(measure);
+      measureEl.textContent = String(measure);
       measureEl.addEventListener("click", (evt) => {
         evt.stopPropagation();
         renderMeasureDetails(measure);
-        });
-        tickEl.appendChild(measureEl);
-      }
+      });
+      tickEl.appendChild(measureEl);
+    }
 
-      if (keyEl) {
-        tickEl.appendChild(keyEl);
-      }
+    // ── Key signature (bottom) ────────────────────────────────────────────
+    const keyEl = hasKey
+      ? makeKeySigSvgEl(tick.key, tick.key_quality)
+      : null;
+    if (keyEl) {
+      keyEl.classList.add("tick-key-bottom");
+      tickEl.appendChild(keyEl);
+    }
 
     canvas.appendChild(tickEl);
   });

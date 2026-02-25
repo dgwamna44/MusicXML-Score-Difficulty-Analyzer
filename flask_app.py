@@ -340,7 +340,7 @@ def _handle_analyze(*, force_inline: bool = False):
     if MAX_QUEUE_SIZE and get_queue_size(q) >= MAX_QUEUE_SIZE:
         return jsonify({"error": "Analysis queue full. Try again shortly."}), 429
     q.enqueue(
-        _run_job,
+        "flask_app._run_job",
         job_id,
         payload,
         job_id=job_id,
