@@ -8,7 +8,7 @@ def derive_observed_grades(
     score_factory: Callable[[], object],
     analyze_confidence: Callable[[object, float], Optional[float]],
     grades=GRADES,
-    flat_threshold: float = 0.97,
+    flat_threshold: float = 0.9,
     flat_epsilon: float = 0.02,
     progress_cb: Optional[Callable[..., None]] = None,
 ) -> Tuple[Optional[float], Dict[float, Optional[float]]]:
@@ -62,6 +62,13 @@ def _derive_observed_grade(
 
     grades = sorted(filtered.keys())
     values = [filtered[g] for g in grades]
+
+    # If grade 0.5 already meets the threshold, treat higher-grade gains as negligible.
+    for grade, conf in zip(grades, values):
+        if float(grade) == 0.5:
+            if conf >= flat_threshold:
+                return grade
+            break
 
     # "too easy" / flat-high detector:
     if min(values) >= flat_threshold and (max(values) - min(values)) <= flat_epsilon:

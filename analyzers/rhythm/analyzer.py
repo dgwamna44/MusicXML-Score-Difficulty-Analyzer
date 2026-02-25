@@ -9,6 +9,7 @@ from analyzers.rhythm.helpers import (
     is_implicit_empty_measure,
     is_extreme_hit,   # expects: is_extreme_hit(note, rule_results, grade)->bool
     mark_eighth_pairs,
+    is_percussion_instrument,
 )
 from analyzers.rhythm.note_rules import rule_dotted, rule_subdivision, rule_syncopation, rule_tuplet
 from analyzers.rhythm.rules import load_rhythm_rules
@@ -75,6 +76,8 @@ def analyze_rhythm_confidence(score, rules, grade: float) -> float | None:
     rules_for_grade = rules.get(rule_grade) if rule_grade is not None else None
     if rules_for_grade is None:
         return None
+    perc_rule_grade = get_closest_grade(2.0, rules.keys())
+    perc_rules = rules.get(perc_rule_grade) if perc_rule_grade is not None else rules_for_grade
 
     part_confs: list[float] = []
 
@@ -147,7 +150,13 @@ def analyze_rhythm_confidence(score, rules, grade: float) -> float | None:
                 if note.rhythm_token is None:
                     continue
 
-                note_conf, res = compute_note_confidence(note, rules_for_grade, grade)
+                rules_for_note = (
+                    perc_rules
+                    if is_percussion_instrument(getattr(note, "instrument", None))
+                    and float(grade) < 2.0
+                    else rules_for_grade
+                )
+                note_conf, res = compute_note_confidence(note, rules_for_note, grade)
 
                 # measure-level extreme flag
                 if is_extreme_hit(note, res, grade):
@@ -217,6 +226,8 @@ def analyze_rhythm_target(score, rules, target_grade: float):
     rules_for_grade = rules.get(rule_grade) if rule_grade is not None else None
     if rules_for_grade is None:
         return {}, None
+    perc_rule_grade = get_closest_grade(2.0, rules.keys())
+    perc_rules = rules.get(perc_rule_grade) if perc_rule_grade is not None else rules_for_grade
 
     # Build note data
     for part in score.parts:
@@ -307,7 +318,13 @@ def analyze_rhythm_target(score, rules, target_grade: float):
             if note.rhythm_token is None:
                 continue
 
-            note_conf, res = compute_note_confidence(note, rules_for_grade, target_grade)
+            rules_for_note = (
+                perc_rules
+                if is_percussion_instrument(getattr(note, "instrument", None))
+                and float(target_grade) < 2.0
+                else rules_for_grade
+            )
+            note_conf, res = compute_note_confidence(note, rules_for_note, target_grade)
             note.rhythm_confidence = note_conf
 
             if any((label == "Subdivision" and conf == 0.0) for conf, _, label in res):

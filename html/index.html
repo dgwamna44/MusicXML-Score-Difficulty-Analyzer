@@ -5,34 +5,38 @@
   <meta charset="UTF-8" />
   <title>eXeMpLify Score Analyzer</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="score-analyzer-api" content="https://exemplify-analyzer-dc964678cf01.herokuapp.com">
+  <meta name="score-analyzer-api" content="http://127.0.0.1:5000">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=20260223b">
 </head>
 
 <body>
   <div class="app container-fluid px-3 px-lg-4">
-    <header class="row align-items-center g-3 py-3">
-      <div class="col-12 col-lg-4">
-        <div class="brand">eXeMpLify</div>
-      </div>
-      <div class="col-12 col-lg-8">
-        <div class="header-controls">
-          <div class="toggles">
-            <label class="form-check form-switch toggle" data-bs-toggle="tooltip"
-              title="Only run analysis for given grade; reduces overall processing time in lieu of providing an observed grade">
-              <input class="form-check-input" type="checkbox" id="targetOnly" />
-              <span class="form-check-label">Target Analysis Only</span>
-            </label>
-            <label class="form-check form-switch toggle" data-bs-toggle="tooltip"
-              title="Expands analysis to compare against all fractional grades (1.5 to 4.5). Takes longer.">
-              <input class="form-check-input" type="checkbox" id="fullGradeSearch" />
-              <span class="form-check-label">Full Grade Search</span>
-            </label>
-            <button class="btn btn-outline-primary btn-sm key-analysis-btn" id="keyAnalysisBtn" data-bs-toggle="tooltip"
-              title="Choose how key spellings are interpreted.">
-              Key Analysis: Standard
-            </button>
+    <header class="row align-items-center g-2 py-2">
+      <div class="col header-left">
+        <div class="brand">e<b>X</b>e<b>M</b>p<b>L</b>ify</div>
+        <div class="score-controls">
+          <div class="controls-block">
+            <div class="controls">
+              <div class="controls-row">
+                <input id="fileInput" type="file" accept=".musicxml,.xml,.mei" class="visually-hidden">
+                <label for="fileInput" class="btn btn-outline-primary btn-lg score-action score-load"
+                  data-bs-toggle="tooltip" title="Load a score file for analysis.">Load XML Score</label>
+                <button class="btn btn-outline-primary btn-lg" id="analyzeBtn" data-bs-toggle="tooltip"
+                  title="Run analysis on the loaded score.">Analyze Score</button>
+                <button class="btn btn-outline-primary btn-lg score-action score-clear" id="clearBtn"
+                  data-bs-toggle="tooltip" title="Clear selected score.">Clear Score</button>
+              </div>
+              <div class="controls-row controls-row-meta">
+                <label class="form-check toggle inline-toggle" data-bs-toggle="tooltip"
+                  title="Run analysis inline (no queue/SSE). Useful for local debugging.">
+                  <span class="form-check-label">Inline Mode</span>
+                  <input class="form-check-input" type="checkbox" id="inlineModeToggle" />
+                </label>
+                <button class="theme-toggle" id="themeToggleBtn" title="Toggle theme">☀</button>
+              </div>
+            </div>
+            <div class="score-title" id="scoreTitle">Score Title: --</div>
           </div>
         </div>
       </div>
@@ -232,62 +236,25 @@
           </div>
 
 
-          <div class="timeline-header results-timeline-header">
-            <div class="timeline-controls">
-              <label class="timeline-toggle">
-                <input type="checkbox" id="toggleIssueMeasures" checked />
-                <span>Show Measures with Issues</span>
-              </label>
-              <label class="timeline-toggle">
-                <input type="checkbox" id="toggleKey" checked />
-                <span>Key</span>
-              </label>
-              <label class="timeline-toggle">
-                <input type="checkbox" id="toggleTempo" checked />
-                <span>Tempo</span>
-              </label>
-              <label class="timeline-toggle">
-                <input type="checkbox" id="toggleMeter" checked />
-                <span>Meter</span>
-              </label>
-              <label class="timeline-toggle">
-                <input type="checkbox" id="toggleDuration" unchecked />
-                <span>Duration</span>
-              </label>
-            </div>
-          </div>
+          
         </div>
       </aside>
 
 
       <section class="viewer-wrap col-12 col-lg-5">
-        <div class="score-controls">
-          <div class="controls-block">
-            <div class="controls">
-              <input id="fileInput" type="file" accept=".musicxml,.xml,.mei" class="visually-hidden">
-              <label for="fileInput" class="btn btn-outline-primary btn-lg w-100 score-action score-load"
-                data-bs-toggle="tooltip" title="Load a score file for analysis.">Load XML Score</label>
-              <button class="btn btn-outline-primary btn-lg w-100" id="analyzeBtn" data-bs-toggle="tooltip"
-                title="Run analysis on the loaded score.">Analyze Score</button>
-              <div class="grade-row score-grade-row">
-                <span class="grade-label" data-bs-toggle="tooltip" title="Target grade of composition to analyze">Select
-                  grade:</span>
-                <select id="targetGradeSelect" class="form-select form-select-sm">
-                  <option value="0.5">.5</option>
-                  <option value="1">1</option>
-                  <option value="2">2</option>
-                  <option value="3">3</option>
-                  <option value="4">4</option>
-                  <option value="5">5+</option>
-                </select>
-              </div>
-              <button class="btn btn-outline-primary btn-lg w-100 score-action score-clear" id="clearBtn"
-                data-bs-toggle="tooltip" title="Clear selected score.">Clear Score</button>
-            </div>
-            <div class="score-title" id="scoreTitle">Score Title: --</div>
-          </div>
+
+        <div class="viewer-nav">
+          <button id="prevPage" class="btn btn-outline-secondary btn-sm viewer-nav-btn">◀</button>
+          <span id="pageLabel" class="page-label"></span>
+          <button id="nextPage" class="btn btn-outline-secondary btn-sm viewer-nav-btn">▶</button>
+          <div class="viewer-nav-divider"></div>
+          <button id="zoomOut" class="btn btn-outline-secondary btn-sm viewer-nav-btn">−</button>
+          <span id="zoomDisplay" class="zoom-display">40%</span>
+          <button id="zoomIn" class="btn btn-outline-secondary btn-sm viewer-nav-btn">+</button>
+          <button id="zoomFit" class="btn btn-outline-secondary btn-sm viewer-nav-btn" title="Fit to window">⊡</button>
         </div>
-        <div id="app" class="verovio-app" style="border: 1px solid lightgray; min-height: 800px;"></div>
+
+        <div id="app" class="verovio-app"></div>
       </section>
 
       <aside class="details-pane col-12 col-lg-4">
@@ -307,9 +274,59 @@
       </aside>
     </main>
 
-    <footer class="row g-5 pb-4 pt-2">
+    <footer class="row g-1 pb-4 pt-2">
       <div class="col-12">
         <div class="timeline">
+          <div class="timeline-precontrols">
+            <div class="toggles">
+              <label class="form-check toggle" data-bs-toggle="tooltip"
+                title="Only run analysis for given grade; reduces overall processing time in lieu of providing an observed grade">
+                <span class="form-check-label">Target Analysis Only</span>
+                <input class="form-check-input" type="checkbox" id="targetOnly" />
+              </label>
+              <label class="form-check toggle" data-bs-toggle="tooltip"
+                title="Expands analysis to compare against all fractional grades (1.5 to 4.5). Takes longer.">
+                <span class="form-check-label">Full Grade Search</span>
+                <input class="form-check-input" type="checkbox" id="fullGradeSearch" />
+              </label>
+              <div class="grade-row score-grade-row">
+                <span class="grade-label" data-bs-toggle="tooltip" title="Target grade of composition to analyze">Select
+                  grade:</span>
+                <select id="targetGradeSelect" class="form-select form-select-sm">
+                  <option value="0.5">.5</option>
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                  <option value="5">5+</option>
+                </select>
+              </div>
+            </div>
+            </div>
+          <div class="timeline-header results-timeline-header">
+            <div class="timeline-controls">
+              <label class="timeline-toggle">
+                <span>Show Measures with Issues</span>
+                <input type="checkbox" id="toggleIssueMeasures" checked />
+              </label>
+              <label class="timeline-toggle">
+                <span>Key</span>
+                <input type="checkbox" id="toggleKey" checked />
+              </label>
+              <label class="timeline-toggle">
+                <span>Tempo</span>
+                <input type="checkbox" id="toggleTempo" checked />
+              </label>
+              <label class="timeline-toggle">
+                <span>Meter</span>
+                <input type="checkbox" id="toggleMeter" checked />
+              </label>
+              <label class="timeline-toggle">
+                <span>Duration</span>
+                <input type="checkbox" id="toggleDuration" unchecked />
+              </label>
+            </div>
+          </div>
           <div class="timeline-track" id="timelineTrack">
             <div class="timeline-line"></div>
           </div>
@@ -364,29 +381,30 @@
 
   <div class="modal fade" id="keyAnalysisModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
-      <div class="modal-content key-analysis-modal">
-        <div class="modal-header">
-          <h5 class="modal-title mb-0">Key Analysis Mode</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <div class="key-analysis-lead" id="keyAnalysisDetectedLabel">String instruments detected</div>
-          <div class="key-analysis-desc" id="keyAnalysisDetectedDesc">
-            This score includes one or more string parts (e.g., violin/viola/cello/bass).
-            String players typically prefer sharp-based keys over equivalent flat keys, so your key analysis can be
-            interpreted in two ways:
+          <div class="modal-content key-analysis-modal">
+            <div class="modal-header">
+            <h5 class="modal-title mb-0">String instruments detected</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
-          <div class="key-analysis-list" id="keyAnalysisDetectedList"></div>
-          <div class="key-analysis-options">
-            <button type="button" class="btn btn-primary" id="keyAnalysisStringBtn">
-              String Key Analysis (standard for orchestral repertoire)
-            </button>
-            <button type="button" class="btn btn-outline-primary" id="keyAnalysisStandardBtn">
-              Standard Key Analysis (standard for wind band repertoire)
-            </button>
+          <div class="modal-body">
+            <div class="key-analysis-lead" id="keyAnalysisDetectedLabel">String instruments detected</div>
+            <div class="key-analysis-desc" id="keyAnalysisDetectedDesc">
+              One or more string instruments were found in this score. Because string writing often favors sharp keys
+              (e.g., G, D, A), this may affect key and range confidence. If this piece is intended for an
+              orchestral/strings context, consider enabling String Harmonic Analysis. Otherwise, the analyzer will
+              continue with the default band/general assumptions.
+            </div>
+            <div class="key-analysis-list" id="keyAnalysisDetectedList"></div>
+            <div class="key-analysis-options">
+              <button type="button" class="btn btn-primary" id="keyAnalysisStringBtn">
+                Enable
+              </button>
+              <button type="button" class="btn btn-outline-primary" id="keyAnalysisStandardBtn">
+                Disable
+              </button>
+            </div>
           </div>
         </div>
-      </div>
     </div>
   </div>
 
@@ -422,8 +440,16 @@
 
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="config.js"></script>
-  <script type="module" src="./script.js"></script>
+  <script src="config.js?v=20260223b"></script>
+  <script type="importmap">
+  {
+    "imports": {
+      "verovio/esm": "/verovio/dist/verovio.js",
+      "verovio/wasm": "/verovio/dist/verovio-module.js"
+    }
+  }
+</script>
+  <script type="module" src="./script.js?v=20260223b"></script>
 </body>
 
 </html>

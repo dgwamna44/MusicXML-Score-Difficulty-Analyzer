@@ -273,19 +273,29 @@ def _pair_congruency(events_a: dict, events_b: dict) -> dict[str, float | None]:
     shared = onsets_a & onsets_b
     rhythmic = len(shared) / max(len(onsets_a), len(onsets_b))
 
-    total_intervals = 0
-    congruent_intervals = 0
+    harmonic_scores = []
     for onset in shared:
         pitch_a = events_a.get(onset)
         pitch_b = events_b.get(onset)
         if pitch_a is None or pitch_b is None:
             continue
-        total_intervals += 1
-        if _is_congruent_interval(pitch_a, pitch_b):
-            congruent_intervals += 1
+        # Tiered harmonic scoring:
+        # 1.0 if notes match exactly; 0.75 if consonant (major/minor triad interval);
+        # 0.5 otherwise (clusters/dissonance).
+        try:
+            if pitch_a.midi == pitch_b.midi:
+                harmonic_scores.append(1.0)
+            elif _is_congruent_interval(pitch_a, pitch_b):
+                harmonic_scores.append(0.75)
+            else:
+                harmonic_scores.append(0.5)
+        except Exception:
+            continue
 
     harmonic = (
-        congruent_intervals / total_intervals if total_intervals > 0 else None
+        sum(harmonic_scores) / len(harmonic_scores)
+        if harmonic_scores
+        else None
     )
     if harmonic is not None:
         overall = (0.6 * harmonic) + (0.4 * rhythmic)
@@ -364,7 +374,9 @@ def _compute_congruency(score, grade: float) -> dict[str, float | None]:
 
     within_vals = []
     within_weights = []
-    for data in group_metrics.values():
+    for group_name, data in group_metrics.items():
+        if group_name == "percussion":
+            continue
         if data.get("overall") is None:
             continue
         within_vals.append(data["overall"])
@@ -417,14 +429,25 @@ def _compute_congruency(score, grade: float) -> dict[str, float | None]:
     elif cross_group is not None:
         base = cross_group
 
+    percussion_harmonic = _avg_metrics(perc_metrics, "harmonic")
     if base is not None and percussion_rhythm is not None:
         base = min(1.0, base + (0.1 * percussion_rhythm))
+    if base is not None and percussion_harmonic is not None:
+        base = min(1.0, base + (0.05 * percussion_harmonic))
 
     harmonic = _avg_metrics(pairing_metrics, "harmonic")
     rhythmic = _avg_metrics(pairing_metrics, "rhythmic")
     if within_group is not None:
-        harmonic_vals = [d["harmonic"] for d in group_metrics.values() if d.get("harmonic") is not None]
-        rhythmic_vals = [d["rhythmic"] for d in group_metrics.values() if d.get("rhythmic") is not None]
+        harmonic_vals = [
+            d["harmonic"]
+            for g, d in group_metrics.items()
+            if g != "percussion" and d.get("harmonic") is not None
+        ]
+        rhythmic_vals = [
+            d["rhythmic"]
+            for g, d in group_metrics.items()
+            if g != "percussion" and d.get("rhythmic") is not None
+        ]
         if harmonic_vals:
             harmonic = (
                 (harmonic or 0.0) + (sum(harmonic_vals) / len(harmonic_vals))
@@ -441,6 +464,7 @@ def _compute_congruency(score, grade: float) -> dict[str, float | None]:
         "within_group": within_group,
         "cross_group": cross_group,
         "percussion_rhythm": percussion_rhythm,
+        "percussion_harmonic": percussion_harmonic,
     }
 
 
@@ -473,9 +497,11 @@ def _estimate_scoring_grade(profile) -> float | None:
 
     congruency = profile.get("overall_congruency")
     if congruency is not None:
-        grade += (0.5 - congruency) * 1.2
+        grade += (0.5 - congruency) * 0.5
 
     grade = max(0.5, min(5.0, grade))
+    if split_instruments == 0 and solo_count == 0:
+        grade = min(grade, 2.0)
     return grade
 
 
@@ -567,6 +593,7 @@ def build_scoring_profile(score, grade: float):
         "within_group_congruency": congruency.get("within_group"),
         "cross_group_congruency": congruency.get("cross_group"),
         "percussion_rhythm_congruency": congruency.get("percussion_rhythm"),
+        "percussion_harmonic_congruency": congruency.get("percussion_harmonic"),
     }
     profile["grade_estimate"] = _estimate_scoring_grade(profile)
     return profile
@@ -591,6 +618,7 @@ def build_scoring_notes(profile, grade: float):
         "Within-group congruency": profile.get("within_group_congruency"),
         "Cross-group congruency": profile.get("cross_group_congruency"),
         "Percussion rhythmic congruency": profile.get("percussion_rhythm_congruency"),
+        "Percussion harmonic congruency": profile.get("percussion_harmonic_congruency"),
     }
 
     def _add_pct_issue(label: str, value: float | None, reason: str) -> None:
@@ -666,11 +694,6 @@ def build_scoring_notes(profile, grade: float):
         "Cross-group congruency",
         summary_metrics["Cross-group congruency"],
         "families diverge in rhythm or harmony.",
-    )
-    _add_pct_issue(
-        "Percussion rhythmic congruency",
-        summary_metrics["Percussion rhythmic congruency"],
-        "percussion patterns do not consistently align with other voices.",
     )
 
     if grade < 2:

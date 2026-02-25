@@ -1,6 +1,6 @@
 from app_data import RHYTHM_TOKEN_MAP
 from utilities import format_grade
-from .helpers import check_syncopation, get_quarter_length, get_token_duration
+from .helpers import check_syncopation, get_quarter_length, get_token_duration, is_percussion_instrument
 from .rules import normalize_tuplet_class, TUPLET_CLASS_ORDER
 
 TOKEN_TO_NAME = {data["token"]: name for name, data in RHYTHM_TOKEN_MAP.items()}
@@ -38,7 +38,21 @@ def _max_allowed_duration(rules):
         return None
     return get_token_duration(token)
 
+
+def _effective_grade(note, target_grade: float) -> float:
+    grade = float(target_grade)
+    if is_percussion_instrument(getattr(note, "instrument", None)) and grade < 2.0:
+        return 2.0
+    return grade
+
 def rule_dotted(note, rules, target_grade):
+    effective_grade = _effective_grade(note, target_grade)
+    # Allow dotted half notes as an exception.
+    token = str(note.rhythm_token or "")
+    if token.lower().rstrip("d") == "h" and token.count("d") == 1:
+        note_duration = note.duration or get_quarter_length(note.rhythm_token)
+        if note_duration is not None and abs(note_duration - 3.0) <= 1e-3:
+            return (1, None, None)
     if "d" not in note.rhythm_token:
         return (1, None, None)
     if rules.allow_dotted:
@@ -51,11 +65,12 @@ def rule_dotted(note, rules, target_grade):
     conf = 0.7 * _ratio_penalty(ratio, exponent=1.2, floor=0.05)
     return (
         conf,
-        f"dotted rhythms not common for grade {format_grade(target_grade)}",
+        f"dotted rhythms not common for grade {format_grade(effective_grade)}",
         "Dotted Rhythm",
     )
 
 def rule_syncopation(note, rules, target_grade):
+    effective_grade = _effective_grade(note, target_grade)
     _, is_sync = check_syncopation(note.duration, note.offset)
     if not is_sync:
         return (1, None, None)
@@ -67,29 +82,32 @@ def rule_syncopation(note, rules, target_grade):
     conf = 0.85 * _ratio_penalty(ratio, exponent=0.6, floor=0.2)
     return (
         conf,
-        f"syncopation not common for grade {format_grade(target_grade)}",
+        f"syncopation not common for grade {format_grade(effective_grade)}",
         "Syncopation",
     )
 
 
 def rule_subdivision(note, rules, target_grade):
+    effective_grade = _effective_grade(note, target_grade)
+    msg_grade = effective_grade
     note_duration = note.duration if note.duration is not None else get_quarter_length(note.rhythm_token)
     if note_duration is None:
         return (0.7, f"unknown rhythm value {_token_label(note.rhythm_token)}", "Subdivision")
-    if float(target_grade) < 5 and note_duration <= 0.0625:
+    if effective_grade < 5 and note_duration <= 0.0625:
         return (
             0.0,
-            f"64th notes or smaller not common for grade {format_grade(target_grade)}",
+            f"64th notes or smaller not common for grade {format_grade(msg_grade)}",
             "Subdivision",
         )
-    if float(target_grade) == 0.5 and getattr(note, "eighth_pair_ok", False):
-        return (1, None, None)
-    if float(target_grade) == 0.5 and getattr(note, "eighth_pair_overflow", False):
-        return (
-            0.0,
-            f"consecutive eighth notes not common for grade {format_grade(target_grade)}",
-            "Subdivision",
-        )
+    if float(target_grade) == 0.5 and not is_percussion_instrument(getattr(note, "instrument", None)):
+        if getattr(note, "eighth_pair_ok", False):
+            return (1, None, None)
+        if getattr(note, "eighth_pair_overflow", False):
+            return (
+                0.8,
+                f"consecutive eighth notes should be used sparingly for grade {format_grade(target_grade)}",
+                "Subdivision",
+            )
     max_allowed = _max_allowed_duration(rules)
     if max_allowed is None:
         return (1, None, None)
@@ -97,28 +115,29 @@ def rule_subdivision(note, rules, target_grade):
         return (1, None, None)
     max_label = _rule_token_label(rules.max_subdivision)
     ratio = note_duration / max_allowed
-    if float(target_grade) < 4 and ratio <= 0.5:
+    if effective_grade < 4 and ratio <= 0.5:
         return (
             0.0,
-            f"subdivisions smaller than a {max_label} note not common for grade {format_grade(target_grade)}",
+            f"subdivisions smaller than a {max_label} note not common for grade {format_grade(msg_grade)}",
             "Subdivision",
         )
-    exponent = max(2.0, 6.0 - float(target_grade))
+    exponent = max(2.0, 6.0 - effective_grade)
     conf = _ratio_penalty(ratio, exponent=exponent, floor=0.02)
     return (
         conf,
-        f"subdivisions smaller than a {max_label} note not common for grade {format_grade(target_grade)}",
+        f"subdivisions smaller than a {max_label} note not common for grade {format_grade(msg_grade)}",
         "Subdivision",
     )
 
 def rule_tuplet(note, rules, target_grade):
+    effective_grade = _effective_grade(note, target_grade)
     if note.tuplet_id is None:
         return (1, None, None)
     if not rules.allow_tuplet:
         tuplet_class = normalize_tuplet_class(note.tuplet_class)
         order = TUPLET_CLASS_ORDER.get(tuplet_class, 1)
         conf = max(0.05, 0.5 / (order + 1))
-        return (conf, "Tuplets not common for given grade", "Tuplets")
+        return (conf, f"Tuplets not common for grade {format_grade(effective_grade)}", "Tuplets")
     if tuplet_class := normalize_tuplet_class(note.tuplet_class):
         if tuplet_class in rules.allowed_tuplet_classes:
             return (1, None, None)
@@ -130,7 +149,7 @@ def rule_tuplet(note, rules, target_grade):
         conf = max(0.1, 0.8 * ratio)
         return (
             conf,
-            f"{tuplet_class} tuplets not common for grade {format_grade(target_grade)}",
+            f"{tuplet_class} tuplets not common for grade {format_grade(effective_grade)}",
             "Tuplets",
         )
         

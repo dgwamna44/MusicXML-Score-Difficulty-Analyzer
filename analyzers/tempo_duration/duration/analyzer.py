@@ -33,8 +33,17 @@ def analyze_duration(score, rules: dict[float, DurationGradeBucket], grade, *, r
     if bucket.core_max == "Any" or duration_data.duration <= bucket.core_max:
         duration_data.confidence = 1.0
     elif bucket.extended_max and duration_data.duration <= bucket.extended_max:
-        duration_data.confidence = 0.5
-        duration_data.comments = "Duration slightly long for grade"
+        core_max = float(bucket.core_max)
+        extended_max = float(bucket.extended_max)
+        ext_max_length_string = f"{int(extended_max // 60)}'{int(math.ceil(extended_max % 60))}\""
+        if extended_max <= core_max:
+            duration_data.confidence = 0.5
+        else:
+            over = max(0.0, duration_data.duration - core_max)
+            span = extended_max - core_max
+            # Linear decay from 1.0 at core_max to 0.5 at extended_max
+            duration_data.confidence = max(0.5, 1.0 - 0.5 * (over / span))
+        duration_data.comments = f"Duration on the longer end for grade {grade} (max is ~{ext_max_length_string})."
     else:
         duration_data.confidence = 0.0
         duration_data.comments = "Duration too long for grade"

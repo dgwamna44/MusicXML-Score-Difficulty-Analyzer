@@ -227,6 +227,27 @@ def run_analysis_engine(
             }
         )
 
+    def analyzer_start(step, name):
+        emit(
+            {
+                "type": "analyzer_start",
+                "analyzer": name,
+                "idx": step,
+                "total": len(analyzers),
+            }
+        )
+
+    def analyzer_done(step, name, duration):
+        emit(
+            {
+                "type": "analyzer_done",
+                "analyzer": name,
+                "idx": step,
+                "total": len(analyzers),
+                "duration": round(float(duration), 3),
+            }
+        )
+
     def collect_partial_notes(result, name, reconciler: NoteReconciler):
         analysis = result.get("analysis_notes") if result else None
         if not analysis:
@@ -273,6 +294,8 @@ def run_analysis_engine(
             observed_grades=analysis_options.observed_grades,
         )
         step += 1
+        analyzer_start(step, name)
+        started_at = perf_counter()
         results[name] = fn(
             score_path,
             target_grade,
@@ -281,12 +304,14 @@ def run_analysis_engine(
             progress_cb=None if target_only or use_cache else progress_bar(name),
             analysis_options=options_for_analyzer,
         )
+        duration = perf_counter() - started_at
         emit({"type": "analyzer_result", "analyzer": name, "data": results[name]})
         if use_cache and cache_entry:
             results[name].update(cache_entry.get("data") or {})
         elif not target_only and options_for_analyzer.run_observed:
             _set_cached_observed(cache_key, name, requested_grades, results[name])
         collect_partial_notes(results[name], name, reconciler)
+        analyzer_done(step, name, duration)
         analyzer_progress(step, name)
         gc.collect()
 
@@ -303,6 +328,8 @@ def run_analysis_engine(
             observed_grades=analysis_options.observed_grades,
         )
         step += 1
+        analyzer_start(step, name)
+        started_at = perf_counter()
         results[name] = fn(
             score_path,
             target_grade,
@@ -311,11 +338,13 @@ def run_analysis_engine(
             progress_cb=None if target_only or use_cache else progress_bar(name),
             analysis_options=options_for_analyzer,
         )
+        duration = perf_counter() - started_at
         emit({"type": "analyzer_result", "analyzer": name, "data": results[name]})
         if use_cache and cache_entry:
             results[name].update(cache_entry.get("data") or {})
         elif not target_only and options_for_analyzer.run_observed:
             _set_cached_observed(cache_key, name, requested_grades, results[name])
+        analyzer_done(step, name, duration)
         analyzer_progress(step, name)
         gc.collect()
 

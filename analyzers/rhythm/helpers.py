@@ -1,7 +1,9 @@
 from app_data import RHYTHM_TOKEN_MAP
+from app_data.instruments import PERCUSSION_INSTRUMENTS
 import math
 from models import PartialNoteData
 from .rules import normalize_tuplet_class, TUPLET_CLASS_ORDER
+import re
 
 TOKEN_DURATION_MAP = {data["token"]: data["duration"] for data in RHYTHM_TOKEN_MAP.values()}
 EXTREME_LABELS = {"Dotted Rhythm", "Syncopation", "Subdivision", "Tuplets"}
@@ -65,6 +67,25 @@ def get_quarter_length(token):
         total += add
         add /= 2
     return total
+
+
+def is_percussion_instrument(name: str | None) -> bool:
+    if not name:
+        return False
+    normalized = (
+        str(name)
+        .replace("â™­", "b")
+        .replace("Ã¢â„¢Â­", "b")
+        .replace("â€“", "-")
+        .replace("Ã¢â‚¬â€œ", "-")
+    )
+    ascii_name = normalized.encode("ascii", "ignore").decode().lower().strip()
+    if "perc" in ascii_name:
+        return True
+    for pattern in PERCUSSION_INSTRUMENTS.values():
+        if re.search(pattern, ascii_name):
+            return True
+    return False
 
 
 def _is_plain_eighth(note: PartialNoteData) -> bool:

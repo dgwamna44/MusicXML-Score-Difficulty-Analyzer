@@ -4,6 +4,7 @@ import tempfile
 import uuid
 import hashlib
 import time
+import threading
 
 from flask import Flask, Response, jsonify, request, stream_with_context, send_from_directory
 from flask_cors import CORS
@@ -20,6 +21,9 @@ CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 UPLOAD_DIR = tempfile.mkdtemp(prefix="score_uploads_")
 JOB_TTL_SECONDS = 60 * 60 * 6
+
+_INLINE_CANCEL_LOCK = threading.Lock()
+_INLINE_CANCEL_FLAGS: dict[str, threading.Event] = {}
 
 
 def _env_int(name, default):
@@ -65,6 +69,33 @@ def make_json_safe(value):
     if hasattr(value, "__dict__"):
         return make_json_safe(vars(value))
     return str(value)
+
+
+def _register_inline_cancel(cancel_id: str | None) -> threading.Event | None:
+    if not cancel_id:
+        return None
+    with _INLINE_CANCEL_LOCK:
+        event = _INLINE_CANCEL_FLAGS.get(cancel_id)
+        if event is None:
+            event = threading.Event()
+            _INLINE_CANCEL_FLAGS[cancel_id] = event
+        return event
+
+
+def _pop_inline_cancel(cancel_id: str | None) -> None:
+    if not cancel_id:
+        return
+    with _INLINE_CANCEL_LOCK:
+        _INLINE_CANCEL_FLAGS.pop(cancel_id, None)
+
+
+def _cancel_inline(cancel_id: str) -> bool:
+    with _INLINE_CANCEL_LOCK:
+        event = _INLINE_CANCEL_FLAGS.get(cancel_id)
+        if event is None:
+            return False
+        event.set()
+        return True
 
 
 def parse_bool(value) -> bool:
@@ -119,6 +150,10 @@ def index():
 @app.get("/<path:filename>")
 def static_files(filename):
     return send_from_directory("html", filename)
+
+@app.get("/verovio/dist/<path:filename>")
+def verovio_dist(filename):
+    return send_from_directory("verovio/dist", filename)
 
 
 def _run_job(job_id, payload):
@@ -238,6 +273,9 @@ def _handle_analyze(*, force_inline: bool = False):
     )
 
     if inline_allowed:
+        cancel_id = payload.get("cancel_id") or request.args.get("cancel_id")
+        cancel_event = _register_inline_cancel(str(cancel_id) if cancel_id else None)
+
         if pending_upload and not payload.get("score_path"):
             tmp = tempfile.NamedTemporaryFile(
                 delete=False, suffix=pending_upload["ext"], dir=UPLOAD_DIR
@@ -263,14 +301,25 @@ def _handle_analyze(*, force_inline: bool = False):
             observed_grades=observed_grades,
         )
         deadline = time.monotonic() + float(timeout_seconds)
-        result = run_analysis_engine(
-            score_path,
-            target_grade,
-            analysis_options=options,
-            progress_cb=None,
-            deadline=deadline,
-        )
-        return jsonify(make_json_safe(result))
+        def _inline_progress(_event):
+            if cancel_event and cancel_event.is_set():
+                raise RuntimeError("Analysis cancelled.")
+
+        try:
+            result = run_analysis_engine(
+                score_path,
+                target_grade,
+                analysis_options=options,
+                progress_cb=_inline_progress,
+                deadline=deadline,
+            )
+            return jsonify(make_json_safe(result))
+        except RuntimeError as exc:
+            if cancel_event and cancel_event.is_set():
+                return jsonify({"error": "Analysis cancelled."}), 409
+            raise exc
+        finally:
+            _pop_inline_cancel(str(cancel_id) if cancel_id else None)
 
     if pending_upload and not payload.get("score_file_key"):
         try:
@@ -309,6 +358,13 @@ def analyze():
 @app.post("/api/analyze_sync")
 def analyze_sync():
     return _handle_analyze(force_inline=True)
+
+
+@app.post("/api/cancel/<cancel_id>")
+def cancel_inline(cancel_id):
+    if _cancel_inline(cancel_id):
+        return jsonify({"ok": True, "cancel_id": cancel_id})
+    return jsonify({"ok": False, "error": "Unknown cancel id"}), 404
 
 
 @app.get("/api/progress/<job_id>")
@@ -362,7 +418,14 @@ def result(job_id):
 
 @app.get("/healthz")
 def healthz():
-    return jsonify({"ok": True})
+    version_file = os.path.join(os.path.dirname(__file__), ".healthz_version")
+    version = None
+    try:
+        with open(version_file, "r", encoding="utf-8") as handle:
+            version = handle.read().strip()
+    except OSError:
+        version = None
+    return jsonify({"ok": True, "version": version})
 
 
 if __name__ == "__main__":

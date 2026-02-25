@@ -1,0 +1,47 @@
+{
+  "name": "verovio",
+  "version": "6.0.1",
+  "description": "This is the stable version of the verovio package",
+  "main": "dist/verovio-toolkit-wasm.js",
+  "exports": {
+    ".": "./dist/verovio-toolkit-wasm.js",
+    "./esm": {
+      "import": "./dist/verovio.mjs",
+      "require": "./dist/verovio.cjs"
+    },
+    "./wasm": "./dist/verovio-module.mjs",
+    "./wasm-hum": "./dist/verovio-module-hum.mjs"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "rollup --config",
+    "prebundle": "rollup --config rollup.config.prebundle.mjs"
+  },
+  "keywords": [
+    "music",
+    "music notation",
+    "music engraving",
+    "mei",
+    "music encoding",
+    "svg"
+  ],
+  "author": "Laurent Pugin and others",
+  "license": "LGPL-3.0-or-later",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rism-digital/verovio.git"
+  },
+  "bugs": {
+    "url": "https://github.com/rism-digital/verovio/issues"
+  },
+  "homepage": "https://www.verovio.org",
+  "engines": {
+    "node": ">= 14.18.0"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^24.1.0",
+    "rollup": "^3.20.6"
+  }
+}
