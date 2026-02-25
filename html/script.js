@@ -1312,20 +1312,20 @@ function buildTimelineTicks(trackEl, ticks, totalMeasures) {
     // ── Position ticks ────────────────────────────────────────────────────────
     // All ticks use translateX(-50%) to center on their position.
     // For start/end, we clamp the position to ensure they stay visible.
-    const EDGE_BUFFER_PX = 10; // Pixels from edge to keep tick center from hitting boundary
+    const EDGE_BUFFER_PX = 2 // Pixels from edge to keep tick center from hitting boundary
     
     if (isStart) {
-      // Keep first tick visible: minimum left position
       tickEl.style.left = `${EDGE_BUFFER_PX}px`;
       tickEl.style.transform = "translateX(-50%)";
+      tickEl.style.top = "50%";
     } else if (isEnd) {
-      // Keep last tick visible: maximum right position
       tickEl.style.left = `calc(100% - ${EDGE_BUFFER_PX}px)`;
       tickEl.style.transform = "translateX(-50%)";
+      tickEl.style.top = "50%";
     } else {
-      // Regular ticks: center on their percentage position
       tickEl.style.left = `${pct}%`;
       tickEl.style.transform = "translateX(-50%)";
+      tickEl.style.top = "50%";
     }
 
     // ── Annotations row (above the stem) ──────────────────────────────────
@@ -1374,6 +1374,20 @@ function buildTimelineTicks(trackEl, ticks, totalMeasures) {
     // ── Stem (the vertical tick mark) ─────────────────────────────────────
     const mark = document.createElement("div");
     mark.className = "tick-mark";
+
+    if (isStart || isEnd) {
+      mark.style.width = "3px";        
+      mark.style.height = "22px";
+      mark.style.background = "var(--accent)";
+      mark.style.boxShadow = "0 0 0 1px rgba(0, 0, 0, 0.12)";
+    } else if (hasIssue) {
+      mark.style.background = "var(--tick-issue)";
+    } else {
+      mark.style.width = "2px";
+      mark.style.height = "18px";
+      mark.style.background = "var(--timeline-tick)";
+    }
+
     tickEl.appendChild(mark);
 
     // ── Measure label (below stem, skip for start/end boundary ticks) ────
@@ -2320,7 +2334,45 @@ function initAnalysisRequest() {
       let finalReceived = false;
         es.onmessage = (evt) => {
           const data = JSON.parse(evt.data);
-        if (data.type === "heartbeat") return;
+          if (data.type === "heartbeat") return;
+          if (data.type === "progress" && data.data) {
+            const prog = data.data;
+            const overallPct = Math.round(
+              (Number(prog.overall_progress) || 0) * 100,
+            );
+            const analyzerEntries = Object.entries(prog.analyzers || {});
+            analyzerEntries.forEach(([analyzer, info]) => {
+              const ids = barIds[analyzer];
+              if (!ids) return;
+              const bar = document.getElementById(ids.bar);
+              const pctEl = document.getElementById(ids.pct);
+              const labelEl = document.getElementById(ids.label);
+              const pct = Math.round((Number(info?.progress) || 0) * 100);
+              if (bar) bar.style.width = `${pct}%`;
+              if (pctEl) pctEl.textContent = `${pct}%`;
+              if (labelEl) {
+                const name = labelMap[analyzer] || analyzer;
+                if (info?.status === "done" && info?.duration != null) {
+                  labelEl.textContent = `${name} • ${Number(info.duration).toFixed(1)}s`;
+                } else {
+                  labelEl.textContent = name;
+                }
+              }
+            });
+            if (progressText) {
+              const current = prog.current_analyzer || "Initializing";
+              const label = labelMap[current] || current;
+              progressText.textContent = `${label} — ${overallPct}% overall`;
+            }
+            return;
+          }
+          if (data.type === "error") {
+            if (progressText) {
+              progressText.textContent = data.message || "Analysis failed.";
+            }
+            if (progressOkBtn) progressOkBtn.disabled = false;
+            return;
+          }
         if (data.type === "observed") {
           const pct = data.total
             ? Math.round((data.idx / data.total) * 100)

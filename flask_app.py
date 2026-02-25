@@ -2,25 +2,22 @@ import json
 import os
 import tempfile
 import uuid
-import hashlib
 import time
 import threading
 
 from flask import Flask, Response, jsonify, request, stream_with_context, send_from_directory
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
-import redis
-from rq import Queue
 
 from app_data import FULL_GRADES, GRADES
 from models import AnalysisOptions
 from run_analysis import run_analysis_engine
+from progress_tracker import progress_tracker
 
 app = Flask(__name__, static_folder="html")
 CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 UPLOAD_DIR = tempfile.mkdtemp(prefix="score_uploads_")
-JOB_TTL_SECONDS = 60 * 60 * 6
 
 _INLINE_CANCEL_LOCK = threading.Lock()
 _INLINE_CANCEL_FLAGS: dict[str, threading.Event] = {}
@@ -47,16 +44,18 @@ JOB_TIMEOUT_PER_MB = _env_float("JOB_TIMEOUT_PER_MB", 8.0)
 JOB_TIMEOUT_MIN = _env_int("JOB_TIMEOUT_MIN", 60)
 JOB_TIMEOUT_MAX = _env_int("JOB_TIMEOUT_MAX", 900)
 
-
-def get_redis():
-    url = os.environ.get("REDIS_URL", "redis://localhost:6379/0")
-    if os.environ.get("REDIS_TLS") == "1":
-        return redis.from_url(url, ssl_cert_reqs=None)
-    return redis.from_url(url)
-
-
-def get_queue():
-    return Queue("default", connection=get_redis())
+ANALYZER_NAMES = [
+    "range",
+    "articulation",
+    "rhythm",
+    "dynamics",
+    "availability",
+    "key",
+    "tempo",
+    "meter",
+    "duration",
+    "scoring",
+]
 
 
 def make_json_safe(value):
@@ -116,30 +115,10 @@ def estimate_timeout(file_size_bytes: int | None) -> int:
     return int(timeout)
 
 
-def get_queue_size(q) -> int:
-    count = getattr(q, "count", None)
-    if count is None:
-        return 0
-    if callable(count):
-        return int(count())
-    return int(count)
 
 
-def ensure_score_path(payload, r):
-    score_path = payload.get("score_path")
-    file_key = payload.get("score_file_key")
-    if not score_path and file_key:
-        raw = r.get(file_key)
-        if raw:
-            ext = payload.get("score_ext", ".musicxml")
-            tmp = tempfile.NamedTemporaryFile(
-                delete=False, suffix=ext, dir=UPLOAD_DIR
-            )
-            tmp.write(raw)
-            tmp.flush()
-            tmp.close()
-            score_path = tmp.name
-    return score_path
+def ensure_score_path(payload):
+    return payload.get("score_path")
 
 
 @app.get("/")
@@ -156,16 +135,47 @@ def verovio_dist(filename):
     return send_from_directory("verovio/dist", filename)
 
 
+def _tracker_names(name: str) -> tuple[str, ...]:
+    if name == "key_range":
+        return ("key", "range")
+    if name == "tempo_duration":
+        return ("tempo", "duration")
+    return (name,)
+
+
+def _track_progress_event(job_id: str, event: dict) -> None:
+    event_type = event.get("type")
+    analyzer = event.get("analyzer")
+    if not analyzer:
+        return
+    names = _tracker_names(str(analyzer))
+    if event_type == "analyzer_start":
+        for name in names:
+            progress_tracker.start_analyzer(job_id, name)
+    elif event_type == "analyzer_done":
+        duration = event.get("duration")
+        for name in names:
+            progress_tracker.complete_analyzer(job_id, name, duration=duration)
+    elif event_type == "observed":
+        idx = event.get("idx") or 0
+        total = event.get("total") or 0
+        for name in names:
+            progress_tracker.update_analyzer_progress(
+                job_id,
+                name,
+                items_processed=int(idx),
+                total_items=int(total) if total else None,
+            )
+
+
 def _run_job(job_id, payload):
-    r = get_redis()
-    events_key = f"job:{job_id}:events"
-    result_key = f"job:{job_id}:result"
-    error_key = f"job:{job_id}:error"
-    done_key = f"job:{job_id}:done"
+    progress_tracker.start_job(job_id)
+    score_path = payload.get("score_path")
 
     def progress_cb(event):
-        r.rpush(events_key, json.dumps(make_json_safe(event)))
-        r.expire(events_key, JOB_TTL_SECONDS)
+        safe_event = make_json_safe(event)
+        progress_tracker.push_event(job_id, safe_event)
+        _track_progress_event(job_id, safe_event)
 
     try:
         target_only = parse_bool(payload.get("target_only"))
@@ -181,8 +191,6 @@ def _run_job(job_id, payload):
             string_only=strings_only,
             observed_grades=observed_grades,
         )
-
-        score_path = ensure_score_path(payload, r)
 
         if not score_path:
             raise RuntimeError("Missing score file for analysis.")
@@ -201,19 +209,20 @@ def _run_job(job_id, payload):
             deadline=deadline,
         )
         safe_result = make_json_safe(result)
-        r.rpush(events_key, json.dumps({"type": "result", "data": safe_result}))
-        r.expire(events_key, JOB_TTL_SECONDS)
-        if parse_bool(payload.get("store_result", True)):
-            r.set(result_key, json.dumps(safe_result))
-            r.expire(result_key, JOB_TTL_SECONDS)
+        progress_tracker.set_result(job_id, safe_result)
+        progress_tracker.finalize_analyzers(job_id)
+        progress_tracker.push_event(job_id, {"type": "result", "data": safe_result})
     except Exception as exc:
-        r.set(error_key, str(exc))
-        r.expire(error_key, JOB_TTL_SECONDS)
+        progress_tracker.set_error(job_id, str(exc))
+        progress_tracker.push_event(job_id, {"type": "error", "message": str(exc)})
     finally:
-        r.set(done_key, "1")
-        r.expire(done_key, JOB_TTL_SECONDS)
-        r.rpush(events_key, json.dumps({"type": "done"}))
-        r.expire(events_key, JOB_TTL_SECONDS)
+        if score_path and os.path.exists(score_path):
+            try:
+                os.remove(score_path)
+            except Exception:
+                pass
+        progress_tracker.mark_done(job_id)
+        progress_tracker.push_event(job_id, {"type": "done"})
 
 
 def _handle_analyze(*, force_inline: bool = False):
@@ -243,7 +252,7 @@ def _handle_analyze(*, force_inline: bool = False):
     else:
         payload = request.get_json(force=True, silent=True) or {}
 
-    if not payload.get("score_file_key") and not payload.get("score_path") and not pending_upload:
+    if not payload.get("score_path") and not pending_upload:
         return jsonify({"error": "Missing score or target grade."}), 400
     if "target_grade" not in payload:
         return jsonify({"error": "Missing score or target grade."}), 400
@@ -284,8 +293,7 @@ def _handle_analyze(*, force_inline: bool = False):
             tmp.flush()
             tmp.close()
             payload["score_path"] = tmp.name
-        r = None
-        score_path = ensure_score_path(payload, r) if r else payload.get("score_path")
+        score_path = ensure_score_path(payload)
         if not score_path:
             return jsonify({"error": "Missing score file for analysis."}), 400
         target_only = parse_bool(payload.get("target_only"))
@@ -321,31 +329,25 @@ def _handle_analyze(*, force_inline: bool = False):
         finally:
             _pop_inline_cancel(str(cancel_id) if cancel_id else None)
 
-    if pending_upload and not payload.get("score_file_key"):
-        try:
-            digest = hashlib.sha256(pending_upload["data"]).hexdigest()
-            file_key = f"score:{digest}{pending_upload['ext']}"
-            r = get_redis()
-            r.set(file_key, pending_upload["data"], ex=JOB_TTL_SECONDS)
-            payload["score_file_key"] = file_key
-            payload["score_ext"] = pending_upload["ext"]
-        except Exception:
-            return (
-                jsonify({"error": "Redis unavailable. Start Redis or use inline analysis."}),
-                503,
-            )
+    if pending_upload and not payload.get("score_path"):
+        tmp = tempfile.NamedTemporaryFile(
+            delete=False, suffix=pending_upload["ext"], dir=UPLOAD_DIR
+        )
+        tmp.write(pending_upload["data"])
+        tmp.flush()
+        tmp.close()
+        payload["score_path"] = tmp.name
 
     job_id = str(uuid.uuid4())
-    q = get_queue()
-    if MAX_QUEUE_SIZE and get_queue_size(q) >= MAX_QUEUE_SIZE:
+    if MAX_QUEUE_SIZE and progress_tracker.active_count() >= MAX_QUEUE_SIZE:
         return jsonify({"error": "Analysis queue full. Try again shortly."}), 429
-    q.enqueue(
-        "flask_app._run_job",
-        job_id,
-        payload,
-        job_id=job_id,
-        job_timeout=int(timeout_seconds),
+    progress_tracker.create_job(job_id, ANALYZER_NAMES)
+    worker = threading.Thread(
+        target=_run_job,
+        args=(job_id, payload),
+        daemon=True,
     )
+    worker.start()
 
     return jsonify({"job_id": job_id})
 
@@ -369,51 +371,55 @@ def cancel_inline(cancel_id):
 
 @app.get("/api/progress/<job_id>")
 def progress(job_id):
-    r = get_redis()
-    events_key = f"job:{job_id}:events"
-    done_key = f"job:{job_id}:done"
-    if not r.exists(events_key) and not r.exists(done_key):
+    if not progress_tracker.has_job(job_id):
         return jsonify({"error": "Unknown job"}), 404
 
     def generate():
         last_heartbeat = time.time()
+        last_progress = None
         while True:
-            item = r.blpop(events_key, timeout=1)
-            if item:
-                _, raw = item
-                try:
-                    event = json.loads(raw)
-                except Exception:
-                    event = {"type": "message", "raw": raw.decode("utf-8", "ignore")}
+            event = progress_tracker.pop_event(job_id, timeout=0.5)
+            if event:
                 yield f"data: {json.dumps(event)}\n\n"
                 last_heartbeat = time.time()
                 if event.get("type") == "done":
                     break
-            else:
-                if r.exists(done_key):
-                    break
-                now = time.time()
-                if now - last_heartbeat >= 10:
-                    last_heartbeat = now
-                    yield f"data: {json.dumps({'type': 'heartbeat'})}\n\n"
+                continue
+
+            progress = progress_tracker.get_job_progress(job_id)
+            if progress is None:
+                yield f"data: {json.dumps({'type': 'error', 'message': 'Job not found'})}\n\n"
+                break
+            if progress != last_progress:
+                yield f"data: {json.dumps({'type': 'progress', 'data': progress})}\n\n"
+                last_progress = progress
+
+            if progress_tracker.is_done(job_id):
+                yield f"data: {json.dumps({'type': 'done'})}\n\n"
+                break
+
+            now = time.time()
+            if now - last_heartbeat >= 10:
+                last_heartbeat = now
+                yield f"data: {json.dumps({'type': 'heartbeat'})}\n\n"
 
     return Response(stream_with_context(generate()), mimetype="text/event-stream")
 
 
 @app.get("/api/result/<job_id>")
 def result(job_id):
-    r = get_redis()
-    result_key = f"job:{job_id}:result"
-    error_key = f"job:{job_id}:error"
-    done_key = f"job:{job_id}:done"
-    if not r.exists(done_key) and not r.exists(result_key) and not r.exists(error_key):
+    if not progress_tracker.has_job(job_id):
         return jsonify({"error": "Unknown job"}), 404
-    payload = {
-        "done": bool(r.exists(done_key)),
-        "error": r.get(error_key).decode("utf-8") if r.exists(error_key) else None,
-        "result": json.loads(r.get(result_key)) if r.exists(result_key) else None,
+    payload = progress_tracker.get_job_progress(job_id) or {}
+    result_data = progress_tracker.get_result(job_id)
+    response = {
+        "done": payload.get("status") in {"done", "error"},
+        "error": payload.get("error"),
+        "result": result_data,
     }
-    return jsonify(make_json_safe(payload))
+    if response["done"]:
+        progress_tracker.cleanup_job(job_id)
+    return jsonify(make_json_safe(response))
 
 
 @app.get("/healthz")
