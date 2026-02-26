@@ -2337,9 +2337,6 @@ function initAnalysisRequest() {
           if (data.type === "heartbeat") return;
           if (data.type === "progress" && data.data) {
             const prog = data.data;
-            const overallPct = Math.round(
-              (Number(prog.overall_progress) || 0) * 100,
-            );
             const analyzerEntries = Object.entries(prog.analyzers || {});
             analyzerEntries.forEach(([analyzer, info]) => {
               const ids = barIds[analyzer];
@@ -2362,7 +2359,7 @@ function initAnalysisRequest() {
             if (progressText) {
               const current = prog.current_analyzer || "Initializing";
               const label = labelMap[current] || current;
-              progressText.textContent = `${label} — ${overallPct}% overall`;
+              progressText.textContent = label;
             }
             return;
           }

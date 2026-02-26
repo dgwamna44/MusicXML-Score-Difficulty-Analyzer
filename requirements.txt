@@ -3,5 +3,5 @@ Flask-Cors
 gunicorn
 music21
 pandas
-python-dotenv
-psycopg[binary]
+dotenv
+psycopg2-binary

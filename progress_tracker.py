@@ -163,9 +163,6 @@ class ProgressTracker:
             job = self._jobs.get(job_id)
             if not job:
                 return None
-            total = len(job.analyzers) or 1
-            progress_sum = sum(a.progress for a in job.analyzers.values())
-            overall = min(1.0, max(0.0, progress_sum / total))
             analyzers = {
                 name: {
                     "status": a.status,
@@ -179,7 +176,6 @@ class ProgressTracker:
             return {
                 "job_id": job.job_id,
                 "status": job.status,
-                "overall_progress": overall,
                 "current_analyzer": job.current_analyzer,
                 "analyzers": analyzers,
                 "last_update": job.last_update,
