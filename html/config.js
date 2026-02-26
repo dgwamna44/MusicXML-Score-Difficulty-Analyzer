@@ -1,1 +1,1 @@
-window.SCORE_ANALYZER_API_BASE = "http://127.0.0.1:5000";
+window.SCORE_ANALYZER_API_BASE = "https://exemplify-music-analyzer.onrender.com";
