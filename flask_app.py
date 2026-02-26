@@ -4,6 +4,7 @@ import tempfile
 import uuid
 import time
 import threading
+from dotenv import load_dotenv
 
 from flask import Flask, Response, jsonify, request, stream_with_context, send_from_directory
 from flask_cors import CORS
@@ -13,6 +14,19 @@ from app_data import FULL_GRADES, GRADES
 from models import AnalysisOptions
 from run_analysis import run_analysis_engine
 from progress_tracker import progress_tracker
+
+import os
+from dotenv import load_dotenv
+from db import init_db, save_job, get_job, list_jobs
+
+# Load environment variables from .env
+load_dotenv()
+
+# Initialize database on startup
+try:
+    init_db()
+except Exception as e:
+    print(f"Warning: Could not initialize database: {e}")
 
 app = Flask(__name__, static_folder="html")
 CORS(app, resources={r"/api/*": {"origins": "*"}})
@@ -223,6 +237,12 @@ def _run_job(job_id, payload):
                 pass
         progress_tracker.mark_done(job_id)
         progress_tracker.push_event(job_id, {"type": "done"})
+        filename = payload.get("score_path", "unknown")
+        target_grade = payload.get("target_grade", 2)
+        try:
+            save_job(job_id, filename, target_grade, safe_result)
+        except Exception as db_err:
+            print(f"Warning: Could not save job to database: {db_err}")
 
 
 def _handle_analyze(*, force_inline: bool = False):
@@ -432,6 +452,14 @@ def healthz():
     except OSError:
         version = None
     return jsonify({"ok": True, "version": version})
+
+@app.get("/api/jobs")
+def jobs_list():
+    try:
+        jobs = list_jobs(limit=20)
+        return jsonify({"jobs": jobs})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 if __name__ == "__main__":
