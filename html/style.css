@@ -150,7 +150,7 @@ header.row {
   height: auto;
   padding: 6px 12px !important;
   margin: 0 !important;
-  background: var(--toolbar-bg);
+  background: white;
   border-bottom: 1px solid var(--border);
   -webkit-app-region: drag;
   position: relative;
@@ -169,18 +169,7 @@ header.row > * {
 }
 
 .brand {
-  font-size: 24px;
-  color: var(--accent);
-  white-space: nowrap;
-  padding-right: 12px;
-  border-right: 1px solid var(--border);
-  margin-bottom: 0;
-  line-height: 1;
-  font-family: "Sylfaen", serif;
-  display: flex;
-  align-items: center;
-  height: 100%;
-  align-self: stretch;
+  width: 240px;
 }
 .header-controls {
   display: flex;
@@ -227,23 +216,6 @@ header.row > * {
   color: var(--text-muted);
   cursor: pointer;
   line-height: 1;
-}
-
-.key-analysis-btn {
-  height: 26px;
-  padding: 0 10px;
-  font-size: 10px;
-  font-family: inherit;
-  letter-spacing: 0.06em;
-  background: var(--grade-bg) !important;
-  border: 1px solid var(--grade-border) !important;
-  color: var(--grade-text) !important;
-  border-radius: 4px;
-  white-space: nowrap;
-  transition: all 0.15s;
-}
-.key-analysis-btn:hover {
-  filter: brightness(1.1);
 }
 
 main.row {
@@ -684,7 +656,7 @@ main.row > * {
 .controls .btn {
   height: 28px;
   padding: 0 12px;
-  font-size: 10px;
+  font-size: 14px;
   font-family: inherit;
   letter-spacing: 0.08em;
   border-radius: 4px;
@@ -706,12 +678,19 @@ main.row > * {
   border-color: var(--accent) !important;
 }
 #analyzeBtn {
-  background: var(--accent-bg) !important;
-  border-color: var(--accent-border) !important;
-  color: var(--accent) !important;
+  background: #ffffff !important;
+  border-color: var(--border) !important;
+  color: var(--text) !important;
 }
 #analyzeBtn:hover {
   filter: brightness(1.1);
+}
+#analyzeBtn:disabled {
+  background: #e5e7eb !important;
+  border-color: #d1d5db !important;
+  color: #9ca3af !important;
+  filter: none;
+  cursor: not-allowed;
 }
 .score-action.is-hidden {
   display: none !important;
@@ -746,7 +725,7 @@ main.row > * {
   box-shadow: none !important;
 }
 .score-title {
-  font-size: 10px;
+  font-size: 18px;
   color: var(--text-muted);
   letter-spacing: 0.06em;
   padding: 2px 0;
@@ -854,10 +833,9 @@ main.row > * {
   flex-shrink: 0;
 }
 .details-header h2 {
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 500;
   letter-spacing: 0.18em;
-  text-transform: uppercase;
   color: var(--text-muted);
   margin: 0;
 }
@@ -875,7 +853,7 @@ main.row > * {
   flex-shrink: 0;
 }
 .observed-grade-title {
-  font-size: 10px;
+  font-size: 12px;
   color: var(--text-muted);
   letter-spacing: 0.06em;
   display: flex;
@@ -1223,18 +1201,21 @@ footer.row > .col-12 {
 .tick-top {
   position: absolute;
   left: 0;
-  bottom: 14px;
+  bottom: 16px;
   transform: translateX(-50%);
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: flex-start;
   gap: 2px;
   line-height: 1;
+  min-height: 26px;
 }
 .tick-tempo {
   display: flex;
   align-items: center;
   gap: 2px;
+  min-height: 12px;
 }
 .tick-tempo-icon {
   width: 4px;
@@ -1271,17 +1252,17 @@ footer.row > .col-12 {
   font-family: "Sylfaen", serif;
 }
 .tick-key-letter {
-  font-size: 11px;
+  font-size: 14px;
   color: var(--purple);
   font-weight: 600;
 }
 .tick-key-accidental {
-  font-size: 9px;
+  font-size: 12px;
   color: var(--purple);
   opacity: 0.85;
 }
 .tick-key-minor {
-  font-size: 9px;
+  font-size: 12px;
   color: var(--purple);
   opacity: 0.65;
 }

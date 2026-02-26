@@ -2645,7 +2645,8 @@ async function initVerovio() {
   const zoomDisplayEl    = document.getElementById("zoomDisplay");
   const controlsEl       = document.querySelector(".controls");
   const loadLabel        = document.querySelector(".score-load");
-  const clearButton      = document.querySelector(".score-clear");
+    const clearButton      = document.querySelector(".score-clear");
+    const analyzeBtn       = document.getElementById("analyzeBtn");
   const scoreActions     = document.querySelectorAll(".score-action");
   const targetOnlyToggle = document.getElementById("targetOnly");
   const observedPane     = document.getElementById("observedGradePane");
@@ -2796,21 +2797,25 @@ async function initVerovio() {
   }
 
   // ── Score actions state ───────────────────────────────────────────────────
-  const syncScoreActions = () => {
-    controlsEl?.classList.toggle("has-score", hasActiveScore);
-    if (loadLabel) {
-      loadLabel.classList.toggle("is-hidden", hasActiveScore);
-      loadLabel.setAttribute("aria-disabled", String(hasActiveScore));
-    }
-    if (clearButton) {
-      clearButton.classList.toggle("is-hidden", !hasActiveScore);
-      clearButton.disabled = !hasActiveScore;
-    }
-    scoreActions.forEach((el) => {
-      if (el !== clearButton && el !== loadLabel) return;
-      el.style.pointerEvents = el.classList.contains("is-hidden") ? "none" : "";
-    });
-  };
+    const syncScoreActions = () => {
+      controlsEl?.classList.toggle("has-score", hasActiveScore);
+      if (loadLabel) {
+        loadLabel.classList.toggle("is-hidden", hasActiveScore);
+        loadLabel.setAttribute("aria-disabled", String(hasActiveScore));
+      }
+      if (analyzeBtn) {
+        analyzeBtn.disabled = !hasActiveScore;
+      }
+      if (clearButton) {
+        clearButton.classList.toggle("is-hidden", !hasActiveScore);
+        clearButton.disabled = !hasActiveScore;
+      }
+      scoreActions.forEach((el) => {
+        if (el !== clearButton && el !== loadLabel) return;
+        el.style.pointerEvents = el.classList.contains("is-hidden") ? "none" : "";
+      });
+    };
+    syncScoreActions();
 
   // ── File load ─────────────────────────────────────────────────────────────
   fileInput?.addEventListener("change", async (e) => {
