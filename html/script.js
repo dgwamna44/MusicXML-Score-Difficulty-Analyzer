@@ -1,3 +1,6 @@
+import { VerovioToolkit } from 'verovio/esm';
+import VerovioModule from 'verovio/wasm';
+
 // script.js (ES module)
 const TS_FONT_PATH = "fonts_ts";
 const KS_FONT_PATH = "fonts_key";
@@ -24,6 +27,15 @@ function formatConfidencePercent(value) {
   const num = Number(value);
   if (!Number.isFinite(num)) return "";
   return `${Math.round(num * 100)}%`;
+}
+
+function normalizeScoreXml(text) {
+  if (!text) return text;
+  return text
+    .replace(/print-object="no"/g, 'print-object="yes"')
+    .replace(/print-object='no'/g, "print-object='yes'")
+    .replace(/print-spacing="no"/g, 'print-spacing="yes"')
+    .replace(/print-spacing='no'/g, "print-spacing='yes'");
 }
 
 function deriveAvailabilityConfidence(availabilityNotes) {
@@ -1080,15 +1092,13 @@ function openKeyAnalysisModal() {
   const listEl = document.getElementById("keyAnalysisDetectedList");
   const hasStrings = Boolean(window._keyAnalysisHasStrings);
   const detected = window._keyAnalysisDetected || [];
+  if (!hasStrings) return;
   if (labelEl) {
-    labelEl.textContent = hasStrings
-      ? "String instruments detected"
-      : "No string instruments detected";
+    labelEl.textContent = "String instruments detected";
   }
   if (descEl) {
-    descEl.textContent = hasStrings
-      ? "This score includes one or more string parts (e.g., violin/viola/cello/bass). String players typically prefer sharp-based keys over equivalent flat keys, so your key analysis can be interpreted in two ways:"
-      : "This score does not appear to include string parts, but you can still choose how key spellings are interpreted for this analysis.";
+    descEl.textContent =
+      "One or more string instruments were found in this score. Because string writing often favors sharp keys (e.g., G, D, A), this may affect key and range confidence. If this piece is intended for an orchestral/strings context, consider enabling String Harmonic Analysis. Otherwise, the analyzer will continue with the default band/general assumptions.";
   }
   if (listEl) {
     listEl.innerHTML = "";
@@ -1202,86 +1212,139 @@ function initTooltips() {
 function buildTimelineTicks(trackEl, ticks, totalMeasures) {
   if (!trackEl) return;
 
+  // Ensure canvas wrapper exists
   let canvas = trackEl.querySelector(".timeline-canvas");
   if (!canvas) {
     canvas = document.createElement("div");
     canvas.className = "timeline-canvas";
     const line = trackEl.querySelector(".timeline-line");
-    if (line) {
-      line.remove();
-      canvas.appendChild(line);
-    }
+    if (line) { line.remove(); canvas.appendChild(line); }
     trackEl.appendChild(canvas);
   }
 
-  // Remove existing ticks
-  canvas.querySelectorAll(".timeline-tick").forEach((node) => node.remove());
+  // Clear old ticks
+  canvas.querySelectorAll(".timeline-tick").forEach((n) => n.remove());
 
-  // Expect ticks like: [{ measure: 12 }, { measure: 48 }, ...]
-  // If you're currently passing objects with tempo/meter/key/etc, that's fine —
-  // we ignore all of it now and only use measure.
   let tickList = Array.isArray(ticks) ? [...ticks] : [];
   const startMeasure = 1;
-  const endMeasure = Number.isFinite(totalMeasures) ? totalMeasures : null;
+  const totalNum = Number(totalMeasures);
+  const endMeasure =
+    Number.isFinite(totalNum) && totalNum > 0 ? totalNum : null;
+  const derivedEnd = tickList.length
+    ? Math.max(...tickList.map((t) => Number(t?.measure) || 0))
+    : null;
+  const endMeasureValue = endMeasure || derivedEnd || null;
 
-  const maxMeasures = endMeasure || 0;
-  const viewWidth = trackEl.clientWidth || 0;
-  if (maxMeasures > 50 && viewWidth > 0) {
-    const measureWidth = viewWidth / 50;
-    const canvasWidth = Math.max(viewWidth, maxMeasures * measureWidth);
-    canvas.style.width = `${canvasWidth}px`;
-    trackEl.style.overflowX = "auto";
+  // ── Canvas width ──────────────────────────────────────────────────────────
+  // Keep ~50 measures visible per viewport; scroll only beyond that.
+  const MEASURES_PER_VIEW = 50;
+  const TIMELINE_SIDE_PAD = 14;
+  const rawWidth =
+    trackEl.clientWidth ||
+    trackEl.parentElement?.clientWidth ||
+    window.innerWidth ||
+    600;
+  const viewWidth = Math.max(200, rawWidth - TIMELINE_SIDE_PAD * 2);
+
+  canvas.style.padding = `0 ${TIMELINE_SIDE_PAD}px`;
+  canvas.style.boxSizing = "border-box";
+  canvas.style.position = "relative";
+
+  if (endMeasureValue && endMeasureValue > 1) {
+    const pxPerMeasure = Math.max(8, Math.floor(viewWidth / MEASURES_PER_VIEW));
+    const naturalWidth =
+      endMeasureValue * pxPerMeasure + TIMELINE_SIDE_PAD * 2;
+    if (endMeasureValue > MEASURES_PER_VIEW) {
+      canvas.style.width = `${naturalWidth}px`;
+      canvas.style.minWidth = `${naturalWidth}px`;
+      trackEl.style.overflowX = "auto";
+    } else {
+      canvas.style.width = "100%";
+      canvas.style.minWidth = "100%";
+      trackEl.style.overflowX = "hidden";
+    }
   } else {
     canvas.style.width = "100%";
+    canvas.style.minWidth = "100%";
     trackEl.style.overflowX = "hidden";
   }
 
-  if (!tickList.some((tick) => tick?.measure === startMeasure)) {
+  // ── Ensure start/end ticks exist ──────────────────────────────────────────
+  if (!tickList.some((t) => Number(t?.measure) === startMeasure)) {
     tickList.unshift({ measure: startMeasure });
   }
-  if (endMeasure && !tickList.some((tick) => tick?.measure === endMeasure)) {
-    tickList.push({ measure: endMeasure });
+  if (
+    endMeasureValue &&
+    !tickList.some((t) => Number(t?.measure) === endMeasureValue)
+  ) {
+    tickList.push({ measure: endMeasureValue });
   }
 
+  // ── Position helper ───────────────────────────────────────────────────────
+  // Maps measure number → left% within the canvas's content area
+  // Measure 1 = 0%, last measure = 100%
+  const measureToPercent = (measure) => {
+    if (!endMeasureValue || endMeasureValue <= 1) return 0;
+    return ((measure - 1) / (endMeasureValue - 1)) * 100;
+  };
+
+  // ── Build each tick ───────────────────────────────────────────────────────
   tickList.forEach((tick) => {
     const measure = Number(tick?.measure);
     if (!Number.isFinite(measure) || measure <= 0) return;
 
-    let left = 0;
-    if (endMeasure && endMeasure > 1) {
-      left = ((measure - 1) / (endMeasure - 1)) * 100;
-    }
-
-    const tickEl = document.createElement("div");
+    const pct = measureToPercent(measure);
     const isStart = measure === startMeasure;
-    const isEnd = measure === endMeasure;
+    const isEnd = measure === endMeasureValue;
     const hasIssue = Boolean(tick.issue);
-    tickEl.className = `timeline-tick${isStart ? " timeline-tick-start" : ""}${isEnd ? " timeline-tick-end" : ""}`;
-    if (hasIssue) tickEl.classList.add("timeline-tick-issue");
-    tickEl.style.left = `${Math.max(0, Math.min(100, left))}%`;
-
     const hasMeter = Boolean(tick.meter);
-    const hasTempo = tick.tempo_bpm != null || tick.tempo;
+    const hasTempo = tick.tempo_bpm != null || tick.tempo != null;
     const hasKey = Boolean(tick.key);
     const issueOnly = hasIssue && !hasMeter && !hasTempo && !hasKey;
+
+    const tickEl = document.createElement("div");
+    tickEl.className = "timeline-tick";
+    if (isStart) tickEl.classList.add("timeline-tick-start");
+    if (isEnd) tickEl.classList.add("timeline-tick-end");
+    if (hasIssue) tickEl.classList.add("timeline-tick-issue");
     if (issueOnly) tickEl.classList.add("timeline-tick-issue-only");
+
+    // ── Position ticks ────────────────────────────────────────────────────────
+    // All ticks use translateX(-50%) to center on their position.
+    // For start/end, we clamp the position to ensure they stay visible.
+    const EDGE_BUFFER_PX = 2 // Pixels from edge to keep tick center from hitting boundary
+    
+    if (isStart) {
+      tickEl.style.left = `${EDGE_BUFFER_PX}px`;
+      tickEl.style.transform = "translateX(-50%)";
+      tickEl.style.top = "50%";
+    } else if (isEnd) {
+      tickEl.style.left = `calc(100% - ${EDGE_BUFFER_PX}px)`;
+      tickEl.style.transform = "translateX(-50%)";
+      tickEl.style.top = "50%";
+    } else {
+      tickEl.style.left = `${pct}%`;
+      tickEl.style.transform = "translateX(-50%)";
+      tickEl.style.top = "50%";
+    }
+
+    // ── Annotations row (above the stem) ──────────────────────────────────
     if (hasMeter || hasTempo) {
       const topRow = document.createElement("div");
       topRow.className = "tick-top";
 
+      // Time signature (topmost)
       if (hasMeter) {
-        const [num, den] = String(tick.meter)
-          .split("/")
-          .map((s) => s.trim());
-        if (num && den) {
-          topRow.appendChild(makeTimeSigSvgEl(num, den));
+        const parts = String(tick.meter).split("/").map((s) => s.trim());
+        if (parts.length === 2) {
+          topRow.appendChild(makeTimeSigSvgEl(parts[0], parts[1]));
         }
       }
 
+      // Tempo (below meter if both present)
       if (hasTempo) {
         const wrap = document.createElement("div");
         wrap.className = "tick-tempo";
-
         const beatUnit = tick.tempo_beat_unit;
         const bpm = tick.tempo_bpm ?? tick.tempo;
         const svgSrc = tempoSvgForBeatUnit(beatUnit);
@@ -1290,31 +1353,44 @@ function buildTimelineTicks(trackEl, ticks, totalMeasures) {
           const img = document.createElement("img");
           img.className = "tick-tempo-icon";
           img.src = svgSrc;
-          img.alt = beatUnit ? `${beatUnit} note` : "Tempo";
+          img.alt = beatUnit || "Tempo";
           wrap.appendChild(img);
         }
 
         const txt = document.createElement("span");
         txt.className = "tick-tempo-text";
-        if (svgSrc) {
-          txt.textContent = `=${bpm}`;
-        } else if (beatUnit) {
-          txt.textContent = `${beatUnit}=${bpm}`;
-        } else {
-          txt.textContent = String(bpm);
-        }
+        txt.textContent = svgSrc
+          ? `=${bpm}`
+          : beatUnit
+            ? `${beatUnit}=${bpm}`
+            : String(bpm);
         wrap.appendChild(txt);
-
         topRow.appendChild(wrap);
       }
 
       tickEl.appendChild(topRow);
     }
 
+    // ── Stem (the vertical tick mark) ─────────────────────────────────────
     const mark = document.createElement("div");
     mark.className = "tick-mark";
+
+    if (isStart || isEnd) {
+      mark.style.width = "3px";        
+      mark.style.height = "22px";
+      mark.style.background = "var(--accent)";
+      mark.style.boxShadow = "0 0 0 1px rgba(0, 0, 0, 0.12)";
+    } else if (hasIssue) {
+      mark.style.background = "var(--tick-issue)";
+    } else {
+      mark.style.width = "2px";
+      mark.style.height = "18px";
+      mark.style.background = "var(--timeline-tick)";
+    }
+
     tickEl.appendChild(mark);
 
+    // ── Measure label (below stem, skip for start/end boundary ticks) ────
     if (!isStart && !isEnd) {
       const measureEl = document.createElement("button");
       measureEl.type = "button";
@@ -1329,13 +1405,19 @@ function buildTimelineTicks(trackEl, ticks, totalMeasures) {
       tickEl.appendChild(measureEl);
     }
 
-    if (tick.key) {
-      tickEl.appendChild(makeKeySigSvgEl(tick.key, tick.key_quality));
+    // ── Key signature (bottom) ────────────────────────────────────────────
+    const keyEl = hasKey
+      ? makeKeySigSvgEl(tick.key, tick.key_quality)
+      : null;
+    if (keyEl) {
+      keyEl.classList.add("tick-key-bottom");
+      tickEl.appendChild(keyEl);
     }
 
     canvas.appendChild(tickEl);
   });
 }
+
 
 function digitImg(digit) {
   const img = document.createElement("img");
@@ -1805,18 +1887,24 @@ function initAnalysisRequest() {
       document.querySelector('meta[name="score-analyzer-api"]')?.content ||
       "",
   ).trim();
-  const API_BASE = configuredBase
-    ? configuredBase.replace(/\/+$/, "")
-    : window.location.hostname === "localhost" ||
-        window.location.hostname === "127.0.0.1"
-      ? "http://127.0.0.1:5000"
-      : "";
+    const API_BASE = configuredBase
+      ? configuredBase.replace(/\/+$/, "")
+      : window.location.hostname === "localhost" ||
+          window.location.hostname === "127.0.0.1"
+        ? "http://127.0.0.1:5000"
+        : "";
+  const isLocalApi =
+    API_BASE.includes("127.0.0.1") || API_BASE.includes("localhost");
   console.log("API_BASE =", API_BASE);
   window.analysisResult = null;
   const analyzeBtn = document.getElementById("analyzeBtn");
   const targetOnly = document.getElementById("targetOnly");
   const fullGrade = document.getElementById("fullGradeSearch");
   const targetGrade = document.getElementById("targetGradeSelect");
+  const inlineToggle = document.getElementById("inlineModeToggle");
+  if (inlineToggle) {
+    inlineToggle.checked = isLocalApi;
+  }
   const keyAnalysisBtn = document.getElementById("keyAnalysisBtn");
   const keyAnalysisStringBtn = document.getElementById("keyAnalysisStringBtn");
   const keyAnalysisStandardBtn = document.getElementById(
@@ -1827,7 +1915,41 @@ function initAnalysisRequest() {
   const progressText = document.getElementById("progressText");
   const progressOkBtn = document.getElementById("progressOkBtn");
   const progressTimer = document.getElementById("progressTimer");
-  const modal = modalEl ? new bootstrap.Modal(modalEl) : null;
+    const modal = modalEl ? new bootstrap.Modal(modalEl) : null;
+    let analysisInProgress = false;
+    let analysisDone = false;
+    let activeCancelId = null;
+    let activeAbort = null;
+
+    const cancelActiveAnalysis = () => {
+      if (!analysisInProgress || analysisDone) return;
+      if (activeAbort) {
+        try {
+          activeAbort.abort();
+        } catch (_) {}
+      }
+      if (activeCancelId) {
+        fetch(`${API_BASE}/api/cancel/${activeCancelId}`, { method: "POST" }).catch(() => {});
+      }
+      analysisInProgress = false;
+    };
+
+    if (modalEl) {
+      modalEl.addEventListener("hide.bs.modal", (evt) => {
+        if (!analysisInProgress || analysisDone) {
+          return;
+        }
+        const ok = window.confirm(
+          "You are about to cancel the current analysis. Continue?"
+        );
+        if (!ok) {
+          evt.preventDefault();
+        }
+      });
+      modalEl.addEventListener("hidden.bs.modal", () => {
+        cancelActiveAnalysis();
+      });
+    }
 
   if (!analyzeBtn) return;
 
@@ -1858,9 +1980,9 @@ function initAnalysisRequest() {
     });
   }
 
-  if (progressOkBtn) {
-    progressOkBtn.addEventListener("click", () => {
-      // Just close modal; do NOT clear/rebuild timeline here.
+      if (progressOkBtn) {
+        progressOkBtn.addEventListener("click", () => {
+          // Just close modal; do NOT clear/rebuild timeline here.
 
       if (!window.analysisResult) return;
 
@@ -1931,6 +2053,59 @@ function initAnalysisRequest() {
     return acc;
   }, {});
 
+  const analyzerTimers = new Map();
+
+  const normalizeAnalyzerKey = (analyzer, label) => {
+    if (analyzer === "key_range") {
+      return label || "range";
+    }
+    if (analyzer === "tempo_duration") {
+      return label || "tempo";
+    }
+    return analyzer;
+  };
+
+  const formatSeconds = (value) => {
+    const seconds = Number(value);
+    if (!Number.isFinite(seconds)) return null;
+    return seconds < 10 ? seconds.toFixed(1) : seconds.toFixed(0);
+  };
+
+  const stopAnalyzerTimer = (key) => {
+    const entry = analyzerTimers.get(key);
+    if (!entry) return null;
+    clearInterval(entry.id);
+    analyzerTimers.delete(key);
+    return entry.start;
+  };
+
+  const stopAllAnalyzerTimers = () => {
+    analyzerTimers.forEach((entry) => clearInterval(entry.id));
+    analyzerTimers.clear();
+  };
+
+  const startAnalyzerTimer = (key) => {
+    stopAnalyzerTimer(key);
+    const ids = barIds[key];
+    if (!ids) return;
+    const bar = document.getElementById(ids.bar);
+    const pctEl = document.getElementById(ids.pct);
+    const label = labelMap[key] || key;
+    const startedAt = performance.now();
+    const tick = () => {
+      const elapsed = (performance.now() - startedAt) / 1000;
+      const next = Math.min(95, 5 + Math.log1p(elapsed) * 14);
+      if (bar) bar.style.width = `${Math.round(next)}%`;
+      if (pctEl) pctEl.textContent = `${Math.round(next)}%`;
+      if (progressText) {
+        progressText.textContent = `${label} running — ${elapsed.toFixed(1)}s`;
+      }
+    };
+    tick();
+    const id = setInterval(tick, 500);
+    analyzerTimers.set(key, { id, start: startedAt });
+  };
+
   const ensureProgressBars = () => {
     if (!progressBars) return;
     progressBars.innerHTML = "";
@@ -1983,70 +2158,38 @@ function initAnalysisRequest() {
       alert(
         "Missing backend URL. Set SCORE_ANALYZER_API_BASE in html/config.js (or a score-analyzer-api meta tag).",
       );
-      return;
-    }
-    const fileInput = document.getElementById("fileInput");
-    const file = fileInput?.files?.[0];
-    if (!file) {
-      alert("Please choose a score file.");
-      return;
-    }
-
-    const form = new FormData();
-    form.append("score_file", file);
-    form.append("target_only", String(Boolean(targetOnly?.checked)));
-    form.append(
-      "strings_only",
-      String(window._keyAnalysisMode === KEY_ANALYSIS_MODES.STRING),
-    );
-    form.append("full_grade_analysis", String(Boolean(fullGrade?.checked)));
-    form.append("target_grade", String(Number(targetGrade?.value || 2)));
-    window.analysisResult = null;
-
-    ensureProgressBars();
-    if (progressText) progressText.textContent = "Starting analysis...";
-    if (progressOkBtn) progressOkBtn.disabled = true;
-    if (progressTimer) progressTimer.textContent = "00m00s";
-    modal?.show();
-    const startedAt = performance.now();
-    let timerId = null;
-    if (progressTimer) {
-      timerId = setInterval(() => {
-        const elapsed = (performance.now() - startedAt) / 1000;
-        const minutes = Math.floor(elapsed / 60);
-        const seconds = Math.floor(elapsed % 60);
-        progressTimer.textContent = `Time Elapsed - ${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
-      }, 200);
-    }
-
-    const applyFinalResult = (result) => {
-      window.analysisResult = result;
+        analysisDone = true;
+        analysisInProgress = false;
+        return;
+      }
+    const applyAnalysisResult = (payload) => {
+      window.analysisResult = payload;
+      analysisDone = true;
+      analysisInProgress = false;
 
       bindBarHeadDetailPaneClicks();
-      updatePartAnalyzerIssueTooltips(
-        result?.result?.analysis_notes_filtered,
-      );
+      updatePartAnalyzerIssueTooltips(payload?.result?.analysis_notes_filtered);
       const targetGradeValue = Number(targetGrade?.value ?? NaN);
-      setMarkerPositions(result?.result?.confidences, {
-        observedGrades: result?.result?.observed_grades,
+      setMarkerPositions(payload?.result?.confidences, {
+        observedGrades: payload?.result?.observed_grades,
         targetGrade: targetGradeValue,
         showObserved: !targetOnly?.checked,
-        availabilityNotes: result?.result?.analysis_notes?.availability,
+        availabilityNotes: payload?.result?.analysis_notes?.availability,
       });
       setObservedGrade(
-        result?.result?.observed_grade_overall,
-        result?.result?.observed_grade_overall_range,
+        payload?.result?.observed_grade_overall,
+        payload?.result?.observed_grade_overall_range,
       );
       const scoringPayload =
-        result?.result?.analysis_notes_filtered?.scoring ??
-        result?.result?.analysis_notes?.scoring;
+        payload?.result?.analysis_notes_filtered?.scoring ??
+        payload?.result?.analysis_notes?.scoring;
       if (scoringPayload) {
         renderScoringDetails(scoringPayload);
       }
 
-      const totalMeasures = result?.result?.total_measures ?? 0;
-      const durationString = result?.result?.duration ?? 0;
-      const tempoData = result?.result?.analysis_notes?.tempo ?? [];
+      const totalMeasures = payload?.result?.total_measures ?? 0;
+      const durationString = payload?.result?.duration ?? 0;
+      const tempoData = payload?.result?.analysis_notes?.tempo ?? [];
 
       setTimelineLabels(totalMeasures, durationString, tempoData);
 
@@ -2057,74 +2200,108 @@ function initAnalysisRequest() {
 
       buildTimelineTicks(track, ticks, totalMeasures);
     };
+    const wrapResult = (data) => ({ done: true, error: null, result: data });
+    const fileInput = document.getElementById("fileInput");
+    const file = fileInput?.files?.[0];
+    if (!file) {
+      alert("Please choose a score file.");
+      return;
+    }
 
-    const handleEvent = (data) => {
-      if (!data || data.type === "heartbeat") return;
-      if (data.type === "observed") {
-        const pct = data.total ? Math.round((data.idx / data.total) * 100) : 0;
-        const analyzerKey =
-          data.analyzer === "key_range" && data.label
-            ? data.label
-            : data.analyzer === "tempo_duration" && data.label
-              ? data.label
-              : data.analyzer;
-        const ids = barIds[analyzerKey];
-        const bar = ids ? document.getElementById(ids.bar) : null;
-        const pctEl = ids ? document.getElementById(ids.pct) : null;
-        const labelEl = ids ? document.getElementById(ids.label) : null;
-        if (bar) bar.style.width = `${pct}%`;
-        if (pctEl) pctEl.textContent = `${pct}%`;
-        if (labelEl) {
-          const name = labelMap[analyzerKey] || analyzerKey;
-          labelEl.textContent = name;
+    const form = new FormData();
+    form.append("score_file", file);
+    form.append("target_only", String(Boolean(targetOnly?.checked)));
+      form.append(
+        "strings_only",
+        String(window._keyAnalysisMode === KEY_ANALYSIS_MODES.STRING),
+      );
+    form.append("full_grade_analysis", String(Boolean(fullGrade?.checked)));
+    form.append("target_grade", String(Number(targetGrade?.value || 2)));
+      if (inlineToggle?.checked) {
+        form.append("debug_inline", "true");
+      }
+      if (window.crypto && typeof window.crypto.randomUUID === "function") {
+        activeCancelId = window.crypto.randomUUID();
+      } else {
+        activeCancelId = `cancel_${Date.now()}_${Math.random().toString(16).slice(2)}`;
+      }
+      form.append("cancel_id", activeCancelId);
+      window.analysisResult = null;
+
+      ensureProgressBars();
+    if (progressText) progressText.textContent = "Starting analysis...";
+    if (progressOkBtn) progressOkBtn.disabled = true;
+    if (progressTimer) progressTimer.textContent = "00m00s";
+      modal?.show();
+      analysisInProgress = true;
+      analysisDone = false;
+      const startedAt = performance.now();
+      let timerId = null;
+    let localProgressTimer = null;
+    const localProgress = {};
+    const localKeys = Object.keys(labelMap);
+    const startLocalProgress = () => {
+      if (localProgressTimer) return;
+      localKeys.forEach((key) => {
+        localProgress[key] = 0;
+      });
+      let tick = 0;
+      localProgressTimer = setInterval(() => {
+        localKeys.forEach((key) => {
+          const ids = barIds[key];
+          const bar = ids ? document.getElementById(ids.bar) : null;
+          const pctEl = ids ? document.getElementById(ids.pct) : null;
+          const bump = 1 + Math.random() * 4;
+          const next = Math.min(95, (localProgress[key] || 0) + bump);
+          localProgress[key] = next;
+          if (bar) bar.style.width = `${Math.round(next)}%`;
+          if (pctEl) pctEl.textContent = `${Math.round(next)}%`;
+        });
+        if (progressText && localKeys.length > 0) {
+          const label = labelMap[localKeys[tick % localKeys.length]] || "Analysis";
+            progressText.textContent = "Now processing...";
         }
-        if (progressText) {
-          const name = labelMap[analyzerKey] || analyzerKey;
-          progressText.textContent = `${name} grade ${formatGrade(data.grade)} - ${pct}%`;
+        tick += 1;
+      }, 700);
+    };
+    const stopLocalProgress = () => {
+      if (localProgressTimer) {
+        clearInterval(localProgressTimer);
+        localProgressTimer = null;
+      }
+    };
+    if (progressTimer) {
+      timerId = setInterval(() => {
+        const elapsed = (performance.now() - startedAt) / 1000;
+        const minutes = Math.floor(elapsed / 60);
+        const seconds = Math.floor(elapsed % 60);
+        progressTimer.textContent = `Time Elapsed - ${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+      }, 200);
+    }
+
+    startLocalProgress();
+        activeAbort = new AbortController();
+        const res = await fetch(`${API_BASE}/api/analyze`, {
+          method: "POST",
+          body: form,
+          signal: activeAbort.signal,
+        });
+
+        if (!res.ok) {
+          stopLocalProgress();
+          if (timerId) clearInterval(timerId);
+          const err = await res.json().catch(() => ({}));
+          alert(err.error || "Failed to start analysis.");
+          analysisInProgress = false;
+          return;
         }
-      } else if (data.type === "analyzer") {
-        const analyzerKey =
-          data.analyzer === "key_range"
-            ? "range"
-            : data.analyzer === "tempo_duration"
-              ? "tempo"
-              : data.analyzer;
-        const ids = barIds[analyzerKey];
-        const bar = ids ? document.getElementById(ids.bar) : null;
-        const pctEl = ids ? document.getElementById(ids.pct) : null;
-        const labelEl = ids ? document.getElementById(ids.label) : null;
-        if (bar && bar.style.width === "0%") {
-          bar.style.width = "100%";
-        }
-        if (pctEl && pctEl.textContent === "0%") {
-          pctEl.textContent = "100%";
-        }
-        if (labelEl) {
-          labelEl.textContent = labelMap[analyzerKey] || analyzerKey;
-        }
-        if (data.analyzer === "tempo_duration") {
-          const tempoIds = barIds.tempo;
-          const durationIds = barIds.duration;
-          const tempoBar = tempoIds ? document.getElementById(tempoIds.bar) : null;
-          const tempoPct = tempoIds ? document.getElementById(tempoIds.pct) : null;
-          const durationBar = durationIds ? document.getElementById(durationIds.bar) : null;
-          const durationPct = durationIds ? document.getElementById(durationIds.pct) : null;
-          if (tempoBar) tempoBar.style.width = "100%";
-          if (tempoPct) tempoPct.textContent = "100%";
-          if (durationBar) durationBar.style.width = "100%";
-          if (durationPct) durationPct.textContent = "100%";
-        }
-      } else if (data.type === "timeout") {
-        if (progressText) {
-          progressText.textContent = "Timed out. Showing partial results.";
-        }
-      } else if (data.type === "result") {
-        applyFinalResult({ done: true, error: null, result: data.data });
-      } else if (data.type === "error") {
-        if (progressText) progressText.textContent = "Analysis error.";
-        console.error("Analysis error:", data.error);
-      } else if (data.type === "done") {
-        Object.values(barIds).forEach((ids) => {
+
+      const initialPayload = await res.json().catch(() => ({}));
+      const jobId = initialPayload?.job_id;
+        if (!jobId) {
+          stopLocalProgress();
+          if (timerId) clearInterval(timerId);
+          Object.values(barIds).forEach((ids) => {
           const bar = document.getElementById(ids.bar);
           const pctEl = document.getElementById(ids.pct);
           if (bar) bar.style.width = "100%";
@@ -2132,74 +2309,236 @@ function initAnalysisRequest() {
         });
         if (progressText) progressText.textContent = "Done.";
         if (progressOkBtn) progressOkBtn.disabled = false;
-        if (timerId) clearInterval(timerId);
-      }
-    };
+        applyAnalysisResult({
+          done: true,
+          error: null,
+          result: initialPayload,
+        });
+          analysisDone = true;
+          analysisInProgress = false;
+          return;
+        }
+        stopLocalProgress();
 
-    let gotResult = false;
-    const handleEventWithResult = (data) => {
-      if (data?.type === "result") {
-        gotResult = true;
-      }
-      handleEvent(data);
-    };
+    window.lastJobId = jobId;
 
-    try {
-      const res = await fetch(`${API_BASE}/api/analyze_stream`, {
-        method: "POST",
-        body: form,
-        headers: {
-          Accept: "text/event-stream",
-        },
-      });
+    let es = null;
+    let reconnectAttempts = 0;
+    const maxReconnects = 5;
+    let reconnectTimer = null;
+    let streamDone = false;
 
-      if (!res.ok || !res.body) {
-        const err = await res.json().catch(() => ({}));
-        alert(err.error || "Failed to start analysis.");
-        if (timerId) clearInterval(timerId);
-        return;
-      }
-
-      const reader = res.body.getReader();
-      const decoder = new TextDecoder();
-      let buffer = "";
-
-      while (true) {
-        const { value, done } = await reader.read();
-        if (done) break;
-        buffer += decoder.decode(value, { stream: true });
-        let idx;
-        while ((idx = buffer.indexOf("\n\n")) !== -1) {
-          const chunk = buffer.slice(0, idx).trim();
-          buffer = buffer.slice(idx + 2);
-          if (!chunk) continue;
-          const lines = chunk.split("\n");
-          for (const line of lines) {
-            if (!line.startsWith("data:")) continue;
-            const payload = line.slice(5).trim();
-            if (!payload) continue;
-            try {
-              const data = JSON.parse(payload);
-              handleEventWithResult(data);
-            } catch (err) {
-              console.warn("Failed to parse SSE payload:", payload, err);
+    const connectProgressStream = () => {
+      if (es) es.close();
+      es = new EventSource(`${API_BASE}/api/progress/${jobId}`);
+      let finalReceived = false;
+        es.onmessage = (evt) => {
+          const data = JSON.parse(evt.data);
+          if (data.type === "heartbeat") return;
+          if (data.type === "progress" && data.data) {
+            const prog = data.data;
+            const analyzerEntries = Object.entries(prog.analyzers || {});
+            analyzerEntries.forEach(([analyzer, info]) => {
+              const ids = barIds[analyzer];
+              if (!ids) return;
+              const bar = document.getElementById(ids.bar);
+              const pctEl = document.getElementById(ids.pct);
+              const labelEl = document.getElementById(ids.label);
+              const pct = Math.round((Number(info?.progress) || 0) * 100);
+              if (bar) bar.style.width = `${pct}%`;
+              if (pctEl) pctEl.textContent = `${pct}%`;
+              if (labelEl) {
+                const name = labelMap[analyzer] || analyzer;
+                if (info?.status === "done" && info?.duration != null) {
+                  labelEl.textContent = `${name} • ${Number(info.duration).toFixed(1)}s`;
+                } else {
+                  labelEl.textContent = name;
+                }
+              }
+            });
+            if (progressText) {
+              const current = prog.current_analyzer || "Initializing";
+              const label = labelMap[current] || current;
+              progressText.textContent = label;
+            }
+            return;
+          }
+          if (data.type === "error") {
+            if (progressText) {
+              progressText.textContent = data.message || "Analysis failed.";
+            }
+            if (progressOkBtn) progressOkBtn.disabled = false;
+            return;
+          }
+        if (data.type === "observed") {
+          const pct = data.total
+            ? Math.round((data.idx / data.total) * 100)
+            : 0;
+          const analyzerKey =
+            data.analyzer === "key_range" && data.label
+              ? data.label
+              : data.analyzer === "tempo_duration" && data.label
+                ? data.label
+                : data.analyzer;
+          stopAnalyzerTimer(analyzerKey);
+          const ids = barIds[analyzerKey];
+          const bar = ids ? document.getElementById(ids.bar) : null;
+          const pctEl = ids ? document.getElementById(ids.pct) : null;
+          const labelEl = ids ? document.getElementById(ids.label) : null;
+          if (bar) bar.style.width = `${pct}%`;
+          if (pctEl) pctEl.textContent = `${pct}%`;
+          if (labelEl) {
+            const name = labelMap[analyzerKey] || analyzerKey;
+            labelEl.textContent = name;
+          }
+          if (progressText) {
+            const name = labelMap[analyzerKey] || analyzerKey;
+            progressText.textContent = `${name} grade ${formatGrade(data.grade)} - ${pct}%`;
+          }
+        } else if (data.type === "analyzer_start") {
+          if (data.analyzer === "tempo_duration") {
+            startAnalyzerTimer("tempo");
+            startAnalyzerTimer("duration");
+          } else {
+            const analyzerKey = normalizeAnalyzerKey(data.analyzer, data.label);
+            startAnalyzerTimer(analyzerKey);
+          }
+        } else if (data.type === "analyzer_done") {
+          const durationText = formatSeconds(data.duration);
+          const finish = (key) => {
+            const ids = barIds[key];
+            const bar = ids ? document.getElementById(ids.bar) : null;
+            const pctEl = ids ? document.getElementById(ids.pct) : null;
+            const labelEl = ids ? document.getElementById(ids.label) : null;
+            stopAnalyzerTimer(key);
+            if (bar) bar.style.width = "100%";
+            if (pctEl) pctEl.textContent = "100%";
+            if (labelEl && durationText) {
+              const name = labelMap[key] || key;
+              labelEl.textContent = `${name} • ${durationText}s`;
+            }
+          };
+          if (data.analyzer === "tempo_duration") {
+            finish("tempo");
+            finish("duration");
+            if (progressText && durationText) {
+              progressText.textContent = `Tempo/Duration done — ${durationText}s`;
+            }
+          } else {
+            const analyzerKey = normalizeAnalyzerKey(data.analyzer, data.label);
+            finish(analyzerKey);
+            if (progressText && durationText) {
+              const name = labelMap[analyzerKey] || analyzerKey;
+              progressText.textContent = `${name} done — ${durationText}s`;
             }
           }
+        } else if (data.type === "analyzer") {
+          const analyzerKey =
+            data.analyzer === "key_range"
+              ? "range"
+              : data.analyzer === "tempo_duration"
+                ? "tempo"
+                : data.analyzer;
+          const ids = barIds[analyzerKey];
+          const bar = ids ? document.getElementById(ids.bar) : null;
+          const pctEl = ids ? document.getElementById(ids.pct) : null;
+          const labelEl = ids ? document.getElementById(ids.label) : null;
+          stopAnalyzerTimer(analyzerKey);
+          if (bar && bar.style.width === "0%") {
+            bar.style.width = "100%";
+          }
+          if (pctEl && pctEl.textContent === "0%") {
+            pctEl.textContent = "100%";
+          }
+          if (labelEl) {
+            labelEl.textContent = labelMap[analyzerKey] || analyzerKey;
+          }
+          if (data.analyzer === "tempo_duration") {
+            const tempoIds = barIds.tempo;
+            const durationIds = barIds.duration;
+            const tempoBar = tempoIds
+              ? document.getElementById(tempoIds.bar)
+              : null;
+            const tempoPct = tempoIds
+              ? document.getElementById(tempoIds.pct)
+              : null;
+            const durationBar = durationIds
+              ? document.getElementById(durationIds.bar)
+              : null;
+            const durationPct = durationIds
+              ? document.getElementById(durationIds.pct)
+              : null;
+            stopAnalyzerTimer("tempo");
+            stopAnalyzerTimer("duration");
+            if (tempoBar) tempoBar.style.width = "100%";
+            if (tempoPct) tempoPct.textContent = "100%";
+            if (durationBar) durationBar.style.width = "100%";
+            if (durationPct) durationPct.textContent = "100%";
+          }
+        } else if (data.type === "analyzer_result") {
+          window.analysisResult = wrapResult(data.data);
+        } else if (data.type === "result") {
+          stopAllAnalyzerTimers();
+          finalReceived = true;
+          streamDone = true;
+          if (progressText) progressText.textContent = "Done.";
+          if (progressOkBtn) progressOkBtn.disabled = false;
+          if (timerId) clearInterval(timerId);
+          if (reconnectTimer) clearTimeout(reconnectTimer);
+          es.close();
+            applyAnalysisResult(wrapResult(data.data));
+        } else if (data.type === "timeout") {
+          stopAllAnalyzerTimers();
+          if (progressText) {
+            progressText.textContent = "Timed out. Showing partial results.";
+          }
+        } else if (data.type === "done") {
+          stopAllAnalyzerTimers();
+          streamDone = true;
+          Object.values(barIds).forEach((ids) => {
+            const bar = document.getElementById(ids.bar);
+            const pctEl = document.getElementById(ids.pct);
+            if (bar) bar.style.width = "100%";
+            if (pctEl) pctEl.textContent = "100%";
+          });
+          if (progressText) progressText.textContent = "Done.";
+          if (progressOkBtn) progressOkBtn.disabled = false;
+          if (timerId) clearInterval(timerId);
+          if (reconnectTimer) clearTimeout(reconnectTimer);
+          es.close();
+            if (!finalReceived) {
+              fetch(`${API_BASE}/api/result/${jobId}`)
+                .then((r) => r.json())
+                .then((result) => {
+                  applyAnalysisResult(result);
+                })
+                .catch((err) => console.error("Failed to fetch result:", err));
+            }
         }
-      }
+      };
 
-      if (!gotResult) {
-        console.warn("Stream ended without result event.");
-        if (progressText) progressText.textContent = "Connection lost.";
-        if (timerId) clearInterval(timerId);
-        if (progressOkBtn) progressOkBtn.disabled = false;
-      }
-    } catch (err) {
-      console.error("Failed to stream analysis:", err);
-      if (progressText) progressText.textContent = "Connection lost.";
-      if (timerId) clearInterval(timerId);
-      if (progressOkBtn) progressOkBtn.disabled = false;
-    }
+      es.onerror = () => {
+        if (streamDone) return;
+        reconnectAttempts += 1;
+        if (reconnectAttempts <= maxReconnects) {
+          const delay = Math.min(2000 * reconnectAttempts, 10000);
+          if (progressText) {
+            progressText.textContent = `Connection lost. Reconnecting (${reconnectAttempts}/${maxReconnects})...`;
+          }
+          if (reconnectTimer) clearTimeout(reconnectTimer);
+          es.close();
+          reconnectTimer = setTimeout(connectProgressStream, delay);
+        } else {
+            if (progressText) progressText.textContent = "Connection lost.";
+            if (timerId) clearInterval(timerId);
+            stopAllAnalyzerTimers();
+            es.close();
+            console.warn("Progress stream error; analysisResult not set yet.");
+          }
+        };
+    };
+
+    connectProgressStream();
   });
 }
 
@@ -2283,105 +2622,211 @@ async function initVerovio() {
   url.searchParams.delete("view");
   if (url.hash && url.hash.includes("view=")) url.hash = "";
   history.replaceState({}, "", url.toString());
-  try {
-    localStorage.clear();
-    sessionStorage.clear();
-  } catch {}
 
-  await import("https://editor.verovio.org/javascript/app/verovio-app.js");
-  console.log(
-    "Verovio loaded:",
-    typeof window.Verovio,
-    typeof window.Verovio?.App,
-  );
+  // ── Init toolkit ──────────────────────────────────────────────────────────
+  const verovioModule = await VerovioModule();
+  const toolkit = new VerovioToolkit(verovioModule);
+  console.log("Verovio toolkit ready. Version:", toolkit.getVersion());
 
-  const appEl = document.getElementById("app");
+  // ── DOM refs ──────────────────────────────────────────────────────────────
+  const appEl            = document.getElementById("app");
+  const fileInput        = document.getElementById("fileInput");
+  const titleEl          = document.getElementById("scoreTitle");
+  const clearBtn         = document.getElementById("clearBtn");
+  const prevBtn          = document.getElementById("prevPage");
+  const nextBtn          = document.getElementById("nextPage");
+  const pageLabel        = document.getElementById("pageLabel");
+  const zoomInBtn        = document.getElementById("zoomIn");
+  const zoomOutBtn       = document.getElementById("zoomOut");
+  const zoomFitBtn       = document.getElementById("zoomFit");
+  const zoomDisplayEl    = document.getElementById("zoomDisplay");
+  const controlsEl       = document.querySelector(".controls");
+  const loadLabel        = document.querySelector(".score-load");
+    const clearButton      = document.querySelector(".score-clear");
+    const analyzeBtn       = document.getElementById("analyzeBtn");
+  const scoreActions     = document.querySelectorAll(".score-action");
+  const targetOnlyToggle = document.getElementById("targetOnly");
+  const observedPane     = document.getElementById("observedGradePane");
+
   if (!appEl) return console.error("Missing #app element");
 
-  appEl.style.minHeight = "800px";
-  appEl.style.border = "1px solid lightgray";
-
-  let app = new window.Verovio.App(appEl, {
-    defaultView: "responsive",
-    documentZoom: 3,
-  });
-
-  function ensureZoomWrapper() {
-    let root = appEl.querySelector(".verovio-zoom-root");
-    if (!root) {
-      root = document.createElement("div");
-      root.className = "verovio-zoom-root";
-      while (appEl.firstChild) root.appendChild(appEl.firstChild);
-      appEl.appendChild(root);
-    }
-    return root;
-  }
-
-  function setCssZoomPercent(pct) {
-    pct = Number(pct);
-    if (!Number.isFinite(pct)) return;
-    pct = Math.max(25, Math.min(400, pct));
-    const scale = pct / 100;
-
-    const root = ensureZoomWrapper();
-    root.style.transform = `scale(${scale})`;
-
-    const unscaledWidth = root.scrollWidth / scale;
-    const unscaledHeight = root.scrollHeight / scale;
-    root.style.width = `${unscaledWidth}px`;
-    root.style.height = `${unscaledHeight}px`;
-  }
-
-  const zoomInput = document.getElementById("zoomPct");
-  const zoomApply = document.getElementById("zoomApply");
-  const fileInput = document.getElementById("fileInput");
-  const titleEl = document.getElementById("scoreTitle");
-  const clearBtn = document.getElementById("clearBtn");
-  const controlsEl = document.querySelector(".controls");
-  const loadLabel = document.querySelector(".score-load");
-  const clearButton = document.querySelector(".score-clear");
-  const scoreActions = document.querySelectorAll(".score-action");
-  const targetOnlyToggle = document.getElementById("targetOnly");
-  const observedPane = document.getElementById("observedGradePane");
-
+  // ── State ─────────────────────────────────────────────────────────────────
+  let currentPage    = 1;
+  let totalPages     = 0;
+  const BASE_ZOOM    = 60;
+  let currentZoom    = BASE_ZOOM;
+  const PAGE_WIDTH_UNITS = 2100;  // A4 portrait width (210mm * 10)
+  const PAGE_HEIGHT_UNITS = 2970; // A4 portrait height (297mm * 10)
+  const MIN_PAGE_WIDTH_UNITS = 3200; // Wider systems -> more measures per line
+  const MAX_PAGE_WIDTH_UNITS = 4200;
+  let basePageWidthUnits = MIN_PAGE_WIDTH_UNITS;
+  const ZOOM_STEP    = 5;
+  const ZOOM_MIN     = 20;
+  const ZOOM_MAX     = 100;
   let hasActiveScore = false;
+  updateBasePageWidth();
 
-  const syncScoreActions = () => {
-    if (controlsEl) {
-      controlsEl.classList.toggle("has-score", hasActiveScore);
-    }
-    if (loadLabel) {
-      loadLabel.classList.toggle("is-hidden", hasActiveScore);
-      loadLabel.setAttribute(
-        "aria-disabled",
-        hasActiveScore ? "true" : "false",
-      );
-    }
-    if (clearButton) {
-      clearButton.classList.toggle("is-hidden", !hasActiveScore);
-      clearButton.disabled = !hasActiveScore;
-    }
-    scoreActions.forEach((el) => {
-      if (el !== clearButton && el !== loadLabel) return;
-      el.style.pointerEvents = el.classList.contains("is-hidden") ? "none" : "";
-    });
-  };
+  // ── Page geometry ─────────────────────────────────────────────────────────
+  // Returns the container's actual pixel dimensions, with safe fallbacks.
+  function containerSize() {
+    const w = appEl.clientWidth  || appEl.offsetWidth  || 800;
+    const h = appEl.clientHeight || appEl.offsetHeight || 600;
+    return { w, h };
+  }
 
+  function updateBasePageWidth() {
+    // Default to A4 portrait width (210mm * 10)
+    const { w } = containerSize();
+    const targetPx = Math.max(320, w - 24);
+    const units = Math.round(targetPx * (100 / BASE_ZOOM) * 0.8);
+    basePageWidthUnits = Math.max(MIN_PAGE_WIDTH_UNITS, Math.min(MAX_PAGE_WIDTH_UNITS, units));
+  }
+
+  // Verovio "units" are roughly 72 DPI points.
+  // pageWidth in units ≈ pixel_width / (scale/100) * 72/96
+  // We use a simpler ratio that's been reliable in practice:
+  //   units = pixels * (100 / scale) * 0.8
+  function getPageOptions() {
+    return {
+      pageWidth:        basePageWidthUnits || 2100,   // 210mm in Verovio units (A4 portrait)
+      pageHeight:       Math.round((basePageWidthUnits || 2100) * 297 / 210),
+      scale:            currentZoom,
+      adjustPageHeight: true,
+      condense:         "none",
+      condenseFirstPage: false,
+      condenseNotLastSystem: false,
+      condenseTempoPages: false,
+      footer:           "none",
+      header:           "none",
+      breaks:           "auto",
+    };
+  }
+
+  // ── Render ────────────────────────────────────────────────────────────────
+  function renderCurrentPage() {
+    if (totalPages === 0) return;
+
+    const svg = toolkit.renderToSVG(currentPage);
+    appEl.innerHTML = svg;
+
+    const svgEl = appEl.querySelector("svg");
+    if (svgEl) {
+      // Keep Verovio's intrinsic size but prevent distortion.
+      svgEl.style.width = "auto";
+      svgEl.style.maxWidth = "none";
+      svgEl.style.height = "auto";
+      svgEl.style.display = "block";
+    }
+
+    updatePageControls();
+    updateScrollMode(svgEl);
+    appEl.scrollTop = 0; // scroll back to top on page change
+  }
+
+  function updateScrollMode(svgEl) {
+    if (!appEl || !svgEl) return;
+    const containerH = appEl.clientHeight || 0;
+    const containerW = appEl.clientWidth || 0;
+    const rect = svgEl.getBoundingClientRect();
+    const needsHScroll = containerW > 0 && rect.width > containerW + 1;
+    appEl.style.overflowY = "auto";
+    appEl.style.overflowX = needsHScroll ? "auto" : "hidden";
+    appEl.style.alignItems = needsHScroll ? "flex-start" : "center";
+  }
+
+
+  function updatePageControls() {
+    if (pageLabel) {
+      pageLabel.textContent = totalPages > 0
+        ? `Page ${currentPage} of ${totalPages}`
+        : "";
+    }
+    if (prevBtn) prevBtn.disabled = currentPage <= 1;
+    if (nextBtn) nextBtn.disabled = currentPage >= totalPages;
+  }
+
+  // ── Zoom ──────────────────────────────────────────────────────────────────
+  function applyZoom(newZoom, opts = {}) {
+    newZoom = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, Math.round(newZoom)));
+    if (newZoom === currentZoom && !opts.force) return;
+    currentZoom = newZoom;
+
+    // Re-render with new scale — this changes the SVG's physical size
+    toolkit.setOptions(getPageOptions());
+    const newTotal = toolkit.getPageCount();
+    totalPages  = newTotal;
+    currentPage = Math.min(currentPage, totalPages || 1);
+
+    renderCurrentPage();
+    updateZoomDisplay();
+  }
+
+  function updateZoomDisplay() {
+    if (zoomDisplayEl) zoomDisplayEl.textContent = `${currentZoom}%`;
+    if (zoomInBtn)  zoomInBtn.disabled  = currentZoom >= ZOOM_MAX;
+    if (zoomOutBtn) zoomOutBtn.disabled = currentZoom <= ZOOM_MIN;
+  }
+
+  // Fit-to-width: find the zoom level where the score fills the container.
+  function fitZoom() {
+    if (totalPages === 0) return;
+    updateBasePageWidth();
+
+    // Probe render at base zoom to measure intrinsic SVG width
+    const probeZoom = 60;
+    toolkit.setOptions({ ...getPageOptions(), scale: probeZoom });
+    const probeSvg = toolkit.renderToSVG(1);
+
+    // Parse viewBox="minX minY width height"
+    const vbMatch = probeSvg.match(/viewBox="[^"]*?\s+[^"]*?\s+([0-9.]+)\s+([0-9.]+)"/);
+    const intrinsicW = vbMatch ? parseFloat(vbMatch[1]) : 0;
+
+    // Target width = available container width (minus padding)
+    const containerW = appEl.clientWidth || appEl.offsetWidth || 800;
+    const targetW    = Math.max(320, containerW - 24);
+
+    if (intrinsicW > 0 && targetW > 0) {
+      const targetZoom = Math.round(probeZoom * (targetW / intrinsicW));
+      applyZoom(Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, targetZoom)), { force: true });
+    } else {
+      applyZoom(40, { force: true });
+    }
+  }
+
+  // ── Score actions state ───────────────────────────────────────────────────
+    const syncScoreActions = () => {
+      controlsEl?.classList.toggle("has-score", hasActiveScore);
+      if (loadLabel) {
+        loadLabel.classList.toggle("is-hidden", hasActiveScore);
+        loadLabel.setAttribute("aria-disabled", String(hasActiveScore));
+      }
+      if (analyzeBtn) {
+        analyzeBtn.disabled = !hasActiveScore;
+      }
+      if (clearButton) {
+        clearButton.classList.toggle("is-hidden", !hasActiveScore);
+        clearButton.disabled = !hasActiveScore;
+      }
+      scoreActions.forEach((el) => {
+        if (el !== clearButton && el !== loadLabel) return;
+        el.style.pointerEvents = el.classList.contains("is-hidden") ? "none" : "";
+      });
+    };
+    syncScoreActions();
+
+  // ── File load ─────────────────────────────────────────────────────────────
   fileInput?.addEventListener("change", async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     const fallbackTitle = file.name.replace(/\.[^/.]+$/, "");
-    if (titleEl) {
-      titleEl.textContent = `Score Title: ${fallbackTitle}`;
-    }
-
-    hasActiveScore = true;
-    syncScoreActions();
+    if (titleEl) titleEl.textContent = `Score Title: ${fallbackTitle}`;
 
     try {
       const text = await file.text();
       window.__lastScoreText = text;
+      const renderText = normalizeScoreXml(text);
+
       window._keyAnalysisDetected = detectStringInstruments(text);
       window._keyAnalysisHasStrings = window._keyAnalysisDetected.length > 0;
       window._keyAnalysisUserChoice = false;
@@ -2390,9 +2835,8 @@ async function initVerovio() {
           ? KEY_ANALYSIS_MODES.STRING
           : KEY_ANALYSIS_MODES.STANDARD,
       );
-      if (window._keyAnalysisHasStrings) {
-        openKeyAnalysisModal();
-      }
+      if (window._keyAnalysisHasStrings) openKeyAnalysisModal();
+
       const xmlTitle = extractScoreTitle(text);
       if (titleEl) {
         const cleanTitle =
@@ -2402,34 +2846,92 @@ async function initVerovio() {
         titleEl.textContent = `Score Title: ${cleanTitle}`;
       }
 
-      const head = text.slice(0, 300).toLowerCase();
-      const looksLikeMei = head.includes("<mei");
-      const looksLikeMusicXml =
-        head.includes("<score-partwise") || head.includes("<score-timewise");
-
-      if (!looksLikeMei && !looksLikeMusicXml) {
-        console.warn(
-          "File doesn't look like MEI or MusicXML. First 300 chars:",
-          text.slice(0, 300),
-        );
+      const loaded = toolkit.loadData(renderText);
+      if (!loaded) {
+        console.error("Verovio failed to load score data.");
+        return;
       }
 
-      const p = app.loadData(text);
-      if (p?.then) await p;
+      // Set initial options BEFORE getting page count
+      toolkit.setOptions(getPageOptions());
+      totalPages     = toolkit.getPageCount();
+      currentPage    = 1;
+      hasActiveScore = true;
+      syncScoreActions();
 
-      console.log(
-        "Loaded file:",
-        file.name,
-        "SVGs:",
-        document.querySelectorAll("#app svg").length,
-      );
+      console.log(`Loaded: ${file.name} — ${totalPages} page(s)`);
+
+      // Wait one frame so the flex layout has settled and clientWidth is real
+      requestAnimationFrame(() => fitZoom());
+
     } catch (err) {
       console.error("Failed to load score:", err);
     }
-
-    setCssZoomPercent(Number(zoomInput?.value || 100));
   });
 
+  // ── Clear ─────────────────────────────────────────────────────────────────
+  clearBtn?.addEventListener("click", () => {
+    const detailsPane = document.getElementsByClassName("detail-body")[0];
+
+    if (fileInput)  fileInput.value = "";
+    if (titleEl)    titleEl.textContent = "Score Title: --";
+
+    toolkit.loadData("");
+    appEl.innerHTML = "";
+    totalPages     = 0;
+    currentPage    = 1;
+    hasActiveScore = false;
+    syncScoreActions();
+    updatePageControls();
+    updateZoomDisplay();
+
+    setMarkerPositions(
+      {
+        availability: null, dynamics: null, key: null,
+        range: null, tempo: null, duration: null,
+        articulation: null, rhythm: null, meter: null, scoring: null,
+      },
+      { emptyLabel: "--" },
+    );
+
+    const track = document.getElementById("timelineTrack");
+    if (track) track.querySelectorAll(".timeline-tick").forEach((n) => n.remove());
+
+    if (detailsPane) {
+      detailsPane.innerHTML = "";
+      detailsPane.classList.remove(
+        "detail-body--measure", "detail-body--analyzer",
+        "detail-body--global",  "detail-body--list",
+      );
+    }
+
+    setTimelineLabels();
+    updatePartAnalyzerIssueTooltips(null);
+    setObservedGrade(null);
+    console.log("Score cleared.");
+  });
+
+  // ── Pagination ────────────────────────────────────────────────────────────
+  prevBtn?.addEventListener("click", () => {
+    if (currentPage > 1) { currentPage--; renderCurrentPage(); }
+  });
+  nextBtn?.addEventListener("click", () => {
+    if (currentPage < totalPages) { currentPage++; renderCurrentPage(); }
+  });
+
+  // ── Zoom controls ─────────────────────────────────────────────────────────
+  zoomInBtn?.addEventListener("click",  () => applyZoom(currentZoom + ZOOM_STEP));
+  zoomOutBtn?.addEventListener("click", () => applyZoom(currentZoom - ZOOM_STEP));
+  zoomFitBtn?.addEventListener("click", () => { if (totalPages > 0) fitZoom(); });
+
+  // Ctrl/Cmd + scroll wheel zoom
+  appEl.addEventListener("wheel", (e) => {
+    if (!e.ctrlKey && !e.metaKey) return;
+    e.preventDefault();
+    applyZoom(currentZoom + (e.deltaY < 0 ? ZOOM_STEP : -ZOOM_STEP));
+  }, { passive: false });
+
+  // ── Target-only toggle ────────────────────────────────────────────────────
   if (targetOnlyToggle && observedPane) {
     const sync = () =>
       (observedPane.style.display = targetOnlyToggle.checked ? "none" : "grid");
@@ -2437,62 +2939,9 @@ async function initVerovio() {
     sync();
   }
 
-  clearBtn?.addEventListener("click", () => {
-    const detailsPane = document.getElementsByClassName("detail-body")[0];
-    if (fileInput) fileInput.value = "";
-    if (titleEl) titleEl.textContent = "Score Title: --";
-
-    appEl.innerHTML = "";
-    app = new window.Verovio.App(appEl, {
-      defaultView: "responsive",
-      documentZoom: 3,
-    });
-
-    hasActiveScore = false;
-    syncScoreActions();
-    console.log("Verovio app reset.");
-    setMarkerPositions(
-      {
-        availability: null,
-        dynamics: null,
-        key: null,
-        range: null,
-        tempo: null,
-        duration: null,
-        articulation: null,
-        rhythm: null,
-        meter: null,
-        scoring: null,
-      },
-      { emptyLabel: "--" },
-    );
-
-    const track = document.getElementById("timelineTrack");
-    if (track) {
-      track.querySelectorAll(".timeline-tick").forEach((node) => node.remove());
-    }
-    if (detailsPane) {
-      detailsPane.innerHTML = "";
-      detailsPane.classList.remove(
-        "detail-body--measure",
-        "detail-body--analyzer",
-        "detail-body--global",
-        "detail-body--list",
-      );
-    }
-    setTimelineLabels();
-    updatePartAnalyzerIssueTooltips(null);
-    setObservedGrade(null);
-  });
-
-  zoomApply?.addEventListener("click", () =>
-    setCssZoomPercent(Number(zoomInput?.value || 100)),
-  );
-  zoomInput?.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") setCssZoomPercent(Number(zoomInput.value || 100));
-  });
-
   syncScoreActions();
+  updatePageControls();
+  updateZoomDisplay();
 }
 
 function initTimelineResize() {
@@ -2603,6 +3052,24 @@ function initExportControls() {
   });
 }
 
+function initThemeToggle() {
+  const btn = document.getElementById("themeToggleBtn");
+  const root = document.documentElement;
+
+  // Load saved preference, default to dark
+  const saved = localStorage.getItem("exemplify-theme") || "light";
+  root.setAttribute("data-theme", saved);
+  if (btn) btn.textContent = saved === "dark" ? "☀" : "🌙";
+
+  btn?.addEventListener("click", () => {
+    const current = root.getAttribute("data-theme") || "dark";
+    const next = current === "dark" ? "light" : "dark";
+    root.setAttribute("data-theme", next);
+    btn.textContent = next === "dark" ? "☀" : "🌙";
+    localStorage.setItem("exemplify-theme", next);
+  });
+}
+
 // Run immediately (DOM is already present because your script tag is at the bottom)
 initTooltips();
 initGradeOptions();
@@ -2610,5 +3077,6 @@ initAnalysisRequest();
 initTimelineToggles();
 initTimelineResize();
 initExportControls();
+initThemeToggle();
 initVerovio().catch((err) => console.error("initVerovio failed:", err));
 setTimelineLabels();
