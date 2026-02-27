@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+
+<style>
+
+html, body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: transparent;
+}
+
+.splash-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    width: 100vw;
+}
+
+.splash-logo {
+
+    max-width: 100vw;
+    max-height: 100vh;
+
+    width: auto;
+    height: auto;
+
+    object-fit: contain;
+
+    animation: blinker 2s linear infinite;
+}
+
+@keyframes blinker {
+    50% {
+        opacity: 0.6;
+    }
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="splash-container">
+    <img src="exemplify_logo.png"
+         alt="Exemplify Logo"
+         class="splash-logo">
+</div>
+<audio autoplay>
+    <source src="theme.wav" type="audio/wav">
+</audio>
+
+</body>
+</html>

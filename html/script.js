@@ -2158,6 +2158,9 @@ function initAnalysisRequest() {
       window.analysisResult = payload;
       analysisDone = true;
       analysisInProgress = false;
+      if (typeof window.setExportEnabled === "function") {
+        window.setExportEnabled(Boolean(payload?.result));
+      }
 
       bindBarHeadDetailPaneClicks();
       updatePartAnalyzerIssueTooltips(payload?.result?.analysis_notes_filtered);
@@ -2215,7 +2218,10 @@ function initAnalysisRequest() {
         activeCancelId = `cancel_${Date.now()}_${Math.random().toString(16).slice(2)}`;
       }
       form.append("cancel_id", activeCancelId);
-      window.analysisResult = null;
+        window.analysisResult = null;
+        if (typeof window.setExportEnabled === "function") {
+          window.setExportEnabled(false);
+        }
 
       ensureProgressBars();
     if (progressText) progressText.textContent = "Starting analysis...";
@@ -2264,7 +2270,7 @@ function initAnalysisRequest() {
         const elapsed = (performance.now() - startedAt) / 1000;
         const minutes = Math.floor(elapsed / 60);
         const seconds = Math.floor(elapsed % 60);
-        progressTimer.textContent = `Time Elapsed - ${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+        progressTimer.textContent = `Elapsed - ${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
       }, 200);
     }
 
@@ -2894,11 +2900,14 @@ async function initVerovio() {
       );
     }
 
-    setTimelineLabels();
-    updatePartAnalyzerIssueTooltips(null);
-    setObservedGrade(null);
-    console.log("Score cleared.");
-  });
+      setTimelineLabels();
+      updatePartAnalyzerIssueTooltips(null);
+      setObservedGrade(null);
+      if (typeof window.setExportEnabled === "function") {
+        window.setExportEnabled(false);
+      }
+      console.log("Score cleared.");
+    });
 
   // ── Pagination ────────────────────────────────────────────────────────────
   prevBtn?.addEventListener("click", () => {
@@ -2943,17 +2952,25 @@ function initTimelineResize() {
   });
 }
 
-function initExportControls() {
-  const exportBtn = document.getElementById("exportBtn");
+  function initExportControls() {
+    const exportBtn = document.getElementById("exportBtn");
   const modalEl = document.getElementById("exportModal");
   const visibleBtn = document.getElementById("exportVisibleBtn");
   const allBtn = document.getElementById("exportAllBtn");
   const progressWrap = document.getElementById("exportProgress");
   const progressBar = document.getElementById("exportProgressBar");
   const statusEl = document.getElementById("exportStatus");
-  const modal = modalEl ? new bootstrap.Modal(modalEl) : null;
+    const modal = modalEl ? new bootstrap.Modal(modalEl) : null;
 
-  if (!exportBtn || !modalEl) return;
+    if (!exportBtn || !modalEl) return;
+
+    const setExportEnabled = (enabled) => {
+      exportBtn.disabled = !enabled;
+      exportBtn.classList.toggle("disabled", !enabled);
+    };
+
+    window.setExportEnabled = setExportEnabled;
+    setExportEnabled(false);
 
   const setProgress = (pct, text) => {
     if (progressBar) {
@@ -3043,19 +3060,27 @@ function initExportControls() {
 
 function initThemeToggle() {
   const btn = document.getElementById("themeToggleBtn");
+  const brandLogo = document.querySelector(".brand");
   const root = document.documentElement;
 
-  // Load saved preference, default to dark
+  const setLogoForTheme = (theme) => {
+    if (!brandLogo) return;
+    brandLogo.src = theme === "blue" ? "exemplify_logo_blue.png" : "exemplify_logo.png";
+  };
+
+  // Load saved preference, default to light
   const saved = localStorage.getItem("exemplify-theme") || "light";
   root.setAttribute("data-theme", saved);
-  if (btn) btn.textContent = saved === "dark" ? "☀" : "🌙";
+  if (btn) btn.textContent = saved === "blue" ? "☀" : "🧊";
+  setLogoForTheme(saved);
 
   btn?.addEventListener("click", () => {
-    const current = root.getAttribute("data-theme") || "dark";
-    const next = current === "dark" ? "light" : "dark";
+    const current = root.getAttribute("data-theme") || "light";
+    const next = current === "light" ? "blue" : "light";
     root.setAttribute("data-theme", next);
-    btn.textContent = next === "dark" ? "☀" : "🌙";
+    btn.textContent = next === "blue" ? "☀" : "🧊";
     localStorage.setItem("exemplify-theme", next);
+    setLogoForTheme(next);
   });
 }
 
