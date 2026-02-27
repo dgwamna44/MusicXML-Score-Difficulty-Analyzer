@@ -1,330 +1,281 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
   <meta charset="UTF-8" />
   <title>eXeMpLify Score Analyzer</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="score-analyzer-api" content="https://exemplify-music-analyzer.onrender.com">
+  <meta name="score-analyzer-api" content="http://127.0.0.1:5000" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
-  <link rel="stylesheet" href="style.css?v=20260223b">
+  <link rel="stylesheet" href="style.css?v=20260226c">
 </head>
 
 <body>
-  <div class="app container-fluid px-3 px-lg-4">
-    <header class="row align-items-center g-2 py-2">
-      <div class="col header-left">
-        <img class="brand" src="html\exemplify_logo.png"></img>
+  <!-- NOTE: No Bootstrap grid classes on layout elements (app/header/main/aside/footer).
+       Bootstrap is only used for buttons, modals, dropdowns, and form controls. -->
+  <div class="app">
+
+    <header>
+      <div class="header-left">
+        <img class="brand" src="exemplify_logo.png" alt="eXeMpLify logo">
         <div class="score-controls">
-          <div class="controls-block">
-            <div class="controls">
-              <div class="controls-row">
-                <input id="fileInput" type="file" accept=".musicxml,.xml,.mei" class="visually-hidden">
-                <label for="fileInput" class="btn btn-outline-primary btn-lg score-action score-load"
-                  data-bs-toggle="tooltip" title="Load a score file for analysis.">Load XML Score</label>
-                <button class="btn btn-outline-primary btn-lg" id="analyzeBtn" data-bs-toggle="tooltip"
-                  title="Run analysis on the loaded score.">Analyze Score</button>
-                <button class="btn btn-outline-primary btn-lg score-action score-clear" id="clearBtn"
-                  data-bs-toggle="tooltip" title="Clear selected score.">Clear Score</button>
-                <!-- Options Dropdown Menu - Right next to action buttons -->
-                <div class="options-dropdown">
-                  <button class="btn btn-outline-primary btn-lg dropdown-toggle" type="button" id="optionsMenuBtn"
-                    data-bs-toggle="dropdown" aria-expanded="false">
-                    ⚙ Options
-                  </button>
-                  <div class="dropdown-menu dropdown-menu-end options-menu" aria-labelledby="optionsMenuBtn">
-                    <!-- Score Options Section -->
-                    <div class="dropdown-section">
-                      <div class="dropdown-section-title">Score Options</div>
-                      <div class="dropdown-option">
-                        <label class="form-check toggle inline-toggle" data-bs-toggle="tooltip"
-                          title="Only run analysis for given grade; reduces overall processing time.">
-                          <input class="form-check-input" type="checkbox" id="targetOnly" />
-                          <span class="form-check-label">Target Analysis Only</span>
-                        </label>
-                      </div>
-                      <div class="dropdown-option">
-                        <label class="form-check toggle inline-toggle" data-bs-toggle="tooltip"
-                          title="Expands analysis to compare against all fractional grades (1.5 to 4.5). Takes longer.">
-                          <input class="form-check-input" type="checkbox" id="fullGradeSearch" />
-                          <span class="form-check-label">Full Grade Search</span>
-                        </label>
-                      </div>
-                      <div class="dropdown-option">
-                        <div class="grade-row score-grade-row">
-                          <span class="grade-label" data-bs-toggle="tooltip"
-                            title="Target grade of composition to analyze">Select grade:</span>
-                          <select id="targetGradeSelect" class="form-select form-select-sm">
-                            <option value="0.5">.5</option>
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                            <option value="5">5+</option>
-                          </select>
-                        </div>
-                      </div>
-                      <div class="dropdown-option">
-                        <label class="form-check toggle inline-toggle" data-bs-toggle="tooltip"
-                          title="Run analysis inline (no queue/SSE). Useful for local debugging.">
-                          <input class="form-check-input" type="checkbox" id="inlineModeToggle" />
-                          <span class="form-check-label">Inline Mode</span>
-                        </label>
-                      </div>
-                    </div>
+          <div class="controls-row">
+            <input id="fileInput" type="file" accept=".musicxml,.xml,.mei" class="visually-hidden">
+            <label for="fileInput" class="btn btn-outline-primary score-action score-load"
+              data-bs-toggle="tooltip" title="Load a score file for analysis.">Load XML Score</label>
+            <button class="btn btn-outline-primary" id="analyzeBtn" data-bs-toggle="tooltip"
+              title="Run analysis on the loaded score.">Analyze Score</button>
+            <button class="btn btn-outline-primary score-action score-clear" id="clearBtn"
+              data-bs-toggle="tooltip" title="Clear selected score.">Clear Score</button>
 
-                    <!-- Divider -->
-                    <div class="dropdown-divider"></div>
-
-                    <!-- Timeline Options Section -->
-                    <div class="dropdown-section">
-                      <div class="dropdown-section-title">Timeline Display</div>
-                      <div class="dropdown-option">
-                        <label class="timeline-toggle">
-                          <input type="checkbox" id="toggleIssueMeasures" checked />
-                          <span>Show Measures with Issues</span>
-                        </label>
-                      </div>
-                      <div class="dropdown-option">
-                        <label class="timeline-toggle">
-                          <input type="checkbox" id="toggleKey" checked />
-                          <span>Show Key Signatures</span>
-                        </label>
-                      </div>
-                      <div class="dropdown-option">
-                        <label class="timeline-toggle">
-                          <input type="checkbox" id="toggleTempo" checked />
-                          <span>Show Tempos</span>
-                        </label>
-                      </div>
-                      <div class="dropdown-option">
-                        <label class="timeline-toggle">
-                          <input type="checkbox" id="toggleMeter" checked />
-                          <span>Show Meters</span>
-                        </label>
-                      </div>
-                      <div class="dropdown-option">
-                        <label class="timeline-toggle">
-                          <input type="checkbox" id="toggleDuration" unchecked />
-                          <span>Show Duration</span>
-                        </label>
-                      </div>
-                    </div>
-
-                    <!-- Divider -->
-                    <div class="dropdown-divider"></div>
-
-                    <!-- Theme Toggle -->
-                    <div class="dropdown-section">
-                      <button class="theme-toggle dropdown-theme-toggle" id="themeToggleBtn" title="Toggle theme">☀</button>
+            <div class="options-dropdown">
+              <button class="btn btn-outline-primary dropdown-toggle" type="button" id="optionsMenuBtn"
+                data-bs-toggle="dropdown" aria-expanded="false">
+                ⚙ Options
+              </button>
+              <div class="dropdown-menu dropdown-menu-end options-menu" aria-labelledby="optionsMenuBtn">
+                <div class="dropdown-section">
+                  <div class="dropdown-section-title">Score Options</div>
+                  <div class="dropdown-option">
+                    <label class="form-check toggle inline-toggle" data-bs-toggle="tooltip"
+                      title="Only run analysis for given grade; reduces overall processing time.">
+                      <input class="form-check-input" type="checkbox" id="targetOnly" />
+                      <span class="form-check-label">Target Analysis Only</span>
+                    </label>
+                  </div>
+                  <div class="dropdown-option">
+                    <label class="form-check toggle inline-toggle" data-bs-toggle="tooltip"
+                      title="Expands analysis to compare against all fractional grades (1.5 to 4.5). Takes longer.">
+                      <input class="form-check-input" type="checkbox" id="fullGradeSearch" />
+                      <span class="form-check-label">Full Grade Search</span>
+                    </label>
+                  </div>
+                  <div class="dropdown-option">
+                    <div class="grade-row score-grade-row">
+                      <span class="grade-label" data-bs-toggle="tooltip"
+                        title="Target grade of composition to analyze">Select grade:</span>
+                      <select id="targetGradeSelect" class="form-select form-select-sm">
+                        <option value="0.5">.5</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5+</option>
+                      </select>
                     </div>
                   </div>
                 </div>
-
-                <div class="score-title" id="scoreTitle">Score Title: --</div>
+                <div class="dropdown-divider"></div>
+                <div class="dropdown-section">
+                  <div class="dropdown-section-title">Timeline Display</div>
+                  <div class="dropdown-option">
+                    <label class="timeline-toggle">
+                      <input type="checkbox" id="toggleIssueMeasures" checked />
+                      <span>Show Measures with Issues</span>
+                    </label>
+                  </div>
+                  <div class="dropdown-option">
+                    <label class="timeline-toggle">
+                      <input type="checkbox" id="toggleKey" checked />
+                      <span>Show Key Signatures</span>
+                    </label>
+                  </div>
+                  <div class="dropdown-option">
+                    <label class="timeline-toggle">
+                      <input type="checkbox" id="toggleTempo" checked />
+                      <span>Show Tempos</span>
+                    </label>
+                  </div>
+                  <div class="dropdown-option">
+                    <label class="timeline-toggle">
+                      <input type="checkbox" id="toggleMeter" checked />
+                      <span>Show Meters</span>
+                    </label>
+                  </div>
+                  <div class="dropdown-option">
+                    <label class="timeline-toggle">
+                      <input type="checkbox" id="toggleDuration" />
+                      <span>Show Duration</span>
+                    </label>
+                  </div>
+                </div>
+                <div class="dropdown-divider"></div>
+                <div class="dropdown-section">
+                  <button class="theme-toggle dropdown-theme-toggle" id="themeToggleBtn"
+                    title="Toggle theme">☀</button>
+                </div>
               </div>
             </div>
+
+            <div class="score-title" id="scoreTitle">Score Title: --</div>
           </div>
         </div>
       </div>
+
+      <!-- Window controls: always last in header, margin-left:auto pins to right -->
+      <div class="window-controls" aria-label="Window controls">
+        <button class="wc-btn wc-minimize" data-window-action="minimize" title="Minimize">
+          <svg width="10" height="1" viewBox="0 0 10 1"><rect width="10" height="1" fill="currentColor"/></svg>
+        </button>
+        <button class="wc-btn wc-maximize" data-window-action="maximize" title="Maximize">
+          <svg width="10" height="10" viewBox="0 0 10 10"><rect x="0.5" y="0.5" width="9" height="9" fill="none" stroke="currentColor"/></svg>
+        </button>
+        <button class="wc-btn wc-close" data-window-action="close" title="Close">
+          <svg width="10" height="10" viewBox="0 0 10 10">
+            <line x1="0" y1="0" x2="10" y2="10" stroke="currentColor" stroke-width="1.2"/>
+            <line x1="10" y1="0" x2="0" y2="10" stroke="currentColor" stroke-width="1.2"/>
+          </svg>
+        </button>
+      </div>
     </header>
 
-    <main class="row g-3 g-lg-4">
-      <aside class="results col-12 col-lg-3">
+    <main>
+      <aside class="results">
         <div class="bars">
           <div class="bar-row">
             <div class="bar-head">
               <span>Range</span>
               <span class="bar-score" data-bar-score="range">--</span>
-              <button class="details-mini" data-bs-toggle="tooltip"
-                title="Displays range information on the details panel. Highlights potential issues for given grade.">
+              <button class="details-mini" data-bs-toggle="tooltip" title="Displays range information on the details panel.">
                 <img src="icons/range.svg" alt="Range">
               </button>
             </div>
             <div class="bar">
               <img class="bar-image" src="confidence_bar.png" alt="">
               <img class="marker" src="tickmark.svg" alt="">
-              <div class="bar-ticks">
-                <span></span><span></span><span></span><span></span><span></span>
-                <span></span><span></span><span></span><span></span><span></span>
-              </div>
+              <div class="bar-ticks"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
             </div>
           </div>
-
           <div class="bar-row">
             <div class="bar-head">
               <span>Key</span>
               <span class="bar-score" data-bar-score="key">--</span>
-              <button class="details-mini" data-bs-toggle="tooltip"
-                title="Displays key information on the details panel. Highlights potential issues for given grade.">
+              <button class="details-mini" data-bs-toggle="tooltip" title="Displays key information on the details panel.">
                 <img src="icons/key.svg" alt="Key">
               </button>
             </div>
             <div class="bar">
               <img class="bar-image" src="confidence_bar.png" alt="">
               <img class="marker" src="tickmark.svg" alt="">
-              <div class="bar-ticks">
-                <span></span><span></span><span></span><span></span><span></span>
-                <span></span><span></span><span></span><span></span><span></span>
-              </div>
+              <div class="bar-ticks"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
             </div>
           </div>
-
           <div class="bar-row">
             <div class="bar-head">
               <span>Articulation</span>
               <span class="bar-score" data-bar-score="articulation">--</span>
-              <button class="details-mini" data-bs-toggle="tooltip"
-                title="Displays articulation information on the details panel. Highlights potential issues for given grade.">
+              <button class="details-mini" data-bs-toggle="tooltip" title="Displays articulation information on the details panel.">
                 <img src="icons/articulation.svg" alt="Articulation">
               </button>
             </div>
             <div class="bar">
               <img class="bar-image" src="confidence_bar.png" alt="">
               <img class="marker" src="tickmark.svg" alt="">
-              <div class="bar-ticks">
-                <span></span><span></span><span></span><span></span><span></span>
-                <span></span><span></span><span></span><span></span><span></span>
-              </div>
+              <div class="bar-ticks"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
             </div>
           </div>
-
           <div class="bar-row">
             <div class="bar-head">
               <span>Rhythm</span>
               <span class="bar-score" data-bar-score="rhythm">--</span>
-              <button class="details-mini" data-bs-toggle="tooltip"
-                title="Displays rhythm information on the details panel. Highlights potential issues for given grade.">
+              <button class="details-mini" data-bs-toggle="tooltip" title="Displays rhythm information on the details panel.">
                 <img src="icons/rhythm.svg" alt="Rhythm">
               </button>
             </div>
             <div class="bar">
               <img class="bar-image" src="confidence_bar.png" alt="">
               <img class="marker" src="tickmark.svg" alt="">
-              <div class="bar-ticks">
-                <span></span><span></span><span></span><span></span><span></span>
-                <span></span><span></span><span></span><span></span><span></span>
-              </div>
+              <div class="bar-ticks"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
             </div>
           </div>
-
           <div class="bar-row">
             <div class="bar-head">
               <span>Dynamics</span>
               <span class="bar-score" data-bar-score="dynamics">--</span>
-              <button class="details-mini" data-bs-toggle="tooltip"
-                title="Displays dynamics information on the details panel. Highlights potential issues for given grade.">
+              <button class="details-mini" data-bs-toggle="tooltip" title="Displays dynamics information on the details panel.">
                 <img src="icons/dynamic.svg" alt="Dynamics">
               </button>
             </div>
             <div class="bar">
               <img class="bar-image" src="confidence_bar.png" alt="">
               <img class="marker" src="tickmark.svg" alt="">
-              <div class="bar-ticks">
-                <span></span><span></span><span></span><span></span><span></span>
-                <span></span><span></span><span></span><span></span><span></span>
-              </div>
+              <div class="bar-ticks"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
             </div>
           </div>
-
           <div class="bar-row">
             <div class="bar-head">
               <span>Availability</span>
               <span class="bar-score" data-bar-score="availability">--</span>
-              <button class="details-mini" data-bs-toggle="tooltip"
-                title="Displays availability information on the details panel. Highlights potential issues for given grade.">
+              <button class="details-mini" data-bs-toggle="tooltip" title="Displays availability information on the details panel.">
                 <img src="icons/instrument.svg" alt="Availability">
               </button>
             </div>
             <div class="bar">
               <img class="bar-image" src="confidence_bar.png" alt="">
               <img class="marker" src="tickmark.svg" alt="">
-              <div class="bar-ticks">
-                <span></span><span></span><span></span><span></span><span></span>
-                <span></span><span></span><span></span><span></span><span></span>
-              </div>
+              <div class="bar-ticks"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
             </div>
           </div>
-
           <div class="bar-row">
             <div class="bar-head">
               <span>Scoring</span>
               <span class="bar-score" data-bar-score="scoring">--</span>
-              <button class="details-mini" data-bs-toggle="tooltip"
-                title="Displays scoring and texture information on the details panel. Highlights potential issues for given grade.">
+              <button class="details-mini" data-bs-toggle="tooltip" title="Displays scoring information on the details panel.">
                 <img src="icons/scoring.svg" alt="Scoring">
               </button>
             </div>
             <div class="bar">
               <img class="bar-image" src="confidence_bar.png" alt="">
               <img class="marker" src="tickmark.svg" alt="">
-              <div class="bar-ticks">
-                <span></span><span></span><span></span><span></span><span></span>
-                <span></span><span></span><span></span><span></span><span></span>
-              </div>
+              <div class="bar-ticks"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
             </div>
           </div>
-
           <div class="bar-row">
             <div class="bar-head">
               <span>Tempo</span>
               <span class="bar-score" data-bar-score="tempo">--</span>
-              <button class="details-mini" data-bs-toggle="tooltip"
-                title="Displays tempo information on the details panel. Highlights potential issues for given grade.">
+              <button class="details-mini" data-bs-toggle="tooltip" title="Displays tempo information on the details panel.">
                 <img src="icons/tempo.svg" alt="Tempo">
               </button>
             </div>
             <div class="bar">
               <img class="bar-image" src="confidence_bar.png" alt="">
               <img class="marker" src="tickmark.svg" alt="">
-              <div class="bar-ticks">
-                <span></span><span></span><span></span><span></span><span></span>
-                <span></span><span></span><span></span><span></span><span></span>
-              </div>
+              <div class="bar-ticks"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
             </div>
           </div>
-
           <div class="bar-row">
             <div class="bar-head">
               <span>Duration</span>
               <span class="bar-score" data-bar-score="duration">--</span>
-              <button class="details-mini" data-bs-toggle="tooltip"
-                title="Displays duration information on the details panel. Highlights potential issues for given grade.">
+              <button class="details-mini" data-bs-toggle="tooltip" title="Displays duration information on the details panel.">
                 <img src="icons/duration.svg" alt="Duration">
               </button>
             </div>
             <div class="bar">
               <img class="bar-image" src="confidence_bar.png" alt="">
               <img class="marker" src="tickmark.svg" alt="">
-              <div class="bar-ticks">
-                <span></span><span></span><span></span><span></span><span></span>
-                <span></span><span></span><span></span><span></span><span></span>
-              </div>
+              <div class="bar-ticks"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
             </div>
           </div>
-
           <div class="bar-row">
             <div class="bar-head">
               <span>Meter</span>
               <span class="bar-score" data-bar-score="meter">--</span>
-              <button class="details-mini" data-bs-toggle="tooltip"
-                title="Displays meter information on the details panel. Highlights potential issues for given grade.">
+              <button class="details-mini" data-bs-toggle="tooltip" title="Displays meter information on the details panel.">
                 <img src="icons/meter.svg" alt="Meter">
               </button>
             </div>
             <div class="bar">
               <img class="bar-image" src="confidence_bar.png" alt="">
               <img class="marker" src="tickmark.svg" alt="">
-              <div class="bar-ticks">
-                <span></span><span></span><span></span><span></span><span></span>
-                <span></span><span></span><span></span><span></span><span></span>
-              </div>
+              <div class="bar-ticks"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
             </div>
           </div>
         </div>
       </aside>
 
-      <section class="viewer-wrap col-12 col-lg-5">
+      <section class="viewer-wrap">
         <div class="viewer-nav">
           <button id="prevPage" class="btn btn-outline-secondary btn-sm viewer-nav-btn">◀</button>
           <span id="pageLabel" class="page-label"></span>
@@ -335,16 +286,13 @@
           <button id="zoomIn" class="btn btn-outline-secondary btn-sm viewer-nav-btn">+</button>
           <button id="zoomFit" class="btn btn-outline-secondary btn-sm viewer-nav-btn" title="Fit to window">⊡</button>
         </div>
-
         <div id="app" class="verovio-app"></div>
       </section>
 
-      <aside class="details-pane col-12 col-lg-4">
+      <aside class="details-pane">
         <div class="details-header">
           <h2>Analysis Details</h2>
-          <button type="button" class="btn btn-outline-primary export-btn" id="exportBtn">
-            Save Report
-          </button>
+          <button type="button" class="btn btn-outline-primary export-btn" id="exportBtn">Save Report</button>
         </div>
         <div class="observed-grade-pane" id="observedGradePane">
           <div class="observed-grade-title">
@@ -356,40 +304,27 @@
       </aside>
     </main>
 
-    <footer class="row g-1">
-      <div class="col-12">
-        <div class="timeline">
-          <div class="timeline-track" id="timelineTrack">
-            <div class="timeline-line"></div>
-          </div>
-          <div class="timeline-range">
-            <span>
-              <span id="startingMeasureLabel">1</span>
-            </span>
-            <span style="text-align:right;">
-              <span id="endingMeasureLabel">--</span>
-            </span>
-          </div>
+    <footer>
+      <div class="timeline">
+        <div class="timeline-track" id="timelineTrack">
+          <div class="timeline-line"></div>
         </div>
       </div>
     </footer>
-  </div>
 
-  <!-- Sanitize BEFORE Verovio loads -->
+  </div><!-- /.app -->
+
   <script>
     (function () {
       const u = new URL(location.href);
       u.searchParams.delete("view");
       u.hash = "";
       history.replaceState({}, "", u.toString());
-
-      try {
-        localStorage.clear();
-        sessionStorage.clear();
-      } catch (e) { }
+      try { localStorage.clear(); sessionStorage.clear(); } catch (e) {}
     })();
   </script>
 
+  <!-- Progress Modal -->
   <div class="modal fade" id="progressModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
@@ -409,6 +344,7 @@
     </div>
   </div>
 
+  <!-- Key Analysis Modal -->
   <div class="modal fade" id="keyAnalysisModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content key-analysis-modal">
@@ -426,18 +362,15 @@
           </div>
           <div class="key-analysis-list" id="keyAnalysisDetectedList"></div>
           <div class="key-analysis-options">
-            <button type="button" class="btn btn-primary" id="keyAnalysisStringBtn">
-              Enable
-            </button>
-            <button type="button" class="btn btn-outline-primary" id="keyAnalysisStandardBtn">
-              Disable
-            </button>
+            <button type="button" class="btn btn-primary" id="keyAnalysisStringBtn">Enable</button>
+            <button type="button" class="btn btn-outline-primary" id="keyAnalysisStandardBtn">Disable</button>
           </div>
         </div>
       </div>
     </div>
   </div>
 
+  <!-- Export Modal -->
   <div class="modal fade" id="exportModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
@@ -446,16 +379,10 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <p class="export-desc">
-            Choose what to save. We'll prepare the file, then prompt you to download it.
-          </p>
+          <p class="export-desc">Choose what to save. We'll prepare the file, then prompt you to download it.</p>
           <div class="export-actions">
-            <button type="button" class="btn btn-primary" id="exportVisibleBtn">
-              Save Visible Details (CSV)
-            </button>
-            <button type="button" class="btn btn-outline-primary" id="exportAllBtn">
-              Save Full Analysis (JSON)
-            </button>
+            <button type="button" class="btn btn-primary" id="exportVisibleBtn">Save Visible Details (CSV)</button>
+            <button type="button" class="btn btn-outline-primary" id="exportAllBtn">Save Full Analysis (JSON)</button>
           </div>
           <div class="export-progress" id="exportProgress" hidden>
             <div class="export-status" id="exportStatus">Preparing file...</div>
@@ -469,16 +396,15 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="config.js?v=20260223b"></script>
+  <script src="config.js?v=20260226c"></script>
   <script type="importmap">
   {
     "imports": {
-      "verovio/esm": "/verovio/dist/verovio.js",
-      "verovio/wasm": "/verovio/dist/verovio-module.js"
+      "verovio/esm": "./verovio.js",
+      "verovio/wasm": "./verovio-module.js"
     }
   }
-</script>
-  <script type="module" src="./script.js?v=20260223b"></script>
+  </script>
+  <script type="module" src="./script.js?v=20260226c"></script>
 </body>
-
 </html>

@@ -2,7 +2,8 @@
   "name": "exemplify",
   "version": "1.0.0",
   "description": "Score analysis desktop app",
-  "author": "Your Name",
+  "author": "Duroje Gwamna",
+  "build.appID": "com.dgwam.exemplify",
   "license": "MIT",
 
   "main": "main.js",

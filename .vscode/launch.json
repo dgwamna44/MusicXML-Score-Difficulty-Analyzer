@@ -1,11 +1,75 @@
 {
+  // .vscode/launch.json
   "version": "0.2.0",
   "configurations": [
+
+    // ── Python ────────────────────────────────────────────────────────────────
     {
       "name": "Run All Analyzers",
       "type": "debugpy",
       "request": "launch",
       "program": "${workspaceFolder}/run_analysis.py"
+    },
+
+    // ── Electron: Main process (main.js, preload.js) ──────────────────────────
+    {
+      "name": "Electron: Main",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
+      "runtimeArgs": ["--inspect=5858", "."],
+      "windows": {
+        "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron.cmd"
+      },
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "EXEMPLIFY_ROOT": "${workspaceFolder}"
+      },
+      "outputCapture": "std",
+      "console": "integratedTerminal"
+    },
+
+    // ── Electron: Renderer process (script.js) ────────────────────────────────
+    // Attach AFTER "Electron: Main" is already running.
+    {
+      "name": "Electron: Renderer",
+      "type": "chrome",
+      "request": "attach",
+      "port": 9222,
+      "webRoot": "${workspaceFolder}/html",
+      "timeout": 30000
+    },
+
+    // ── Electron: Main + Renderer in one launch ───────────────────────────────
+    {
+      "name": "Electron: Full",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
+      "runtimeArgs": [
+        "--inspect=5858",
+        "--remote-debugging-port=9222",
+        "."
+      ],
+      "windows": {
+        "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron.cmd"
+      },
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "EXEMPLIFY_ROOT": "${workspaceFolder}"
+      },
+      "outputCapture": "std",
+      "console": "integratedTerminal"
+    }
+
+  ],
+
+  "compounds": [
+    {
+      // Runs Electron: Main and attaches the renderer debugger simultaneously.
+      "name": "Electron: Main + Renderer",
+      "configurations": ["Electron: Main", "Electron: Renderer"],
+      "stopAll": true
     }
   ]
 }

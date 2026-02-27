@@ -132,44 +132,140 @@ body {
 
 .app {
   display: grid;
-  grid-template-rows: auto 1fr auto;
+  grid-template-rows: 44px 1fr 150px;
   grid-template-columns: 1fr;
   height: 100vh;
   overflow: hidden;
-  padding: 0 !important;
-  max-width: 100% !important;
+  outline: 1px solid var(--border-strong);
+  border-radius: 8px;
+  margin: 10px;
+  height: calc(100vh - 20px);
+}
+.window-controls {
+  display: flex;
+  align-items: stretch;
+  flex-shrink: 0;
+}
+
+.wc-btn {
+  width: 46px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+  -webkit-app-region: no-drag;
+}
+.wc-btn:hover {
+  background: var(--btn-hover);
+  color: var(--accent);
+}
+
+.wc-btn.wc-close:hover {
+  background: #c42b1c;
+  color: #ffffff;
+}
+
+/* ── macOS: hide custom controls, make room for traffic lights ── */
+
+.platform-darwin .window-controls {
+  display: none;
+}
+
+.platform-darwin header.row {
+  /* Traffic lights are ~72px wide including the inset gap */
+  padding-left: 80px !important;
+}
+
+header {
+  grid-row: 1;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  height: 44px;
+  min-height: 44px;
+  padding: 0;
+  margin: 0;
+  background: white;
+  border-bottom: 1px solid var(--border);
+  /* Drag the whole header; buttons override below */
+  -webkit-app-region: drag;
+  position: relative;
+  z-index: 5;
+  /* Remove all Bootstrap row/col side-effects */
+  gap: 0 !important;
+}
+
+header * {
+  -webkit-app-region: no-drag;
 }
 
 header.row {
   grid-row: 1;
   display: flex !important;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px 12px;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  gap: 0;
   min-height: 44px;
-  height: auto;
-  padding: 6px 12px !important;
+  height: 44px;
+  padding: 0 !important;
   margin: 0 !important;
   background: white;
   border-bottom: 1px solid var(--border);
-  -webkit-app-region: drag;
+  -webkit-app-region: no-drag;
   position: relative;
   z-index: 5;
 }
+
+header.row::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 44px;
+  -webkit-app-region: drag;
+  pointer-events: none;          /* ← lets clicks pass through to buttons */
+  z-index: 0;
+}
 header.row > * {
+  position: relative;
+  z-index: 1;
   -webkit-app-region: no-drag;
 }
 
 .header-left {
+  flex: 1 1 0;
+  flex-wrap: wrap;
+  min-width: 0;
   display: flex;
   align-items: center;
   gap: 14px;
-  flex-wrap: wrap;
-  min-width: 0;
+  padding: 0 8px;
+  overflow: hidden;
+}
+
+main {
+  align-items: stretch; 
+  grid-row: 2;
+  display: flex;
+  flex-wrap: nowrap;
+  overflow: hidden;
+  height: 100%;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  gap: 0;
 }
 
 .brand {
-  width: 240px;
+  height: 40px;
+  width: auto;
+  flex-shrink: 0;
 }
 .header-controls {
   display: flex;
@@ -223,10 +319,11 @@ main.row {
   display: flex !important;
   flex-wrap: nowrap !important;
   overflow: hidden;
-  height: 100%;
   margin: 0 !important;
   gap: 0 !important;
   min-height: 0;
+  align-items: stretch;
+  flex: 1 1 auto;
 }
 main.row > * {
   padding: 0 !important;
@@ -235,20 +332,22 @@ main.row > * {
 
 /* ── Left sidebar ─────────────────────────────────────────── */
 .results {
-  flex: 1 1 0;
-  min-width: 230px;
+  width: 230px;
+  flex: 0 0 230px;
   background: var(--bg-surface);
   border-right: 1px solid var(--border);
   display: flex;
+  min-height: 0;  
   flex-direction: column;
-  overflow: hidden;
+  overflow: hidden
 }
 .bars {
   display: flex;
+  min-height: 0;
   flex-direction: column;
   overflow-y: auto;
   overflow-x: hidden;
-  flex: 1;
+  flex: 1 1 0;
   padding-bottom: 8px;
 }
 .bar-row {
@@ -271,7 +370,7 @@ main.row > * {
   cursor: pointer;
 }
 .bar-head span:first-child {
-  font-size: 15px;
+  font-size: 16px;
   color: var(--text-mid);
   letter-spacing: 0.04em;
   flex: 1;
@@ -385,17 +484,15 @@ main.row > * {
 
 /* ── Center: score viewer ─────────────────────────────────── */
 .viewer-wrap {
-  flex: 0 0 900px;
+  flex: 1 1 0;
   min-width: 0;
-  max-width: 900px;
-  margin: 0 auto;
   display: flex;
   flex-direction: column;
   background: var(--bg);
   overflow: hidden;
 }
 
-.score-options {
+.score-options {  
   display: flex;
   align-items: center;
   gap: 16px;
@@ -404,24 +501,21 @@ main.row > * {
   border-left: 1px solid var(--border);
 }
 
-.options-dropdown {
+.options-dropdown { 
   display: flex;
   align-items: center;
-  gap: 8px;
-  position: relative;
+  gap: 6px;
+  flex-wrap: nowrap;
 }
 
 .options-dropdown .btn {
-  height: 40px;
-  padding: 0 14px;
-  font-size: 13px;
+  height: 38px;
+  padding: 0 12px;
+  font-size: 16px;
   font-family: inherit;
-  letter-spacing: 0.06em;
-  border-radius: 4px;
   white-space: nowrap;
   display: inline-flex;
   align-items: center;
-  justify-content: center;
   transition: all 0.15s;
   margin: 0;
 }
@@ -607,17 +701,17 @@ main.row > * {
 }
 .controls-block {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
-  align-items: flex-start;
+  flex-direction: row;
+  gap: 8px;
+  align-items: center;
   width: auto;
 }
 .controls {
   display: flex;
   align-items: center;
-  gap: 6px;
-  flex-wrap: wrap;
-  flex-direction: column;
+  gap: 8px;
+  flex-wrap: nowrap;
+  flex-direction: row;
   justify-content: flex-start;
   width: auto;
 }
@@ -626,8 +720,8 @@ main.row > * {
   align-items: center;
   justify-content: flex-start;
   gap: 8px;
-  flex-wrap: wrap;
-  width: 100%;
+  flex-wrap: nowrap;
+  width: auto;
 }
 .controls-row .btn {
   min-width: 120px;
@@ -727,8 +821,10 @@ main.row > * {
 .score-title {
   font-size: 18px;
   color: var(--text-muted);
-  letter-spacing: 0.06em;
-  padding: 2px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-left: 4px;
 }
 
 .viewer-nav {
@@ -736,7 +832,7 @@ main.row > * {
   align-items: center;
   justify-content: center;
   gap: 10px;
-  padding: 5px 10px;
+  padding: 6.5px 10px;
   background: var(--bg-alt);
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
@@ -814,7 +910,8 @@ main.row > * {
 
 /* ── Right sidebar ────────────────────────────────── */
 .details-pane {
-  flex: 1 1 0;
+  width: 280px;
+  flex: 0 0 280px;
   min-width: 280px;
   background: var(--bg-surface);
   border-left: 1px solid var(--border);
@@ -833,7 +930,7 @@ main.row > * {
   flex-shrink: 0;
 }
 .details-header h2 {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 500;
   letter-spacing: 0.18em;
   color: var(--text-muted);
@@ -842,7 +939,7 @@ main.row > * {
 .export-btn {
   height: 22px;
   padding: 0 8px;
-  font-size: 9px;
+  font-size: 12px;
   font-family: inherit;
   letter-spacing: 0.06em;
 }
@@ -851,21 +948,25 @@ main.row > * {
   border-bottom: 1px solid var(--border);
   background: var(--bg-alt);
   flex-shrink: 0;
+  min-width: 0;
 }
 .observed-grade-title {
-  font-size: 12px;
+  font-size: 14px;
   color: var(--text-muted);
   letter-spacing: 0.06em;
   display: flex;
   align-items: baseline;
   justify-content: space-between;
   gap: 8px;
+  flex-wrap: nowrap;
+  overflow: hidden;
 }
 .observed-grade-value {
   font-size: 18px;
   font-weight: 600;
   color: var(--grade-text);
   letter-spacing: 0.04em;
+  flex-shrink: 0;
 }
 .detail-body {
   flex: 1;
@@ -1036,6 +1137,28 @@ main.row > * {
 }
 
 /* ── Footer: timeline ─────────────────────────────────────── */
+footer {
+  grid-row: 3;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  background: var(--bg-deep);
+  border-top: 1px solid var(--border);
+  overflow: hidden;
+  height: 150px;
+  min-height: 150px;
+  max-height: 150px;
+}
+
+footer .timeline {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+}
+
+
 footer.row {
   grid-row: 3;
   display: flex !important;
@@ -1127,16 +1250,6 @@ footer.row > .col-12 {
   background: var(--border-mid);
   transform: translateY(-50%);
 }
-.timeline-range {
-  display: flex;
-  justify-content: space-between;
-  padding: 4px 14px;
-  font-size: 9px;
-  color: var(--tick-label);
-  letter-spacing: 0.08em;
-  background: var(--bg-deep);
-  flex-shrink: 0;
-}
 .timeline-tick {
   position: absolute;
   top: 50%;
@@ -1167,7 +1280,7 @@ footer.row > .col-12 {
   left: 0;
   top: 14px;
   transform: translateX(-50%);
-  font-size: 9px;
+  font-size: 11px;
   color: var(--tick-label);
   background: none;
   border: none;
@@ -1203,13 +1316,24 @@ footer.row > .col-12 {
   left: 0;
   bottom: 16px;
   transform: translateX(-50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 2px;
+  display: block;
   line-height: 1;
-  min-height: 26px;
+  min-height: 35px;
+}
+.tick-top .tick-timesig {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.tick-top .tick-tempo {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.tick-top .tick-tempo.tick-tempo-start {
+  transform: translateX(-50%) translateX(5px);
 }
 .tick-tempo {
   display: flex;
@@ -1218,12 +1342,12 @@ footer.row > .col-12 {
   min-height: 12px;
 }
 .tick-tempo-icon {
-  width: 4px;
-  height: 10px;
+  width: 5px;
+  height: 12px;
   opacity: 0.75;
 }
 .tick-tempo-text {
-  font-size: 9px;
+  font-size: 11px;
   color: var(--blue);
   letter-spacing: 0.03em;
   white-space: nowrap;
@@ -1251,19 +1375,25 @@ footer.row > .col-12 {
   gap: 1px;
   font-family: "Sylfaen", serif;
 }
+.tick-key-icon {
+  height: 10px;
+  width: auto;
+  margin-left: 1px;
+  opacity: 0.85;
+  align-self: center;
+}
 .tick-key-letter {
-  font-size: 14px;
-  color: var(--purple);
-  font-weight: 600;
+  font-size: 17px;
+  color: black;
 }
 .tick-key-accidental {
-  font-size: 12px;
-  color: var(--purple);
+  font-size: 14px;
+  color: black;
   opacity: 0.85;
 }
 .tick-key-minor {
-  font-size: 12px;
-  color: var(--purple);
+  font-size: 14px;
+  color: black;
   opacity: 0.65;
 }
 .timeline.hide-key .tick-key-wrap {

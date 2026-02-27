@@ -1345,6 +1345,7 @@ function buildTimelineTicks(trackEl, ticks, totalMeasures) {
       if (hasTempo) {
         const wrap = document.createElement("div");
         wrap.className = "tick-tempo";
+        if (isStart) wrap.classList.add("tick-tempo-start");
         const beatUnit = tick.tempo_beat_unit;
         const bpm = tick.tempo_bpm ?? tick.tempo;
         const svgSrc = tempoSvgForBeatUnit(beatUnit);
@@ -1471,25 +1472,19 @@ function makeKeySigSvgEl(keyName, quality) {
 
   const textVal = String(keyName || "").trim();
   const match = textVal.match(/^([A-Ga-g])([#b-])?/);
-  if (match) {
-    const letter = match[1].toUpperCase();
-    const accidental = match[2];
-    const letterEl = document.createElement("span");
-    letterEl.className = "tick-key-letter";
-    letterEl.textContent = letter;
-    wrap.appendChild(letterEl);
-    if (accidental === "#") {
-      const acc = document.createElement("span");
-      acc.className = "tick-key-accidental";
-      acc.textContent = "♯";
-      wrap.appendChild(acc);
-    } else if (accidental === "b" || accidental === "-") {
-      const acc = document.createElement("span");
-      acc.className = "tick-key-accidental";
-      acc.textContent = "♭";
-      wrap.appendChild(acc);
+    if (match) {
+      const letter = match[1].toUpperCase();
+      const accidental = match[2];
+      const letterEl = document.createElement("span");
+      letterEl.className = "tick-key-letter";
+      letterEl.textContent = letter;
+      wrap.appendChild(letterEl);
+      if (accidental === "#") {
+        wrap.appendChild(keySigImg("sharp.svg", "sharp"));
+      } else if (accidental === "b" || accidental === "-") {
+        wrap.appendChild(keySigImg("flat.svg", "flat"));
+      }
     }
-  }
 
   if (quality) {
     const q = String(quality).toLowerCase();
@@ -1643,23 +1638,8 @@ function getSecondsForMeasure(measure, tempoData, totalMeasures) {
 }
 
 function setTimelineLabels(totalMeasures, durationString, tempoData) {
-  const startEl = document.querySelector("#startingMeasureLabel");
-  const endEl = document.querySelector("#endingMeasureLabel");
   const durationCheck = document.querySelector("#toggleDuration");
-  let endText = totalMeasures ? String(totalMeasures) : "--";
   const durationText = durationString != null ? String(durationString) : "";
-  if (durationCheck?.checked && durationText) {
-    const parts = durationText.split("'");
-    if (parts.length > 1) {
-      const min = parts[0];
-      const sec = parts.slice(1).join("'");
-      endText = min === "0" ? sec : durationText;
-    } else {
-      endText = durationText;
-    }
-  }
-  if (startEl) startEl.textContent = durationCheck?.checked ? '0"' : "1";
-  if (endEl) endEl.textContent = endText;
   if (totalMeasures != null || durationString != null) {
     window._timelineMeta = { totalMeasures, durationString, tempoData };
   }
@@ -1901,25 +1881,27 @@ function initAnalysisRequest() {
   const targetOnly = document.getElementById("targetOnly");
   const fullGrade = document.getElementById("fullGradeSearch");
   const targetGrade = document.getElementById("targetGradeSelect");
-  const inlineToggle = document.getElementById("inlineModeToggle");
-  if (inlineToggle) {
-    inlineToggle.checked = isLocalApi;
-  }
   const keyAnalysisBtn = document.getElementById("keyAnalysisBtn");
   const keyAnalysisStringBtn = document.getElementById("keyAnalysisStringBtn");
   const keyAnalysisStandardBtn = document.getElementById(
     "keyAnalysisStandardBtn",
   );
-  const modalEl = document.getElementById("progressModal");
-  const progressBars = document.getElementById("progressBars");
-  const progressText = document.getElementById("progressText");
-  const progressOkBtn = document.getElementById("progressOkBtn");
-  const progressTimer = document.getElementById("progressTimer");
-    const modal = modalEl ? new bootstrap.Modal(modalEl) : null;
-    let analysisInProgress = false;
-    let analysisDone = false;
-    let activeCancelId = null;
-    let activeAbort = null;
+    const modalEl = document.getElementById("progressModal");
+    const cancelModalEl = document.getElementById("cancelAnalysisModal");
+    const confirmCancelBtn = document.getElementById("confirmCancelAnalysisBtn");
+    const progressBars = document.getElementById("progressBars");
+    const progressText = document.getElementById("progressText");
+    const progressOkBtn = document.getElementById("progressOkBtn");
+    const progressTimer = document.getElementById("progressTimer");
+      const modal = modalEl ? new bootstrap.Modal(modalEl) : null;
+      const cancelModal = cancelModalEl
+        ? new bootstrap.Modal(cancelModalEl)
+        : null;
+      let analysisInProgress = false;
+      let analysisDone = false;
+      let activeCancelId = null;
+      let activeAbort = null;
+      let allowCancelClose = false;
 
     const cancelActiveAnalysis = () => {
       if (!analysisInProgress || analysisDone) return;
@@ -1934,22 +1916,32 @@ function initAnalysisRequest() {
       analysisInProgress = false;
     };
 
-    if (modalEl) {
-      modalEl.addEventListener("hide.bs.modal", (evt) => {
-        if (!analysisInProgress || analysisDone) {
-          return;
-        }
-        const ok = window.confirm(
-          "You are about to cancel the current analysis. Continue?"
-        );
-        if (!ok) {
+      if (modalEl) {
+        modalEl.addEventListener("hide.bs.modal", (evt) => {
+          if (!analysisInProgress || analysisDone) {
+            allowCancelClose = false;
+            return;
+          }
+          if (allowCancelClose) {
+            allowCancelClose = false;
+            return;
+          }
           evt.preventDefault();
-        }
-      });
-      modalEl.addEventListener("hidden.bs.modal", () => {
-        cancelActiveAnalysis();
-      });
-    }
+          cancelModal?.show();
+        });
+        modalEl.addEventListener("hidden.bs.modal", () => {
+          cancelActiveAnalysis();
+          allowCancelClose = false;
+        });
+      }
+
+      if (confirmCancelBtn) {
+        confirmCancelBtn.addEventListener("click", () => {
+          allowCancelClose = true;
+          cancelModal?.hide();
+          modal?.hide();
+        });
+      }
 
   if (!analyzeBtn) return;
 
@@ -2217,9 +2209,6 @@ function initAnalysisRequest() {
       );
     form.append("full_grade_analysis", String(Boolean(fullGrade?.checked)));
     form.append("target_grade", String(Number(targetGrade?.value || 2)));
-      if (inlineToggle?.checked) {
-        form.append("debug_inline", "true");
-      }
       if (window.crypto && typeof window.crypto.randomUUID === "function") {
         activeCancelId = window.crypto.randomUUID();
       } else {
