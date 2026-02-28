@@ -41,9 +41,18 @@ jobs:
           Add-Content -Path Python\python311._pth -Value "`r`nLib\site-packages"
           (Get-Content Python\python311._pth) -replace "#import site", "import site" | Set-Content Python\python311._pth
 
-      # Build per platform. Uses your package.json build config.
-      - name: Build
-        run: npm run dist
+      # Build per platform. Avoid cross-building on Linux.
+      - name: Build (Windows)
+        if: runner.os == 'Windows'
+        run: npx electron-builder --win --publish=never
+
+      - name: Build (macOS)
+        if: runner.os == 'macOS'
+        run: npx electron-builder --mac --publish=never
+
+      - name: Build (Linux)
+        if: runner.os == 'Linux'
+        run: npx electron-builder --linux --publish=never
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
