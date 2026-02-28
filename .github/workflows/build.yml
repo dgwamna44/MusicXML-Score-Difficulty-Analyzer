@@ -2,8 +2,8 @@ name: Build Desktop Apps
 
 on:
   push:
-    tags:
-      - "v*"
+    branches:
+      - "electron-local"
   workflow_dispatch: {}
 
 jobs:
