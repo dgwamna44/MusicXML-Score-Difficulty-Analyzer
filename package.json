@@ -1,58 +1,80 @@
 {
   "name": "exemplify",
-  "version": "1.0.0",
-  "description": "Score analysis desktop app",
+  "version": "1.0.1",
+  "description": "Score analysis desktop app using MusicXML files. Built with Electron and Python.",
   "author": "Duroje Gwamna",
-  "build.appID": "com.dgwam.exemplify",
   "license": "MIT",
-
   "main": "main.js",
-
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dgwamna44/eXeMpLify-Music-Analyzer"
+  },
   "scripts": {
     "start": "electron .",
-
-    "flask": "python flask_app.py",
-
-    "build": "electron-builder"
+    "build": "electron-builder",
+    "dist": "electron-builder --win"
   },
-
-  "dependencies": {},
-
   "devDependencies": {
-    "electron": "^29.0.0"
+    "electron": "^29.0.0",
+    "electron-builder": "^26.8.1"
   },
-
-
+  "dependencies": {
+    "electron-updater": "^6.8.3"
+  },
   "build": {
-    "appId": "com.yourname.exemplify",
+    "appId": "com.dgwam.exemplify",
     "productName": "eXeMpLify",
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "dgwamna44",
+        "repo": "eXeMpLify-Music-Analyzer"
+      }
+    ],
     "directories": {
       "output": "dist"
     },
     "files": [
       "main.js",
       "preload.js",
-      "html/**/*",
-      "!html/node_modules"
+      "html/**/*"
     ],
     "extraResources": [
-        {
-            "from": "flask_app.py",
-            "to": "flask_app.py"
-        },
-        {
-            "from": "model.pkl",
-            "to": "model.pkl"
-        }
-
+      {
+        "from": "Python",
+        "to": "python"
+      },
+      {
+        "from": "flask_app.py",
+        "to": "flask_app.py"
+      },
+      {
+        "from": "model.pkl",
+        "to": "model.pkl"
+      },
+       { "from": "assets", "to": "assets" }
     ],
-    "mac": {
-      "category": "public.app-category.music",
-      "icon": "assets/icon.icns"
-    },
     "win": {
-      "target": "nsis",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
       "icon": "assets/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "assets/icon.icns"
     },
     "linux": {
       "target": "AppImage",

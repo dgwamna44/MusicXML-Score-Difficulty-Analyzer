@@ -3084,6 +3084,20 @@ function initThemeToggle() {
   });
 }
 
+function initWindowControls() {
+  const api = window.electronAPI;
+  if (!api) return;
+
+  document.querySelectorAll("[data-window-action]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const action = btn.getAttribute("data-window-action");
+      if (action === "minimize") api.minimizeWindow();
+      if (action === "maximize") api.maximizeWindow();
+      if (action === "close") api.closeWindow();
+    });
+  });
+}
+
 // Run immediately (DOM is already present because your script tag is at the bottom)
 initTooltips();
 initGradeOptions();
@@ -3092,5 +3106,6 @@ initTimelineToggles();
 initTimelineResize();
 initExportControls();
 initThemeToggle();
+initWindowControls();
 initVerovio().catch((err) => console.error("initVerovio failed:", err));
 setTimelineLabels();
