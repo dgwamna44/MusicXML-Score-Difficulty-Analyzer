@@ -28,6 +28,19 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Download Python (Windows only)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $url = "https://www.python.org/ftp/python/3.11.9/python-3.11.9-embed-amd64.zip"
+          $zip = "python-embed.zip"
+          Invoke-WebRequest -Uri $url -OutFile $zip
+          New-Item -ItemType Directory -Path Python | Out-Null
+          Expand-Archive -Path $zip -DestinationPath Python
+          # Enable site-packages in embedded Python
+          Add-Content -Path Python\python311._pth -Value "`r`nLib\site-packages"
+          (Get-Content Python\python311._pth) -replace "#import site", "import site" | Set-Content Python\python311._pth
+
       # Build per platform. Uses your package.json build config.
       - name: Build
         run: npm run dist
