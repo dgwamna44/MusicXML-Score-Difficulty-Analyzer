@@ -3,6 +3,7 @@ I've always had an interest in writing for concert band, and have a couple publi
 Turns out there are several resources from varying publishers regarding the music grading system. Each one has its own guidelines, and it's up to the composer to use their best judgment when assigning that grade.
 
 After working with my fellow colleagues who write for the concert band medium, I decided to develop a tool to help with the guesswork and offer some insights based on quantitative data.
+Special shoutout especially to composer Matt Neufeld for his insight as fellow composer, and educator! Checkout his music at https://www.mattneufeldmusic.com/
 
 Most composers work with a score writing software like Sibelius or Musescore, and have the capability of saving their music as a .musicXML file to share amongst people using different software.
 
@@ -28,26 +29,27 @@ Given a MusicXML score, eXeMpLify:
 **Screenshots**
 1. Click Load XML Score to get started (remember to export the score you want to analyze as a .musicXML file.
 2. Once selected, the score will show up in the center. You can adjust the zoom as needed.
+<img width="355" height="104" alt="image" src="https://github.com/user-attachments/assets/3b86ae9a-d889-4625-84d1-7f2e7de21d0d" />
+<img width="688" height="662" alt="image" src="https://github.com/user-attachments/assets/5fdd78d2-8d8a-4257-aa5e-0444ce80c5dc" />
 
-<img width="1918" height="1065" alt="Screenshot 2026-02-18 134615" src="https://github.com/user-attachments/assets/8c15e560-3532-4f7e-a0d4-2d080bffdb53" />
 
+3. Select the grade you estimate the piece to be by selecting Options, and then the dropdown. You can choose to search through partial grades (like 2.5, 3.5), or if you want detailed analysis based on the grade you select only. 
+<img width="312" height="463" alt="image" src="https://github.com/user-attachments/assets/208f0129-ded1-44b4-8796-b0f62919d6d9" />
 
-3. Select the grade you estimate the piece to be on the top right, then click analyze. You can choose to search through partial grades (like 2.5, 3.5), or if you want detailed analysis based on the grade you select only. 
-Each sub-process takes ~ 30 seconds.
-
-<img width="598" height="736" alt="Screenshot 2026-02-18 134631" src="https://github.com/user-attachments/assets/52be572c-58b6-4675-ae06-13c2bd8629af" />
 
 4. Once finished, click OK, and each analyzer's confidence score, which is based on the selected grade, will populate on the left panel. Each icon over the bar will provide a detailed analysis that shows on the right panel.
-<img width="473" height="840" alt="Screenshot 2026-02-18 134908" src="https://github.com/user-attachments/assets/b6e7f18e-c386-4ce7-a1d5-fd6cce4579e5" />
+<img width="506" height="485" alt="image" src="https://github.com/user-attachments/assets/e2d7fc0c-c82b-4c7e-b9b1-96da80bd7c0c" />
 
 5. You'll get a scoring overview as long as there's more than one part analyzed (can't provide scoring analysis on solo music).
-<img width="638" height="788" alt="image" src="https://github.com/user-attachments/assets/588f10a2-3d4d-4447-9ee7-a17fe7ad8d6a" />
+<img width="290" height="666" alt="image" src="https://github.com/user-attachments/assets/81427ad3-1ac0-40ac-93f3-3b56165c0178" />
+
 
 6. A timeline with measure numbers, tempo, key, and meters will populate at the bottom. Clicking on a measure number will provide highlights that are found across all analyzers (uncommon rhythms, high C found in tuba part, etc)
-<img width="1898" height="197" alt="image" src="https://github.com/user-attachments/assets/6023d8bb-fdbe-4f1f-9616-2b0c3895cc7c" />
+<img width="1380" height="151" alt="image" src="https://github.com/user-attachments/assets/2ef6ac0f-5208-48e2-bb8f-24049b87641a" />
 
-7. An estimated grade will show on the top right (as long as Target Analysis Only is not selected). You can also choose to save the analysis as a csv/JSON.
-<img width="674" height="266" alt="image" src="https://github.com/user-attachments/assets/19f92a4c-3b4f-41e5-97cc-1b4c01c2ce97" />
+
+7. An estimated grade range will show on the bottom left (as long as Target Analysis Only is not selected). You can also choose to save the analysis as a csv/JSON.
+<img width="270" height="683" alt="image" src="https://github.com/user-attachments/assets/0b048c39-9488-40cb-8a7e-3fe3bd386686" />
 
 
 **Project structure**
@@ -69,36 +71,4 @@ High-level layout (main folders/scripts): 2
 
 ---
 
-**Installation** If wanting to clone
 
-> **Note:** exact dependencies may vary as the project evolves.
-
-1. Create and activate a virtual environment
-2. Install dependencies (example):
-   ```bash
-   pip install -r requirements.txt
-   ```
-
----
-
-**Hosting**
-
-This repo can be split so the backend runs locally and is exposed via Cloudflare Tunnel, while the frontend is hosted separately (e.g., Cloudflare Pages).
-
-**Backend (Cloudflare Tunnel)**
-
-1. Run the backend locally:
-   ```bash
-   python flask_app.py
-   ```
-2. Expose it with Cloudflare Tunnel (cloudflared) and map a public hostname to `http://localhost:5000`.
-3. Your API base will be that public hostname (e.g., `https://exemplify.dgwamna-music.com`).
-
-**Frontend (static hosting / Pages)**
-
-1. Host the `html/` directory as a static site.
-2. Set the backend base URL in `html/config.js`:
-   ```js
-   window.SCORE_ANALYZER_API_BASE = "https://your-backend.example.com";
-   ```
-3. If needed, you can also set a `<meta name="score-analyzer-api">` tag in `html/index.html` instead of editing `config.js`.
